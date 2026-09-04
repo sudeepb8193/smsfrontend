@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   GLOBAL RESET & THEME TOKENS
+   ========================================================================== */
+
+*, ::before, ::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prevent text caret cursor (|) on static non-editable elements when clicked */
+body, table, td, th, h1, h2, h3, h4, h5, h6, span, div, p {
+  caret-color: transparent;
+}
+
+/* Enable normal text caret cursor (|) inside inputs, textareas, and editable fields */
+input, textarea, [contenteditable="true"] {
+  caret-color: auto;
+}
+
+:root,
+:root[data-theme='dark'] {
+  --bg-app: #1A1015;
+  --bg-surface: #271820;
+  --bg-sidebar: #21141A;
+  --bg-card: #271820;
+  --bg-card-hover: #36222C;
+  --bg-input: #1D1217;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(138, 74, 82, 0.5);
+
+  --text-primary: #F9FAFB;
+  --text-secondary: #C4B5BE;
+  --text-muted: #8E7A86;
+
+  --primary: #8A4A52;
+  --primary-hover: #753C44;
+  --primary-gradient: linear-gradient(135deg, #8A4A52 0%, #6E363E 100%);
+  --primary-light: rgba(138, 74, 82, 0.22);
+
+  --secondary: #64748B;
+  --success: #10B981;
+  --success-light: rgba(16, 185, 129, 0.18);
+  --danger: #EF4444;
+  --danger-light: rgba(239, 68, 68, 0.18);
+  --warning: #F59E0B;
+  --warning-light: rgba(245, 158, 11, 0.18);
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 4px 18px rgba(138, 74, 82, 0.4);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 24px;
+}
+
+:root[data-theme='light'] {
+  --bg-app: #FDF8F9;
+  --bg-surface: #FFFFFF;
+  --bg-sidebar: #21141A;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FAF0F2;
+  --bg-input: #F7EFEF;
+  --border-color: #E2E8F0;
+  --border-hover: #8A4A52;
+
+  --text-primary: #271820;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  --primary: #8A4A52;
+  --primary-hover: #753C44;
+  --primary-gradient: linear-gradient(135deg, #8A4A52 0%, #6E363E 100%);
+  --primary-light: rgba(138, 74, 82, 0.14);
+
+  --secondary: #64748B;
+  --success: #10B981;
+  --success-light: rgba(16, 185, 129, 0.12);
+  --danger: #EF4444;
+  --danger-light: rgba(239, 68, 68, 0.12);
+  --warning: #F59E0B;
+  --warning-light: rgba(245, 158, 11, 0.12);
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 4px 18px rgba(138, 74, 82, 0.25);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 24px;
+}
