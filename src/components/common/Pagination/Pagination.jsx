@@ -70,7 +70,7 @@ export const Pagination = ({
             onClick={() => onPageChange && onPageChange(num)}
             className={`w-8 h-8 rounded-lg text-xs font-semibold flex items-center justify-center transition-all ${
               num === currentPage
-                ? 'bg-[#8A4A52] text-white font-bold shadow-md'
+                ? 'bg-primary-500 text-white font-bold shadow-md'
                 : 'bg-[#271820] text-[#C4B5BE] hover:bg-white/10 hover:text-white border border-white/5'
             }`}
           >

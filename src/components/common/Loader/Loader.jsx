@@ -9,7 +9,7 @@ export const Loader = ({ text = 'Loading...', fullPage = false, size = 'large' }
       }`}
     >
       <div className="flex flex-col items-center justify-center gap-4 text-center">
-        <Spinner size={size} color="#8A4A52" />
+        <Spinner size={size} color="var(--primary, #8A4A52)" />
         {text && <p className="text-sm font-semibold text-[#C4B5BE]">{text}</p>}
       </div>
     </div>

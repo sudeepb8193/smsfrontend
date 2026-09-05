@@ -53,21 +53,21 @@ export const Modal = ({
       aria-labelledby="modal-title"
     >
       <div
-        className={`bg-[#271820] border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] w-full overflow-hidden text-[#F9FAFB] transition-all duration-200 ${
+        className={`bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl flex flex-col max-h-[90vh] w-full overflow-hidden text-[var(--text-primary)] transition-all duration-200 ${
           sizeClasses[size] || sizeClasses.medium
         } ${className}`}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between gap-3">
+        <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between gap-3">
           {title && (
-            <h3 id="modal-title" className="text-lg font-bold text-[#F9FAFB] tracking-tight">
+            <h3 id="modal-title" className="text-lg font-bold text-[var(--text-primary)] tracking-tight">
               {title}
             </h3>
           )}
           {onClose && (
             <button
               type="button"
-              className="text-[#8E7A86] hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all"
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] p-1.5 rounded-lg transition-all"
               onClick={onClose}
               aria-label="Close modal"
             >
@@ -80,7 +80,7 @@ export const Modal = ({
         <div className="p-6 overflow-y-auto flex-1">{children}</div>
 
         {/* Footer */}
-        {footer && <div className="px-6 py-4 border-t border-white/10 bg-black/20 flex items-center justify-end gap-3">{footer}</div>}
+        {footer && <div className="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-input)] flex items-center justify-end gap-3">{footer}</div>}
       </div>
     </div>
   );

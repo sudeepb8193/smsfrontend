@@ -126,7 +126,7 @@ export const DatePicker = ({
           placeholder={placeholder}
           disabled={disabled}
           className={`w-full h-10 pl-10 pr-9 text-sm font-sans text-[#F9FAFB] bg-[#1D1217] border cursor-pointer ${
-            error ? 'border-red-500 focus:ring-2 focus:ring-red-500/20' : 'border-white/10 focus:border-[#8A4A52] focus:ring-2 focus:ring-[#8A4A52]/20'
+            error ? 'border-red-500 focus:ring-2 focus:ring-red-500/20' : 'border-white/10 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20'
           } rounded-xl outline-none transition-all placeholder:text-[#8E7A86] disabled:opacity-60 disabled:cursor-not-allowed`}
           aria-invalid={!!error}
         />
@@ -205,9 +205,9 @@ export const DatePicker = ({
                   onClick={() => handleSelectDay(dayNum)}
                   className={`h-8 w-8 mx-auto rounded-lg font-medium flex items-center justify-center transition-all ${
                     isSelected
-                      ? 'bg-[#8A4A52] text-white font-bold shadow-md'
+                      ? 'bg-primary-500 text-white font-bold shadow-md'
                       : isToday
-                      ? 'border border-[#8A4A52] text-[#8A4A52] font-bold'
+                      ? 'border border-primary-500 text-primary-400 font-bold'
                       : 'text-[#C4B5BE] hover:bg-white/10 hover:text-white'
                   }`}
                 >
@@ -222,7 +222,7 @@ export const DatePicker = ({
             <button
               type="button"
               onClick={handleToday}
-              className="text-[#8A4A52] font-bold hover:underline"
+              className="text-primary-400 font-bold hover:underline"
             >
               Select Today
             </button>

@@ -182,7 +182,7 @@ export const CustomSelector = ({
                     onClick={() => handleSelectOption(optVal)}
                     className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between gap-2 transition-all ${
                       selected
-                        ? 'bg-[#8A4A52]/20 text-[#8A4A52] font-bold'
+                        ? 'bg-primary-500/20 text-primary-400 font-bold'
                         : 'text-[#C4B5BE] hover:bg-white/10 hover:text-white font-medium'
                     }`}
                   >
@@ -190,7 +190,7 @@ export const CustomSelector = ({
                       {isMulti && (
                         <div
                           className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                            selected ? 'bg-[#8A4A52] border-[#8A4A52] text-white' : 'border-white/20 bg-transparent'
+                            selected ? 'bg-primary-500 border-primary-500 text-white' : 'border-white/20 bg-transparent'
                           }`}
                         >
                           {selected && <Check size={12} />}
@@ -201,7 +201,7 @@ export const CustomSelector = ({
 
                     <div className="flex items-center gap-1.5">
                       {optBadge && <Badge variant="neutral" size="small">{optBadge}</Badge>}
-                      {!isMulti && selected && <Check size={16} className="text-[#8A4A52]" />}
+                      {!isMulti && selected && <Check size={16} className="text-primary-400" />}
                     </div>
                   </button>
                 );

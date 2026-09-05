@@ -13,7 +13,7 @@ export const Badge = ({
     warning: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
     info: 'bg-sky-500/15 text-sky-400 border border-sky-500/30',
     neutral: 'bg-white/10 text-[#C4B5BE] border border-white/10',
-    primary: 'bg-[#8A4A52]/20 text-[#8A4A52] border border-[#8A4A52]/30',
+    primary: 'bg-primary-500/20 text-primary-400 border border-primary-500/30',
   };
 
   const sizeClasses = {

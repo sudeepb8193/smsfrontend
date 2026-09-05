@@ -28,7 +28,7 @@ export const SearchInput = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full h-10 pl-10 pr-9 text-sm font-sans text-[#F9FAFB] bg-[#1D1217] border border-white/10 rounded-xl outline-none focus:border-[#8A4A52] focus:ring-2 focus:ring-[#8A4A52]/20 transition-all placeholder:text-[#8E7A86]"
+        className="w-full h-10 pl-10 pr-9 text-sm font-sans text-[#F9FAFB] bg-[#1D1217] border border-white/10 rounded-xl outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all placeholder:text-[#8E7A86]"
         {...props}
       />
 
