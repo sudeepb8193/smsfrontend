@@ -14,10 +14,10 @@ export const DataTable = ({
 }) => {
   return (
     <div className={`w-full flex flex-col gap-3 ${className}`}>
-      <div className="w-full overflow-x-auto rounded-2xl border border-white/10 bg-[#271820] shadow-md">
+      <div className="w-full overflow-x-auto rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] shadow-md">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-white/10 bg-black/20 text-[#8E7A86] text-xs font-semibold uppercase tracking-wider">
+            <tr className="border-b border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-muted)] text-xs font-semibold uppercase tracking-wider">
               {columns.map((col, idx) => (
                 <th key={col.id || col.accessor || idx} className={`p-4 ${col.headerClassName || ''}`}>
                   {col.header}
@@ -25,7 +25,7 @@ export const DataTable = ({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5 text-sm text-[#F9FAFB]">
+          <tbody className="divide-y divide-[var(--border-color)] text-sm text-[var(--text-primary)]">
             {loading ? (
               <tr>
                 <td colSpan={columns.length} className="p-12 text-center text-[#8E7A86]">

@@ -4,6 +4,7 @@ import { UserStatusBadge } from '../components/UserStatusBadge';
 import { AddUserModal } from '../components/AddUserModal';
 import { AcceptInviteModal } from '../components/AcceptInviteModal';
 import { UserProfileModal } from '../components/UserProfileModal';
+import { RoleManagementModal } from '../components/RoleManagementModal';
 import {
   Users,
   Settings,
@@ -40,6 +41,8 @@ export const UserManagementPage = () => {
   const [isAcceptInviteOpen, setIsAcceptInviteOpen] = useState(false);
   const [selectedInviteToken, setSelectedInviteToken] = useState('');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [selectedUserForRoles, setSelectedUserForRoles] = useState(null);
   const [resendNotification, setResendNotification] = useState({ type: '', text: '' });
 
   const fetchUsers = useCallback(async () => {
@@ -406,6 +409,28 @@ export const UserManagementPage = () => {
 
                     <td style={{ padding: '18px 24px', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                        <button
+                          onClick={() => {
+                            setSelectedUserForRoles(u);
+                            setIsRoleModalOpen(true);
+                          }}
+                          style={{
+                            padding: '6px 12px',
+                            backgroundColor: 'var(--primary-light, rgba(99, 102, 241, 0.15))',
+                            color: 'var(--primary, #6366f1)',
+                            border: '1px solid var(--border-hover, #4f46e5)',
+                            borderRadius: '8px',
+                            fontSize: '0.8rem',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          <Shield size={13} /> Roles
+                        </button>
+
                         {(u.status === 'pending' || u.status === 'expired') && (
                           <button
                             onClick={() => handleResendInvite(u.id)}
@@ -530,6 +555,15 @@ export const UserManagementPage = () => {
       <UserProfileModal
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
+      />
+
+      <RoleManagementModal
+        isOpen={isRoleModalOpen}
+        onClose={() => {
+          setIsRoleModalOpen(false);
+          fetchUsers();
+        }}
+        user={selectedUserForRoles}
       />
     </div>
   );

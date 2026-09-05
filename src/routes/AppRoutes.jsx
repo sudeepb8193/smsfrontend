@@ -5,6 +5,7 @@ import Dashboard from '../pages/Dashboard';
 import NotFound from '../pages/NotFound';
 import Unauthorized from '../pages/Unauthorized';
 import { UserManagementPage } from '../features/users/pages/UserManagementPage';
+import { OrganizationManagementPage } from '../features/organization/pages/OrganizationManagementPage';
 import Card from '../components/common/Card/Card';
 import PageHeader from '../components/layout/PageHeader/PageHeader';
 import {
@@ -47,12 +48,18 @@ export const AppRoutes = () => {
     <Routes>
       <Route element={<DashboardLayout />}>
         {/* Default Route */}
-        <Route path="/" element={<Navigate to="/users/credentials" replace />} />
+        <Route path="/" element={<Navigate to="/organization/profile" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
 
         {/* Organization Routes */}
-        <Route path="/organization/profile" element={<ModulePlaceholder title="Business Profile" description="Manage salon organization details, address, and contact numbers." icon={Building2} />} />
-        <Route path="/organization/branding" element={<ModulePlaceholder title="Brand & Media Assets" description="Manage salon logos, invoice headers, and media branding." icon={ImageIcon} />} />
+        <Route path="/organization/profile" element={<OrganizationManagementPage />} />
+        <Route path="/organization/contacts" element={<OrganizationManagementPage />} />
+        <Route path="/organization/addresses" element={<OrganizationManagementPage />} />
+        <Route path="/organization/tax" element={<OrganizationManagementPage />} />
+        <Route path="/organization/settings" element={<OrganizationManagementPage />} />
+        <Route path="/organization/hours" element={<OrganizationManagementPage />} />
+        <Route path="/organization/holidays" element={<OrganizationManagementPage />} />
+        <Route path="/organization/branding" element={<OrganizationManagementPage />} />
         <Route path="/organization" element={<Navigate to="/organization/profile" replace />} />
 
         {/* User Management Routes */}

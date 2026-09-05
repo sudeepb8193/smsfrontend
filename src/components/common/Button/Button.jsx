@@ -23,13 +23,13 @@ export const Button = ({
   };
 
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-[#8A4A52] to-[#6E363E] text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all border-none',
-    secondary: 'bg-[#271820] text-[#F9FAFB] border border-white/10 hover:bg-[#36222C] hover:border-white/20 transition-all',
-    success: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm active:translate-y-0 transition-all border-none',
-    danger: 'bg-red-600 text-white hover:bg-red-700 shadow-sm active:translate-y-0 transition-all border-none',
-    warning: 'bg-amber-500 text-white hover:bg-amber-600 shadow-sm active:translate-y-0 transition-all border-none',
-    outline: 'bg-transparent text-[#8A4A52] border border-[#8A4A52] hover:bg-[#8A4A52]/10 transition-all',
-    ghost: 'bg-transparent text-[#C4B5BE] hover:bg-white/5 hover:text-white border-none transition-all',
+    primary: 'bg-primary-600 hover:bg-primary-700 text-white shadow-md hover:shadow-lg transition-all border-none font-bold',
+    secondary: 'bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border-color)] hover:bg-[var(--bg-surface)] transition-all font-semibold',
+    success: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm transition-all border-none font-bold',
+    danger: 'bg-rose-600 text-white hover:bg-rose-700 shadow-sm transition-all border-none font-bold',
+    warning: 'bg-amber-600 text-white hover:bg-amber-700 shadow-sm transition-all border-none font-bold',
+    outline: 'bg-transparent text-primary-500 border border-primary-500 hover:bg-primary-500/10 transition-all font-semibold',
+    ghost: 'bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-input)] hover:text-[var(--text-primary)] border-none transition-all font-medium',
   };
 
   const baseClasses = 'inline-flex items-center justify-center font-sans select-none whitespace-nowrap outline-none transition-all duration-200 disabled:opacity-60 disabled:pointer-events-none disabled:transform-none';

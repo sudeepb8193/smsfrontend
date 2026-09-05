@@ -23,7 +23,7 @@ export const ConfirmDialog = ({
       case 'success':
         return <CheckCircle2 size={32} className="text-emerald-500" />;
       default:
-        return <Info size={32} className="text-[#8A4A52]" />;
+        return <Info size={32} className="text-primary-500" />;
     }
   };
 

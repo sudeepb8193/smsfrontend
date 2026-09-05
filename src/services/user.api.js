@@ -53,4 +53,32 @@ export const userApi = {
   toggle2FA(enable) {
     return apiClient.post('/users/me/2fa/toggle', { enable });
   },
+
+  getAvailableRoles() {
+    return apiClient.get('/users/available-roles');
+  },
+
+  getUserRoles(userId) {
+    return apiClient.get(`/users/${userId}/roles`);
+  },
+
+  assignRole(userId, roleData) {
+    return apiClient.post(`/users/${userId}/roles`, roleData);
+  },
+
+  makeRolePrimary(userId, roleId) {
+    return apiClient.patch(`/users/${userId}/roles/${roleId}/primary`, {});
+  },
+
+  getRoleRemovalImpact(userId, roleId) {
+    return apiClient.get(`/users/${userId}/roles/${roleId}/removal-impact`);
+  },
+
+  removeRole(userId, roleId) {
+    return apiClient.delete(`/users/${userId}/roles/${roleId}`);
+  },
+
+  getEffectivePermissions(userId) {
+    return apiClient.get(`/users/${userId}/effective-permissions`);
+  },
 };
