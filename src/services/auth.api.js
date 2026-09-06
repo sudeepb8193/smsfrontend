@@ -15,6 +15,10 @@ export const authApi = {
     return data;
   },
 
+  async registerCustomer(customerData) {
+    return apiClient.post('/auth/register', customerData);
+  },
+
   async seedDemo() {
     const data = await apiClient.post('/auth/seed-demo', {});
     if (data?.accessToken) {
@@ -36,3 +40,4 @@ export const authApi = {
     apiClient.activeOrgId = null;
   },
 };
+

@@ -22,10 +22,6 @@ export const SIDEBAR_MODULE_CONFIG = [
     allowedRoles: ['SUPER_ADMIN', 'BRANCH_MANAGER', 'ACCOUNTANT'],
     subtasks: [
       { id: 'org-profile', label: 'Business Profile', path: '/organization/profile' },
-      { id: 'org-contacts', label: 'Contact Information', path: '/organization/contacts' },
-      { id: 'org-addresses', label: 'Addresses', path: '/organization/addresses' },
-      { id: 'org-tax', label: 'Tax Information', path: '/organization/tax' },
-      { id: 'org-settings', label: 'Regional Settings', path: '/organization/settings' },
       { id: 'org-hours', label: 'Business Hours', path: '/organization/hours' },
       { id: 'org-holidays', label: 'Holiday Calendar', path: '/organization/holidays' },
     ],

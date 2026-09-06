@@ -224,6 +224,7 @@ export const ThemeProvider = ({ children }) => {
     root.style.setProperty('--primary-gradient', `linear-gradient(135deg, ${palette.shades[500]} 0%, ${palette.shades[700]} 100%)`);
     root.style.setProperty('--shadow-glow', `0 4px 18px ${palette.shades[500]}50`);
     root.style.setProperty('--border-hover', `${palette.shades[500]}80`);
+    root.style.setProperty('--bg-sidebar', palette.shades[950]);
   }, [accentColor]);
 
   // Sync font family

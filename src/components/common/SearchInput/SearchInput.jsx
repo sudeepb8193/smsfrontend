@@ -19,7 +19,7 @@ export const SearchInput = ({
 
   return (
     <div className={`relative flex items-center w-full ${className}`}>
-      <span className="absolute left-3.5 text-[#8E7A86] pointer-events-none flex items-center justify-center">
+      <span className="absolute left-3.5 text-[var(--text-muted)] pointer-events-none flex items-center justify-center">
         <Search size={18} />
       </span>
 
@@ -28,7 +28,7 @@ export const SearchInput = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full h-10 pl-10 pr-9 text-sm font-sans text-[#F9FAFB] bg-[#1D1217] border border-white/10 rounded-xl outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all placeholder:text-[#8E7A86]"
+        className="w-full h-10 pl-10 pr-9 text-sm font-sans text-[var(--text-primary)] bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all placeholder:text-[var(--text-muted)]"
         {...props}
       />
 
@@ -36,7 +36,7 @@ export const SearchInput = ({
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-3 text-[#8E7A86] hover:text-white p-0.5 rounded transition-all"
+          className="absolute right-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] p-0.5 rounded transition-all"
           aria-label="Clear search"
         >
           <X size={16} />

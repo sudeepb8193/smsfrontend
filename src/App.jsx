@@ -2,22 +2,23 @@ import React from 'react';
 import { AuthProvider } from './store/AuthContext';
 import { ThemeProvider } from './store/ThemeContext';
 import { useAuth } from './hooks/useAuth';
-import { LoginPage } from './components/LoginPage';
 import AppRoutes from './routes/AppRoutes';
 import Loader from './components/common/Loader/Loader';
+import { Toaster } from 'sonner';
 
 const MainShell = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return <Loader fullPage text="Initializing SalonFlow Pro..." />;
   }
 
-  if (!isAuthenticated) {
-    return <LoginPage />;
-  }
-
-  return <AppRoutes />;
+  return (
+    <>
+      <AppRoutes />
+      <Toaster position="top-right" duration={3000} visibleToasts={1} richColors />
+    </>
+  );
 };
 
 function App() {
