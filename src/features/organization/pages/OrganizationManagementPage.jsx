@@ -31,10 +31,6 @@ export const OrganizationManagementPage = () => {
   const navigate = useNavigate();
 
   const getTabFromPath = () => {
-    if (location.pathname.includes('/organization/contacts')) return 'contacts';
-    if (location.pathname.includes('/organization/addresses')) return 'addresses';
-    if (location.pathname.includes('/organization/tax')) return 'tax';
-    if (location.pathname.includes('/organization/settings')) return 'settings';
     if (location.pathname.includes('/organization/hours')) return 'hours';
     if (location.pathname.includes('/organization/holidays')) return 'holidays';
     return 'profile';
@@ -92,10 +88,6 @@ export const OrganizationManagementPage = () => {
 
   const tabs = [
     { id: 'profile', label: 'Business Profile', icon: Building2 },
-    { id: 'contacts', label: 'Contacts', icon: UserCheck },
-    { id: 'addresses', label: 'Addresses', icon: MapPin },
-    { id: 'tax', label: 'Tax Profiles', icon: FileText },
-    { id: 'settings', label: 'Regional Settings', icon: Globe },
     { id: 'hours', label: 'Business Hours', icon: Clock },
     { id: 'holidays', label: 'Holiday Calendar', icon: Calendar },
   ];
@@ -143,27 +135,17 @@ export const OrganizationManagementPage = () => {
       ) : (
         <div className="pt-2">
           {activeTab === 'profile' && (
-            <BusinessProfileSection
-              organization={organization}
-              onUpdateSuccess={loadOrganization}
-              isReadOnly={isReadOnly}
-            />
-          )}
-
-          {activeTab === 'contacts' && (
-            <ContactManagementSection organizationId={organization?.id || 1} isReadOnly={isReadOnly} />
-          )}
-
-          {activeTab === 'addresses' && (
-            <AddressManagementSection organizationId={organization?.id || 1} isReadOnly={isReadOnly} />
-          )}
-
-          {activeTab === 'tax' && (
-            <TaxProfileSection organizationId={organization?.id || 1} isReadOnly={isReadOnly} />
-          )}
-
-          {activeTab === 'settings' && (
-            <RegionalSettingsSection organizationId={organization?.id || 1} isReadOnly={isReadOnly} />
+            <div className="space-y-8">
+              <BusinessProfileSection
+                organization={organization}
+                onUpdateSuccess={loadOrganization}
+                isReadOnly={isReadOnly}
+              />
+              <ContactManagementSection organizationId={organization?.id || 1} isReadOnly={isReadOnly} />
+              <AddressManagementSection organizationId={organization?.id || 1} isReadOnly={isReadOnly} />
+              <TaxProfileSection organizationId={organization?.id || 1} isReadOnly={isReadOnly} />
+              <RegionalSettingsSection organizationId={organization?.id || 1} isReadOnly={isReadOnly} />
+            </div>
           )}
 
           {activeTab === 'hours' && (

@@ -106,7 +106,7 @@ export const DatePicker = ({
   return (
     <div className={`relative flex flex-col gap-1.5 w-full ${className}`} ref={containerRef}>
       {label && (
-        <label htmlFor={dateId} className="text-xs font-semibold text-[#F9FAFB] flex items-center gap-1">
+        <label htmlFor={dateId} className="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1">
           {label}
           {required && <span className="text-red-500">*</span>}
         </label>
@@ -114,7 +114,7 @@ export const DatePicker = ({
 
       {/* Input Field Trigger */}
       <div className="relative flex items-center w-full cursor-pointer" onClick={() => !disabled && setIsOpen(!isOpen)}>
-        <span className="absolute left-3.5 text-[#8E7A86] pointer-events-none flex items-center justify-center">
+        <span className="absolute left-3.5 text-[var(--text-muted)] pointer-events-none flex items-center justify-center">
           <CalendarIcon size={18} />
         </span>
 
@@ -125,9 +125,9 @@ export const DatePicker = ({
           value={formatDisplay(selectedDate)}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full h-10 pl-10 pr-9 text-sm font-sans text-[#F9FAFB] bg-[#1D1217] border cursor-pointer ${
-            error ? 'border-red-500 focus:ring-2 focus:ring-red-500/20' : 'border-white/10 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20'
-          } rounded-xl outline-none transition-all placeholder:text-[#8E7A86] disabled:opacity-60 disabled:cursor-not-allowed`}
+          className={`w-full h-10 pl-10 pr-9 text-sm font-sans text-[var(--text-primary)] bg-[var(--bg-input)] border cursor-pointer ${
+            error ? 'border-red-500 focus:ring-2 focus:ring-red-500/20' : 'border-[var(--border-color)] focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20'
+          } rounded-xl outline-none transition-all placeholder:text-[var(--text-muted)] disabled:opacity-60 disabled:cursor-not-allowed`}
           aria-invalid={!!error}
         />
 
@@ -135,7 +135,7 @@ export const DatePicker = ({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 text-[#8E7A86] hover:text-white p-0.5 rounded transition-all"
+            className="absolute right-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] p-0.5 rounded transition-all"
             aria-label="Clear date"
           >
             <X size={16} />
@@ -144,7 +144,7 @@ export const DatePicker = ({
       </div>
 
       {error && <span className="text-xs text-red-500 font-medium" role="alert">{error}</span>}
-      {!error && helperText && <span className="text-xs text-[#8E7A86]">{helperText}</span>}
+      {!error && helperText && <span className="text-xs text-[var(--text-muted)]">{helperText}</span>}
 
       {/* Calendar Popover */}
       {isOpen && (

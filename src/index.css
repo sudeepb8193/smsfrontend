@@ -122,7 +122,7 @@ input, textarea, [contenteditable="true"] {
 :root[data-theme='light'] {
   --bg-app: #F8FAFC;
   --bg-surface: #FFFFFF;
-  --bg-sidebar: #FFFFFF;
+  --bg-sidebar: var(--color-primary-950, #21141A);
   --bg-card: #FFFFFF;
   --bg-card-hover: #F1F5F9;
   --bg-input: #F8FAFC;

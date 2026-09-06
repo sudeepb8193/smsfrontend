@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Check, ChevronDown } from 'lucide-react';
 import { useTheme } from '../../../hooks/useTheme';
 import { FONT_FAMILIES } from '../../../store/ThemeContext';
+import { toast } from 'sonner';
 
 export const ThemeSettingsModal = () => {
   const {
@@ -110,7 +111,10 @@ export const ThemeSettingsModal = () => {
                   <div key={acc.key} className="flex flex-col items-center gap-1.5 flex-shrink-0">
                     <button
                       type="button"
-                      onClick={() => setAccentColor(acc.key)}
+                      onClick={() => {
+                        setAccentColor(acc.key);
+                        toast.info(`Accent theme changed to ${acc.name}`);
+                      }}
                       style={{ backgroundColor: acc.color }}
                       className={`w-8 h-8 rounded-full transition-all transform duration-200 flex items-center justify-center ${
                         isSelected

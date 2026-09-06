@@ -3,16 +3,17 @@ import {
   FileText,
   Plus,
   CheckCircle2,
-  AlertTriangle,
   XCircle,
   Clock,
   ShieldCheck,
-  RefreshCw,
   ExternalLink,
+  Sparkles,
+  X,
 } from 'lucide-react';
 import { organizationApi } from '../../../services/organization.api';
-import { AddTaxProfileModal } from './AddTaxProfileModal';
 import { Button } from '../../../components/common/Button/Button';
+import { Input } from '../../../components/common/Input/Input';
+import { Select } from '../../../components/common/Select/Select';
 import { EmptyState } from '../../../components/common/EmptyState/EmptyState';
 import { Loader } from '../../../components/common/Loader/Loader';
 
@@ -20,8 +21,20 @@ export const TaxProfileSection = ({ organizationId, isReadOnly }) => {
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
+
+  // Inline Form State
+  const [formData, setFormData] = useState({
+    taxIdentifierType: 'gstin',
+    taxIdentifierNumber: '',
+    registeredBusinessName: '',
+    taxRegistrationDate: '',
+    isTaxExempt: false,
+    documentUrl: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState(null);
 
   const loadProfiles = async () => {
     setLoading(true);
@@ -39,6 +52,20 @@ export const TaxProfileSection = ({ organizationId, isReadOnly }) => {
   useEffect(() => {
     if (organizationId) loadProfiles();
   }, [organizationId]);
+
+  useEffect(() => {
+    if (profiles && profiles.length > 0) {
+      const p = profiles[0];
+      setFormData({
+        taxIdentifierType: p.taxIdentifierType || 'gstin',
+        taxIdentifierNumber: p.taxIdentifierNumber || '',
+        registeredBusinessName: p.registeredBusinessName || '',
+        taxRegistrationDate: p.taxRegistrationDate ? p.taxRegistrationDate.substring(0, 10) : '',
+        isTaxExempt: p.isTaxExempt || false,
+        documentUrl: p.documentUrl || '',
+      });
+    }
+  }, [profiles]);
 
   const handleVerify = async (taxId) => {
     setActionLoading(taxId);
@@ -66,6 +93,29 @@ export const TaxProfileSection = ({ organizationId, isReadOnly }) => {
     }
   };
 
+  const handleInlineSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setFormError(null);
+    try {
+      await organizationApi.createTaxProfile(organizationId, formData);
+      setFormData({
+        taxIdentifierType: 'gstin',
+        taxIdentifierNumber: '',
+        registeredBusinessName: '',
+        taxRegistrationDate: '',
+        isTaxExempt: false,
+        documentUrl: '',
+      });
+      setIsAddOpen(false);
+      loadProfiles();
+    } catch (err) {
+      setFormError(err.message || 'Failed to create tax profile');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -78,7 +128,7 @@ export const TaxProfileSection = ({ organizationId, isReadOnly }) => {
             Manage GSTIN, PAN, EIN, VAT registration codes and document verification
           </p>
         </div>
-        {!isReadOnly && (
+        {!isReadOnly && !isAddOpen && (
           <Button
             variant="primary"
             onClick={() => setIsAddOpen(true)}
@@ -90,13 +140,111 @@ export const TaxProfileSection = ({ organizationId, isReadOnly }) => {
         )}
       </div>
 
+      {/* Embedded Inline Form Card */}
+      {isAddOpen && (
+        <div className="p-6 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-5 shadow-md animate-fadeIn">
+          <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
+            <h4 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <FileText size={18} className="text-primary-500" />
+              Add Tax Registration Profile
+            </h4>
+            <button
+              type="button"
+              onClick={() => setIsAddOpen(false)}
+              className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-input)] transition"
+              title="Close form"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          <form onSubmit={handleInlineSubmit} className="space-y-4">
+            {formError && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-semibold">
+                {formError}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Select
+                label="Tax Identifier Type"
+                value={formData.taxIdentifierType}
+                onChange={(e) => setFormData({ ...formData, taxIdentifierType: e.target.value })}
+                options={[
+                  { value: 'gstin', label: 'GSTIN (India)' },
+                  { value: 'pan', label: 'PAN (India)' },
+                  { value: 'ein', label: 'EIN (US)' },
+                  { value: 'vat', label: 'VAT (UK/EU)' },
+                  { value: 'tin', label: 'TIN' },
+                  { value: 'other', label: 'Other' },
+                ]}
+              />
+
+              <Input
+                label="Tax Number / Code"
+                required
+                value={formData.taxIdentifierNumber}
+                onChange={(e) => setFormData({ ...formData, taxIdentifierNumber: e.target.value.toUpperCase() })}
+                placeholder="e.g. 22AAAAA0000A1Z5"
+              />
+            </div>
+
+            <Input
+              label="Registered Business Name for Tax"
+              required
+              value={formData.registeredBusinessName}
+              onChange={(e) => setFormData({ ...formData, registeredBusinessName: e.target.value })}
+              placeholder="Legal entity registered with tax department"
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Tax Registration Date"
+                type="date"
+                value={formData.taxRegistrationDate}
+                onChange={(e) => setFormData({ ...formData, taxRegistrationDate: e.target.value })}
+              />
+
+              <div className="flex items-center pt-5">
+                <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.isTaxExempt}
+                    onChange={(e) => setFormData({ ...formData, isTaxExempt: e.target.checked })}
+                    className="rounded border-[var(--border-color)] text-primary-600 focus:ring-0 bg-[var(--bg-input)]"
+                  />
+                  <span>Is Tax Exempt Entity</span>
+                </label>
+              </div>
+            </div>
+
+            <Input
+              label="Supporting Document URL (PDF/Image)"
+              type="url"
+              value={formData.documentUrl}
+              onChange={(e) => setFormData({ ...formData, documentUrl: e.target.value })}
+              placeholder="https://storage.salon.com/tax-cert.pdf"
+            />
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border-color)]">
+              <Button type="button" variant="secondary" size="small" onClick={() => setIsAddOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" size="small" loading={submitting} icon={Sparkles}>
+                Save Tax Profile
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {loading ? (
         <Loader text="Loading tax profiles..." size="large" />
       ) : error ? (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-semibold">
           {error}
         </div>
-      ) : profiles.length === 0 ? (
+      ) : profiles.length === 0 && !isAddOpen ? (
         <EmptyState
           icon={FileText}
           title="No tax registration profiles added"
@@ -145,7 +293,7 @@ export const TaxProfileSection = ({ organizationId, isReadOnly }) => {
                     href={p.documentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-[#8A4A52] hover:underline pt-1"
+                    className="inline-flex items-center gap-1 text-xs text-primary-500 hover:underline pt-1"
                   >
                     View Attached Tax Document <ExternalLink size={12} />
                   </a>
@@ -181,13 +329,8 @@ export const TaxProfileSection = ({ organizationId, isReadOnly }) => {
           ))}
         </div>
       )}
-
-      <AddTaxProfileModal
-        orgId={organizationId}
-        isOpen={isAddOpen}
-        onClose={() => setIsAddOpen(false)}
-        onSuccess={loadProfiles}
-      />
     </div>
   );
 };
+
+export default TaxProfileSection;
