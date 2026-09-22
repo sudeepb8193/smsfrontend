@@ -25,8 +25,6 @@ export const Sidebar = ({
   const isCollapsed = propsIsCollapsed !== undefined ? propsIsCollapsed : internalCollapsed;
 
   const [expandedModules, setExpandedModules] = useState({
-    users: true,
-    organization: true,
     staff: false,
     audit: false,
   });

@@ -4,6 +4,8 @@ import Card from '../components/common/Card/Card';
 import PageHeader from '../components/layout/PageHeader/PageHeader';
 import { Scissors, Clock } from 'lucide-react';
 
+import { UserManagementPage } from '../features/user/pages/UserManagementPage';
+
 const ModulePlaceholder = ({ title, description, icon: Icon }) => (
   <div className="space-y-6">
     <PageHeader title={title} description={description} />
@@ -22,6 +24,7 @@ const ModulePlaceholder = ({ title, description, icon: Icon }) => (
 );
 
 export const StaffRoutes = [
+  <Route key="user-roles" path="/staff/users" element={<UserManagementPage />} />,
   <Route key="staff-directory" path="/staff/directory" element={<ModulePlaceholder title="Staff HR Directory" description="Manage hair stylists, staff employee records, and designations." icon={Scissors} />} />,
   <Route key="staff-rosters" path="/staff/rosters" element={<ModulePlaceholder title="Shift Rosters & Schedules" description="Weekly staff work rosters and shift scheduling interface." icon={Clock} />} />,
   <Route key="staff-redirect" path="/staff" element={<Navigate to="/staff/directory" replace />} />,

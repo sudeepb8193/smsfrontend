@@ -1,12 +1,12 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { AuthRoutes } from './AuthRoutes';
-import { OrganizationRoutes } from './OrganizationRoutes';
-import { UserRoutes } from './UserRoutes';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { RegisterPage } from '../features/auth/pages/RegisterPage';
+import { LoginPage } from '../features/auth/pages/LoginPage';
+import { ProtectedRoute } from './ProtectedRoute';
 import { StaffRoutes } from './StaffRoutes';
 import { AuditRoutes } from './AuditRoutes';
 import { OperationsRoutes } from './OperationsRoutes';
-import { ProtectedRoute } from './ProtectedRoute';
+import { OrganizationRoutes } from './OrganizationRoutes';
 import DashboardLayout from '../components/layout/DashboardLayout/DashboardLayout';
 import Dashboard from '../pages/Dashboard';
 import NotFound from '../pages/NotFound';
@@ -16,16 +16,17 @@ export const AppRoutes = () => {
   return (
     <Routes>
       {/* Root & Public Auth Routes */}
-      {AuthRoutes}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/login" element={<LoginPage />} />
 
       {/* Protected Application Routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
 
-          {/* Modularized Sub-Routes */}
+          {/* Sub-Routes */}
           {OrganizationRoutes}
-          {UserRoutes}
           {StaffRoutes}
           {AuditRoutes}
           {OperationsRoutes}

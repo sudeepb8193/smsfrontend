@@ -2,7 +2,6 @@ const BASE_URL = 'http://localhost:3000';
 
 export const apiClient = {
   activeRole: 'SUPER_ADMIN',
-  activeOrgId: null,
 
   setRole(role) {
     this.activeRole = role;
@@ -17,15 +16,14 @@ export const apiClient = {
       headers['Content-Type'] = 'application/json';
     }
 
-    // Role & tenant headers for development / demo mode
+    // Role header for development / demo mode
     if (this.activeRole) {
       headers['x-user-role'] = this.activeRole;
     }
-    if (this.activeOrgId) {
-      headers['x-organization-id'] = this.activeOrgId;
-    }
 
-    const token = localStorage.getItem('salon_jwt_token');
+    const token =
+      localStorage.getItem('salon_jwt_token') ||
+      localStorage.getItem('salon_access_token');
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -66,5 +64,17 @@ export const apiClient = {
       method: 'PATCH',
       body: isFormData ? body : JSON.stringify(body),
     });
+  },
+
+  put(endpoint, body) {
+    const isFormData = body instanceof FormData;
+    return this.request(endpoint, {
+      method: 'PUT',
+      body: isFormData ? body : JSON.stringify(body),
+    });
+  },
+
+  delete(endpoint) {
+    return this.request(endpoint, { method: 'DELETE' });
   },
 };

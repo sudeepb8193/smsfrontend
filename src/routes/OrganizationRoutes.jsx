@@ -1,15 +1,18 @@
 import React from 'react';
 import { Route, Navigate } from 'react-router-dom';
-import { OrganizationManagementPage } from '../features/organization/pages/OrganizationManagementPage';
+import OrganizationHubPage from '../features/organization/pages/OrganizationHubPage';
+import BusinessHoursPage from '../features/organization/pages/BusinessHoursPage';
+import CreateOrganizationPage from '../features/organization/pages/CreateOrganizationPage';
+import HolidayCalendarPage from '../features/organization/pages/HolidayCalendarPage';
 
-export const OrganizationRoutes = [
-  <Route key="org-profile" path="/organization/profile" element={<OrganizationManagementPage />} />,
-  <Route key="org-contacts" path="/organization/contacts" element={<OrganizationManagementPage />} />,
-  <Route key="org-addresses" path="/organization/addresses" element={<OrganizationManagementPage />} />,
-  <Route key="org-tax" path="/organization/tax" element={<OrganizationManagementPage />} />,
-  <Route key="org-settings" path="/organization/settings" element={<OrganizationManagementPage />} />,
-  <Route key="org-hours" path="/organization/hours" element={<OrganizationManagementPage />} />,
-  <Route key="org-holidays" path="/organization/holidays" element={<OrganizationManagementPage />} />,
-  <Route key="org-branding" path="/organization/branding" element={<OrganizationManagementPage />} />,
-  <Route key="org-redirect" path="/organization" element={<Navigate to="/organization/profile" replace />} />,
-];
+export const OrganizationRoutes = (
+  <>
+    <Route path="/organization" element={<Navigate to="/organization/setup" replace />} />
+    <Route path="/organization/setup" element={<OrganizationHubPage initialTab="setup" />} />
+    <Route path="/organization/create" element={<CreateOrganizationPage />} />
+    <Route path="/organization/business-hours" element={<BusinessHoursPage />} />
+    <Route path="/organization/holidays" element={<HolidayCalendarPage />} />
+  </>
+);
+
+export default OrganizationRoutes;
