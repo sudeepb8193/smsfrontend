@@ -3,7 +3,7 @@ import { AuthProvider } from './store/AuthContext';
 import { ThemeProvider } from './store/ThemeContext';
 import { useAuth } from './hooks/useAuth';
 import AppRoutes from './routes/AppRoutes';
-import Loader from './components/common/Loader/Loader';
+import Loader from './components/shared/Loader';
 import { Toaster } from 'sonner';
 
 const MainShell = () => {

@@ -143,7 +143,7 @@ export const UserManagementPage = () => {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
         <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-primary-500 to-indigo-600 text-white shadow-lg shadow-primary-500/20">
+          <div className="p-3 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg shadow-primary-500/20">
             <ShieldCheck size={26} />
           </div>
           <div>
@@ -170,7 +170,7 @@ export const UserManagementPage = () => {
           <button
             type="button"
             onClick={() => setIsBulkAssignOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-indigo-600 text-white font-bold text-xs rounded-xl shadow-md shadow-primary-500/20 hover:opacity-95 transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold text-xs rounded-xl shadow-md shadow-primary-500/20 hover:opacity-95 transition-all"
           >
             <UserPlus size={16} />
             <span>Bulk Assign Roles</span>

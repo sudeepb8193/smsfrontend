@@ -41,7 +41,7 @@ export const UserRoleChips = ({
           <div key={roleId} className="relative inline-flex items-center">
             {/* Primary Role Chip */}
             {isPrimary ? (
-              <div className="group relative flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-primary-600 to-indigo-600 text-white shadow-md shadow-primary-500/20 border border-primary-500/40 transition-all">
+              <div className="group relative flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/20 border border-primary-500/40 transition-all">
                 <Star size={13} className="fill-yellow-300 text-yellow-300 shrink-0 animate-pulse" />
                 <span>{r.name}</span>
                 <span className="text-[10px] uppercase tracking-wider bg-white/20 px-1.5 py-0.5 rounded text-white font-extrabold ml-0.5">

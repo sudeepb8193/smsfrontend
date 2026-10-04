@@ -1,5 +1,5 @@
 import React from 'react';
-import DatePicker from '../common/DatePicker/DatePicker';
+import DatePicker from '../shared/DatePicker';
 
 export const FormDatePicker = (props) => {
   return <DatePicker {...props} />;

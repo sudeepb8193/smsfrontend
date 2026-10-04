@@ -3,7 +3,8 @@ import { Bell, PanelLeftClose, PanelLeftOpen, ArrowLeft, ShieldCheck, Sun, Moon,
 import { useTheme } from '../../../hooks/useTheme';
 import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import ThemeSettingsModal from '../../common/ThemeSettingsModal/ThemeSettingsModal';
+import ThemeSettingsModal from '../../shared/ThemeSettingsModal';
+import Tooltip from '../../shared/Tooltip';
 
 export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOpenSecurityModal }) => {
   const { isDark, toggleTheme, openThemeModal } = useTheme();
@@ -35,54 +36,58 @@ export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOp
       <header className="h-16 px-6 bg-[var(--bg-surface)] border-b border-[var(--border-color)] flex items-center justify-between sticky top-0 z-20 select-none transition-colors duration-200">
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Sidebar Toggle Button */}
-          <button
-            type="button"
-            onClick={onToggleSidebar}
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center justify-center focus:outline-none"
-            aria-label="Toggle Sidebar Navigation"
-            title="Toggle Sidebar"
-          >
-            {isMobileOpen || !isSidebarCollapsed ? (
-              <PanelLeftClose size={22} className="text-primary-500 hover:scale-105 transition-transform" />
-            ) : (
-              <PanelLeftOpen size={22} className="text-[var(--text-secondary)] hover:scale-105 transition-transform" />
-            )}
-          </button>
+          <Tooltip content="Toggle Sidebar Navigation" position="bottom">
+            <button
+              type="button"
+              onClick={onToggleSidebar}
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center justify-center focus:outline-none"
+              aria-label="Toggle Sidebar Navigation"
+            >
+              {isMobileOpen || !isSidebarCollapsed ? (
+                <PanelLeftClose size={22} className="text-primary-500 hover:scale-105 transition-transform" />
+              ) : (
+                <PanelLeftOpen size={22} className="text-[var(--text-secondary)] hover:scale-105 transition-transform" />
+              )}
+            </button>
+          </Tooltip>
 
-          {/* Back Navigation Button (Goes 1 Step Back in History) */}
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center justify-center focus:outline-none"
-            aria-label="Go Back"
-            title="Go Back 1 Step"
-          >
-            <ArrowLeft size={20} className="hover:-translate-x-0.5 transition-transform" />
-          </button>
+          {/* Back Navigation Button */}
+          <Tooltip content="Go Back 1 Step" position="bottom">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center justify-center focus:outline-none"
+              aria-label="Go Back"
+            >
+              <ArrowLeft size={20} className="hover:-translate-x-0.5 transition-transform" />
+            </button>
+          </Tooltip>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Theme Switcher / Customizer Trigger */}
-          <button
-            type="button"
-            onClick={openThemeModal}
-            className="p-2 px-3 text-[var(--text-secondary)] hover:text-white rounded-lg hover:bg-white/5 transition-all flex items-center gap-2 font-semibold text-xs border border-[var(--border-color)] bg-primary-500/10 text-primary-400 hover:bg-primary-500/20"
-            title="Open Visual Theme Customizer"
-          >
-            <Palette size={16} className="text-primary-500 animate-pulse" />
-            <span className="hidden sm:inline">Theme</span>
-          </button>
+          <Tooltip content="Open Visual Theme Customizer" position="bottom">
+            <button
+              type="button"
+              onClick={openThemeModal}
+              className="p-2 px-3 text-[var(--text-secondary)] hover:text-white rounded-lg hover:bg-white/5 transition-all flex items-center gap-2 font-semibold text-xs border border-[var(--border-color)] bg-primary-500/10 text-primary-400 hover:bg-primary-500/20"
+            >
+              <Palette size={16} className="text-primary-500 animate-pulse" />
+              <span className="hidden sm:inline">Theme</span>
+            </button>
+          </Tooltip>
 
           {/* Quick Dark/Light Toggle */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center gap-2 font-medium text-xs border border-[var(--border-color)]"
-            title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-          >
-            {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-indigo-400" />}
-            <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
-          </button>
+          <Tooltip content={`Switch to ${isDark ? 'light' : 'dark'} mode`} position="bottom">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center gap-2 font-medium text-xs border border-[var(--border-color)]"
+            >
+              {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-primary-400" />}
+              <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
+            </button>
+          </Tooltip>
 
           {/* Notifications Icon */}
           <button
@@ -106,11 +111,11 @@ export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOp
               </div>
               <div className="hidden md:flex flex-col text-left">
                 <span className="text-xs font-bold text-[var(--text-primary)] leading-tight flex items-center gap-1">
-                  {user?.displayName || 'Super Admin'}
+                  {user?.displayName || 'User Profile'}
                   <ChevronDown size={12} className="text-[var(--text-muted)]" />
                 </span>
                 <span className="text-[10px] text-[var(--text-muted)] font-medium">
-                  {role || 'SUPER_ADMIN'}
+                  {user?.role || role || 'Owner'}
                 </span>
               </div>
             </button>
@@ -120,13 +125,13 @@ export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOp
               <div className="absolute right-0 mt-2 w-60 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl p-2 z-50 text-[var(--text-primary)] animate-fadeIn">
                 <div className="px-3.5 py-3 border-b border-[var(--border-color)] bg-[var(--bg-input)] rounded-xl mb-1">
                   <div className="text-xs font-bold text-[var(--text-primary)] truncate">
-                    {user?.displayName || 'Super Admin'}
+                    {user?.displayName || 'User Profile'}
                   </div>
                   <div className="text-[11px] text-[var(--text-muted)] truncate font-mono mt-0.5">
-                    {user?.email || user?.phoneNumber || 'admin@salon.com'}
+                    {user?.email || user?.phoneNumber || ''}
                   </div>
                   <div className="inline-block px-2 py-0.5 mt-1.5 rounded-md bg-primary-500/15 text-primary-500 text-[10px] font-bold uppercase tracking-wider">
-                    {role || 'SUPER_ADMIN'}
+                    {user?.role || role || 'Owner'}
                   </div>
                 </div>
 

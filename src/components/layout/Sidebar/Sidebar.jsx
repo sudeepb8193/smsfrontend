@@ -18,8 +18,10 @@ export const Sidebar = ({
   isMobileOpen,
   onCloseMobile,
 }) => {
-  const { role } = useAuth();
+  const { user, role: contextRole } = useAuth();
   const location = useLocation();
+
+  const userRole = contextRole || user?.role || user?.roleSlug || user?.roleName || '';
 
   const [internalCollapsed, setInternalCollapsed] = useState(false);
   const isCollapsed = propsIsCollapsed !== undefined ? propsIsCollapsed : internalCollapsed;
@@ -53,7 +55,11 @@ export const Sidebar = ({
 
   const filteredModules = SIDEBAR_MODULE_CONFIG.filter((module) => {
     if (!module.allowedRoles || module.allowedRoles.length === 0) return true;
-    return module.allowedRoles.includes(role || 'SUPER_ADMIN');
+    if (!userRole) return false;
+    const normUserRole = String(userRole).toUpperCase().replace(/\s+/g, '_');
+    return module.allowedRoles.some(
+      (r) => r.toUpperCase().replace(/\s+/g, '_') === normUserRole
+    );
   });
 
   return (

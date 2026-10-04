@@ -1,18 +1,18 @@
 import React from 'react';
-import { Route, Navigate } from 'react-router-dom';
-import OrganizationHubPage from '../features/organization/pages/OrganizationHubPage';
-import BusinessHoursPage from '../features/organization/pages/BusinessHoursPage';
-import CreateOrganizationPage from '../features/organization/pages/CreateOrganizationPage';
-import HolidayCalendarPage from '../features/organization/pages/HolidayCalendarPage';
+import { Route } from 'react-router-dom';
+import RoleGuard from './RoleGuard';
+import OrganisationListPage from '../features/organisation/pages/OrganisationListPage';
+import CreateOrganisationPage from '../features/organisation/pages/CreateOrganisationPage';
+import OrganisationDetailsPage from '../features/organisation/pages/OrganisationDetailsPage';
+import EditOrganisationPage from '../features/organisation/pages/EditOrganisationPage';
 
 export const OrganizationRoutes = (
-  <>
-    <Route path="/organization" element={<Navigate to="/organization/setup" replace />} />
-    <Route path="/organization/setup" element={<OrganizationHubPage initialTab="setup" />} />
-    <Route path="/organization/create" element={<CreateOrganizationPage />} />
-    <Route path="/organization/business-hours" element={<BusinessHoursPage />} />
-    <Route path="/organization/holidays" element={<HolidayCalendarPage />} />
-  </>
+  <Route element={<RoleGuard allowedRoles={['SUPER_ADMIN', 'Super Admin']} />}>
+    <Route path="/super-admin/organisations" element={<OrganisationListPage />} />
+    <Route path="/super-admin/organisations/create" element={<CreateOrganisationPage />} />
+    <Route path="/super-admin/organisations/:organisationId" element={<OrganisationDetailsPage />} />
+    <Route path="/super-admin/organisations/:organisationId/edit" element={<EditOrganisationPage />} />
+  </Route>
 );
 
 export default OrganizationRoutes;

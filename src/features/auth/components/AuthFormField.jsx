@@ -29,7 +29,7 @@ export const AuthFormField = ({
         className={`w-full px-4 py-3 rounded-xl bg-slate-800/80 border text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-all ${
           error
             ? 'border-rose-500 focus:ring-rose-500/30'
-            : 'border-slate-700 focus:border-indigo-500 focus:ring-indigo-500/20'
+            : 'border-slate-700 focus:border-primary-500 focus:ring-primary-500/20'
         } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
       />
       {error && (

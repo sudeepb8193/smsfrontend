@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import PageHeader from '../components/layout/PageHeader/PageHeader';
-import Card from '../components/common/Card/Card';
-import Badge from '../components/common/Badge/Badge';
-import Button from '../components/common/Button/Button';
-import Modal from '../components/common/Modal/Modal';
-import DatePicker from '../components/common/DatePicker/DatePicker';
-import TimePicker from '../components/common/TimePicker/TimePicker';
-import CustomSelector from '../components/common/CustomSelector/CustomSelector';
-import Input from '../components/common/Input/Input';
+import Card from '../components/shared/Card';
+import Badge from '../components/shared/Badge';
+import Button from '../components/shared/Button';
+import Modal from '../components/shared/Modal';
+import DatePicker from '../components/shared/DatePicker';
+import TimePicker from '../components/shared/TimePicker';
+import CustomSelector from '../components/shared/CustomSelector';
+import Input from '../components/shared/Input';
 import DataTable from '../components/tables/DataTable/DataTable';
 import { useAuth } from '../hooks/useAuth';
 import { Calendar, DollarSign, Users, Scissors, Plus, Filter } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -197,7 +198,7 @@ export const Dashboard = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            alert('Appointment created successfully!');
+            toast.success('Appointment created successfully!');
             setIsModalOpen(false);
           }}
           className="space-y-4"

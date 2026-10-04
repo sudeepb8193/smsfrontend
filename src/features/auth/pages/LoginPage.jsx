@@ -60,14 +60,14 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 selection:bg-primary-500 selection:text-white">
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden">
         {/* Glow accent */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary-500/20 rounded-full blur-3xl pointer-events-none" />
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-lg shadow-indigo-500/30 mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/30 mb-4">
             <Crown size={28} />
           </div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">Sign In to SalonFlow</h1>
@@ -113,7 +113,7 @@ export const LoginPage = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full mt-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white font-bold text-sm shadow-xl shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full mt-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 hover:from-primary-600 hover:to-primary-800 text-white font-bold text-sm shadow-xl shadow-primary-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           >
             {submitting ? (
               <>
@@ -132,7 +132,7 @@ export const LoginPage = () => {
         {/* Footer Link */}
         <div className="mt-8 text-center text-xs text-slate-400 font-medium">
           Don't have an account?{' '}
-          <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-bold transition-colors">
+          <Link to="/register" className="text-primary-400 hover:text-primary-300 font-bold transition-colors">
             Register Salon
           </Link>
         </div>

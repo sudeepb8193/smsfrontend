@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import Card from '../components/common/Card/Card';
+import Card from '../components/shared/Card';
 import PageHeader from '../components/layout/PageHeader/PageHeader';
 import {
   Users,
