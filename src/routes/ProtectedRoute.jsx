@@ -9,7 +9,7 @@ export const ProtectedRoute = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <Loader2 size={36} className="animate-spin text-indigo-500 mb-3" />
+        <Loader2 size={36} className="animate-spin text-primary-500 mb-3" />
         <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
           Verifying Session...
         </p>

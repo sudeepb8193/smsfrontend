@@ -1,5 +1,5 @@
 import React from 'react';
-import Pagination from '../../common/Pagination/Pagination';
+import Pagination from '../../shared/Pagination';
 
 export const TablePagination = (props) => {
   return (

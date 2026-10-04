@@ -1,6 +1,6 @@
 import React from 'react';
-import Spinner from '../../common/Spinner/Spinner';
-import EmptyState from '../../common/EmptyState/EmptyState';
+import Spinner from '../../shared/Spinner';
+import EmptyState from '../../shared/EmptyState';
 import TablePagination from '../TablePagination/TablePagination';
 
 export const DataTable = ({

@@ -1,7 +1,10 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const CLEAN_BASE = RAW_API_BASE.replace(/\/+$/, '');
+const API_BASE = CLEAN_BASE.endsWith('/sms') ? CLEAN_BASE : `${CLEAN_BASE}/sms`;
 
 async function request(path, options = {}) {
-  const res = await fetch(`${API_BASE}/sms${path}`, {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const res = await fetch(`${API_BASE}${cleanPath}`, {
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
