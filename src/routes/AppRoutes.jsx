@@ -1,7 +1,7 @@
-import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { RegisterPage } from '../features/auth/pages/RegisterPage';
 import { LoginPage } from '../features/auth/pages/LoginPage';
+import ContactEmailVerificationPage from '../features/auth/pages/ContactEmailVerificationPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import { StaffRoutes } from './StaffRoutes';
 import { AuditRoutes } from './AuditRoutes';
@@ -19,6 +19,7 @@ export const AppRoutes = () => {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/verify-contact-email" element={<ContactEmailVerificationPage />} />
 
       {/* Protected Application Routes */}
       <Route element={<ProtectedRoute />}>

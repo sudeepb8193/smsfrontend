@@ -13,16 +13,27 @@ export const SIDEBAR_MODULE_CONFIG = [
   },
   {
     id: 'organisations',
-    label: 'Organisations',
+    label: 'Organisations & Setup',
     icon: Building2,
     allowedRoles: ['SUPER_ADMIN'],
     path: '/super-admin/organisations',
   },
+  {
+    id: 'my-organisation',
+    label: 'My Organization',
+    icon: Building2,
+    allowedRoles: ['OWNER'],
+    path: '/owner/organisation/setup',
+  },
 ];
 
 export const getAuthorizedNavModules = (userRole = 'SUPER_ADMIN') => {
+  const normalizedRole = String(userRole).toUpperCase().replace(/[\s-]+/g, '_');
   return SIDEBAR_MODULE_CONFIG.filter((module) => {
     if (!module.allowedRoles || module.allowedRoles.length === 0) return true;
-    return module.allowedRoles.includes(userRole);
+    return module.allowedRoles.some(
+      (allowedRole) =>
+        allowedRole.toUpperCase().replace(/[\s-]+/g, '_') === normalizedRole,
+    );
   });
 };
