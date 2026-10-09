@@ -80,6 +80,70 @@ export function updateOrganisation(id, payload) {
   });
 }
 
+export function updateOrganisationSetup(id, payload) {
+  return request(`/super-admin/organisations/${id}/setup`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function fetchOwnerOrganisationSetup() {
+  return request('/owner/organisation/setup', { method: 'GET' });
+}
+
+export function updateOwnerOrganisationSetup(payload) {
+  return request('/owner/organisation/setup', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function checkOwnerOrganisationSlugAvailability(slug) {
+  const query = new URLSearchParams({ slug });
+  return request(`/owner/organisation/setup/slug-availability?${query}`, {
+    method: 'GET',
+  });
+}
+
+export function checkOrganisationSlugAvailability(id, slug) {
+  const query = new URLSearchParams({ slug });
+  return request(`/super-admin/organisations/${id}/slug-availability?${query}`, {
+    method: 'GET',
+  });
+}
+
+export function fetchAddressSuggestions(input, country, sessionToken) {
+  const query = new URLSearchParams({ input, country, sessionToken });
+  return request(`/super-admin/organisations/address-suggestions?${query}`, {
+    method: 'GET',
+  });
+}
+
+export function fetchAddressDetails(placeId, sessionToken) {
+  const query = new URLSearchParams({ placeId, sessionToken });
+  return request(`/super-admin/organisations/address-details?${query}`, {
+    method: 'GET',
+  });
+}
+
+export function sendOrganisationContactVerification(organisationId, contactId) {
+  return request(
+    `/super-admin/organisations/${organisationId}/contacts/${contactId}/verify-email`,
+    { method: 'POST' },
+  );
+}
+
+export function sendOwnerContactVerification(contactId) {
+  return request(`/owner/organisation/contacts/${contactId}/verify-email`, {
+    method: 'POST',
+  });
+}
+
+export function verifyOrganisationContactEmail(token) {
+  const query = new URLSearchParams({ token });
+  return request(`/organization-contact-verification?${query}`, { method: 'GET' });
+}
+
 export function updateOrganisationStatus(id, status) {
   return request(`/super-admin/organisations/${id}/status`, {
     method: 'PATCH',

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import {
   Building2,
-  ArrowLeft,
   Edit,
+  Settings2,
   Power,
   Trash2,
   Layers,
@@ -16,10 +16,7 @@ import {
   Phone,
   Globe,
   MapPin,
-  Clock,
-  ShieldCheck,
   Loader2,
-  CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -171,9 +168,9 @@ export const OrganisationDetailsPage = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
         <div>
           <div className="flex items-center gap-3">
-            {organisation.logoUrl ? (
+            {(organisation.logoSquareUrl || organisation.logoUrl) ? (
               <img
-                src={getLogoUrl(organisation.logoUrl)}
+                src={getLogoUrl(organisation.logoSquareUrl || organisation.logoUrl)}
                 alt={organisation.name}
                 className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 bg-white shrink-0"
                 onError={(e) => {
@@ -219,6 +216,13 @@ export const OrganisationDetailsPage = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => navigate(`/super-admin/organisations/${organisationId}/setup`)}
+            className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
+          >
+            <Settings2 className="w-4 h-4" />
+            Complete Setup
+          </button>
           <button
             onClick={() => navigate(`/super-admin/organisations/${organisationId}/edit`)}
             className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
