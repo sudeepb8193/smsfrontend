@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import Button from './Button';
 
 export const DatePicker = ({
   label,
@@ -21,18 +20,22 @@ export const DatePicker = ({
   const [isOpen, setIsOpen] = useState(false);
   const [openUpwards, setOpenUpwards] = useState(false);
   const containerRef = useRef(null);
+  const generatedId = useId();
 
   // Parse input value to Date object or current date
   const parseDate = (val) => {
     if (!val) return null;
-    const d = new Date(val);
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(val);
+    const d = dateOnlyMatch
+      ? new Date(Number(dateOnlyMatch[1]), Number(dateOnlyMatch[2]) - 1, Number(dateOnlyMatch[3]))
+      : new Date(val);
     return isNaN(d.getTime()) ? null : d;
   };
 
   const selectedDate = parseDate(value);
   const [viewDate, setViewDate] = useState(() => selectedDate || new Date());
 
-  const dateId = id || name || `datepicker-${Math.random().toString(36).substr(2, 9)}`;
+  const dateId = id || name || generatedId;
 
   const toggleDropdown = () => {
     if (disabled) return;
@@ -80,8 +83,12 @@ export const DatePicker = ({
 
   const handleSelectDay = (dayNum) => {
     const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), dayNum);
+    const newDateISO = formatISO(newDate);
+    if ((minDate && newDateISO < minDate.slice(0, 10)) || (maxDate && newDateISO > maxDate.slice(0, 10))) {
+      return;
+    }
     if (onChange) {
-      onChange(formatISO(newDate));
+      onChange(newDateISO);
     }
     setIsOpen(false);
   };
@@ -95,9 +102,13 @@ export const DatePicker = ({
 
   const handleToday = () => {
     const today = new Date();
+    const todayISO = formatISO(today);
+    if ((minDate && todayISO < minDate.slice(0, 10)) || (maxDate && todayISO > maxDate.slice(0, 10))) {
+      return;
+    }
     setViewDate(today);
     if (onChange) {
-      onChange(formatISO(today));
+      onChange(todayISO);
     }
     setIsOpen(false);
   };
@@ -217,11 +228,16 @@ export const DatePicker = ({
                 new Date().getDate() === dayNum &&
                 new Date().getMonth() === viewDate.getMonth() &&
                 new Date().getFullYear() === viewDate.getFullYear();
+              const dayISO = formatISO(new Date(viewDate.getFullYear(), viewDate.getMonth(), dayNum));
+              const isOutsideRange =
+                (minDate && dayISO < minDate.slice(0, 10)) ||
+                (maxDate && dayISO > maxDate.slice(0, 10));
 
               return (
                 <button
                   key={dayNum}
                   type="button"
+                  disabled={isOutsideRange}
                   onClick={() => handleSelectDay(dayNum)}
                   className={`h-8 w-8 mx-auto rounded-lg font-medium flex items-center justify-center transition-all cursor-pointer ${
                     isSelected
@@ -229,7 +245,7 @@ export const DatePicker = ({
                       : isToday
                       ? 'border border-primary-500 text-primary-400 font-bold'
                       : 'text-[#C4B5BE] hover:bg-white/10 hover:text-white'
-                  }`}
+                  } ${isOutsideRange ? 'cursor-not-allowed opacity-30' : ''}`}
                 >
                   {dayNum}
                 </button>

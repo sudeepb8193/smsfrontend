@@ -28,10 +28,10 @@ import {
   sendOwnerContactVerification,
   uploadImageFile,
 } from '../api/organisationApi';
-import Dropdown from '../../shared/components/Dropdown';
-import DatePicker from '../../shared/components/DatePicker';
-import TimePicker from '../../shared/components/TimePicker';
-import StateCard from '../../shared/components/StateCard';
+import Dropdown from '../../../components/shared/Dropdown';
+import DatePicker from '../../../components/shared/DatePicker';
+import TimePicker from '../../../components/shared/TimePicker';
+import StateCard from '../../../components/shared/StateCard';
 
 const STEPS = [
   { id: 'profile', label: 'Business profile', icon: Building2 },
@@ -1268,15 +1268,15 @@ export default function OrganisationSetupForm({
               {hour.isOpen ? (
                 <div className="space-y-3">
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <TimePicker label="Opens" value={hour.openTime} onChange={(value) => setHour(day.value, 'openTime', value)} />
-                    <TimePicker label="Closes" value={hour.closeTime} onChange={(value) => setHour(day.value, 'closeTime', value)} />
+                    <TimePicker label="Opens" value={hour.openTime} onChange={(value) => setHour(day.value, 'openTime', value)} step={15} timeFormat="24h" />
+                    <TimePicker label="Closes" value={hour.closeTime} onChange={(value) => setHour(day.value, 'closeTime', value)} step={15} timeFormat="24h" />
                   </div>
                   <Toggle checked={hour.spansMidnight} onChange={(value) => setHour(day.value, 'spansMidnight', value)} label="Spans midnight" />
                   <details className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
                     <summary className="cursor-pointer text-xs font-semibold text-slate-600 dark:text-slate-300">Add a break window</summary>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      <TimePicker label="Break starts" value={hour.breakStartTime} onChange={(value) => setHour(day.value, 'breakStartTime', value)} />
-                      <TimePicker label="Break ends" value={hour.breakEndTime} onChange={(value) => setHour(day.value, 'breakEndTime', value)} />
+                      <TimePicker label="Break starts" value={hour.breakStartTime} onChange={(value) => setHour(day.value, 'breakStartTime', value)} step={15} timeFormat="24h" />
+                      <TimePicker label="Break ends" value={hour.breakEndTime} onChange={(value) => setHour(day.value, 'breakEndTime', value)} step={15} timeFormat="24h" />
                     </div>
                   </details>
                 </div>
