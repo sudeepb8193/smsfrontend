@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Clock, X } from 'lucide-react';
 
 export const TimePicker = ({
@@ -7,6 +7,7 @@ export const TimePicker = ({
   onChange,
   placeholder = 'Select time',
   step = 30, // interval in minutes
+  timeFormat = '12h',
   disabled = false,
   required = false,
   error,
@@ -17,8 +18,9 @@ export const TimePicker = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
+  const generatedId = useId();
 
-  const timeId = id || name || `timepicker-${Math.random().toString(36).substr(2, 9)}`;
+  const timeId = id || name || generatedId;
 
   // Close popover on click outside
   useEffect(() => {
@@ -53,9 +55,9 @@ export const TimePicker = ({
 
   const timeSlots = generateTimeSlots();
 
-  const handleSelectTime = (slotValue) => {
+  const handleSelectTime = (slot) => {
     if (onChange) {
-      onChange(slotValue);
+      onChange(timeFormat === '24h' ? slot.val24 : slot.label);
     }
     setIsOpen(false);
   };
@@ -119,14 +121,14 @@ export const TimePicker = ({
               <button
                 key={slot.label}
                 type="button"
-                onClick={() => handleSelectTime(slot.label)}
+                onClick={() => handleSelectTime(slot)}
                 className={`w-full text-left px-3 py-2 rounded-lg font-medium transition-all ${
                   isSelected
                     ? 'bg-primary-500 text-white font-bold'
                     : 'text-[#C4B5BE] hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {slot.label}
+                {timeFormat === '24h' ? slot.val24 : slot.label}
               </button>
             );
           })}
