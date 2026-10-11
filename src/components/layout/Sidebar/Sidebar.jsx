@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { gsap } from 'gsap';
 import { SIDEBAR_MODULE_CONFIG } from '../../../config/sidebar.config';
 import { useAuth } from '../../../hooks/useAuth';
+import Tooltip from '../../shared/Tooltip';
 import {
   ChevronLeft,
   ChevronRight,
@@ -11,6 +13,239 @@ import {
   PanelLeftClose,
   X,
 } from 'lucide-react';
+
+/**
+ * Animated Module Item using GSAP for buttery-smooth height accordion,
+ * staggered subtask entrance, and chevron rotation.
+ */
+const SidebarModuleItem = ({
+  mod,
+  isCollapsed,
+  isExpanded,
+  onToggleExpand,
+  onNavItemClick,
+  hoveredModule,
+  setHoveredModule,
+  location,
+}) => {
+  const chevronRef = useRef(null);
+  const contentRef = useRef(null);
+  const isFirstRender = useRef(true);
+
+  const IconComponent = mod.icon;
+  const isSubtaskActive = mod.subtasks?.some(
+    (st) =>
+      location.pathname === st.path ||
+      (location.pathname.startsWith(st.path + '/') && st.path !== '/')
+  );
+  const isDirectPathActive = mod.path && location.pathname === mod.path;
+  const isModuleActive = isDirectPathActive || isSubtaskActive;
+
+  // GSAP Accordion Animation
+  useEffect(() => {
+    const el = contentRef.current;
+    const chevron = chevronRef.current;
+    if (!el) return;
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      if (isExpanded && !isCollapsed) {
+        gsap.set(el, { height: 'auto', opacity: 1, display: 'block' });
+        if (chevron) gsap.set(chevron, { rotation: 0 });
+      } else {
+        gsap.set(el, { height: 0, opacity: 0, display: 'none' });
+        if (chevron) gsap.set(chevron, { rotation: -90 });
+      }
+      return;
+    }
+
+    // Animate Chevron Rotation
+    if (chevron) {
+      gsap.to(chevron, {
+        rotation: isExpanded && !isCollapsed ? 0 : -90,
+        duration: 0.32,
+        ease: 'power2.out',
+      });
+    }
+
+    // Animate Accordion Body
+    if (isExpanded && !isCollapsed) {
+      gsap.killTweensOf(el);
+      gsap.set(el, { display: 'block' });
+      const targetHeight = el.scrollHeight;
+
+      gsap.fromTo(
+        el,
+        { height: el.offsetHeight || 0, opacity: 0 },
+        {
+          height: targetHeight,
+          opacity: 1,
+          duration: 0.35,
+          ease: 'power2.out',
+          onComplete: () => {
+            gsap.set(el, { height: 'auto' });
+          },
+        }
+      );
+
+      // Stagger Subtasks for modern real-time fluidity
+      const items = el.querySelectorAll('.gsap-subtask-item');
+      if (items.length > 0) {
+        gsap.fromTo(
+          items,
+          { opacity: 0, x: -8 },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.22,
+            stagger: 0.04,
+            ease: 'power2.out',
+            delay: 0.04,
+          }
+        );
+      }
+    } else {
+      gsap.killTweensOf(el);
+      gsap.to(el, {
+        height: 0,
+        opacity: 0,
+        duration: 0.25,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          gsap.set(el, { display: 'none' });
+        },
+      });
+    }
+
+    return () => {
+      gsap.killTweensOf(el);
+      if (chevron) gsap.killTweensOf(chevron);
+    };
+  }, [isExpanded, isCollapsed]);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => isCollapsed && setHoveredModule(mod.id)}
+      onMouseLeave={() => isCollapsed && setHoveredModule(null)}
+    >
+      {/* Module Nav Item */}
+      {mod.subtasks && mod.subtasks.length > 0 ? (
+        <button
+          type="button"
+          onClick={() => !isCollapsed && onToggleExpand(mod.id)}
+          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 cursor-pointer ${
+            isModuleActive
+              ? 'bg-white/10 text-white font-bold border border-white/10 shadow-sm'
+              : 'text-white/80 hover:bg-white/10 hover:text-white'
+          } ${isCollapsed ? 'justify-center px-0' : ''}`}
+        >
+          <div className="flex items-center gap-3 overflow-hidden">
+            <IconComponent
+              size={20}
+              className={`shrink-0 transition-colors duration-200 ${
+                isModuleActive ? 'text-primary-400' : 'text-primary-400/80'
+              }`}
+            />
+            {!isCollapsed && <span className="truncate">{mod.label}</span>}
+          </div>
+          {!isCollapsed && (
+            <span
+              ref={chevronRef}
+              className="text-white/70 flex items-center justify-center p-0.5 inline-block origin-center"
+            >
+              <ChevronDown size={16} />
+            </span>
+          )}
+        </button>
+      ) : (
+        <NavLink
+          to={mod.path}
+          onClick={onNavItemClick}
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
+              isActive
+                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 font-bold'
+                : 'text-white/80 hover:bg-white/10 hover:text-white'
+            } ${isCollapsed ? 'justify-center px-0' : ''}`
+          }
+          title={isCollapsed ? mod.label : undefined}
+        >
+          <IconComponent size={20} className="shrink-0" />
+          {!isCollapsed && <span className="truncate">{mod.label}</span>}
+        </NavLink>
+      )}
+
+      {/* Sub-tasks Tree View (GSAP Animated Accordion) */}
+      {!isCollapsed && mod.subtasks && (
+        <div
+          ref={contentRef}
+          className="overflow-hidden"
+          style={{ display: isExpanded && !isCollapsed ? 'block' : 'none' }}
+        >
+          <div className="ml-5 pl-2.5 border-l border-white/15 my-1.5 space-y-1 py-0.5">
+            {mod.subtasks.map((st) => (
+              <NavLink
+                key={st.id}
+                to={st.path}
+                end
+                onClick={onNavItemClick}
+                className={({ isActive }) =>
+                  `gsap-subtask-item group/sub flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? 'bg-primary-500 text-white font-bold shadow-md shadow-primary-500/25 translate-x-0.5'
+                      : 'text-white/70 hover:text-white hover:bg-white/10 hover:translate-x-0.5'
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-200 ${
+                        isActive
+                          ? 'bg-white ring-2 ring-white/30 scale-110'
+                          : 'border border-white/40 bg-transparent group-hover/sub:border-white'
+                      }`}
+                    />
+                    <span className="truncate">{st.label}</span>
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Hover Popover Tree View (Collapsed Mode) */}
+      {isCollapsed && hoveredModule === mod.id && mod.subtasks && (
+        <div className="absolute left-16 top-0 w-60 bg-[var(--bg-sidebar)] border border-white/20 rounded-xl shadow-2xl p-3.5 z-50 text-white">
+          <div className="font-bold text-sm text-white mb-2">{mod.label}</div>
+          <div className="border-l border-white/15 pl-2.5 space-y-1">
+            {mod.subtasks.map((st) => (
+              <NavLink
+                key={st.id}
+                to={st.path}
+                onClick={() => {
+                  setHoveredModule(null);
+                  onNavItemClick();
+                }}
+                className={({ isActive }) =>
+                  `block px-2.5 py-1.5 rounded-lg text-xs transition-all ${
+                    isActive
+                      ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold shadow-sm'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`
+                }
+              >
+                • {st.label}
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const Sidebar = ({
   isCollapsed: propsIsCollapsed,
@@ -26,19 +261,40 @@ export const Sidebar = ({
   const [internalCollapsed, setInternalCollapsed] = useState(false);
   const isCollapsed = propsIsCollapsed !== undefined ? propsIsCollapsed : internalCollapsed;
 
-  const [expandedModules, setExpandedModules] = useState({
-    staff: false,
-    audit: false,
+  const [expandedModules, setExpandedModules] = useState(() => {
+    const initial = {};
+    SIDEBAR_MODULE_CONFIG.forEach((mod) => {
+      if (
+        mod.subtasks?.some(
+          (st) =>
+            location.pathname === st.path ||
+            (location.pathname.startsWith(st.path + '/') && st.path !== '/')
+        )
+      ) {
+        initial[mod.id] = true;
+      }
+    });
+    return initial;
   });
   const [hoveredModule, setHoveredModule] = useState(null);
 
-  const handleToggle = () => {
-    if (onToggleCollapse) {
-      onToggleCollapse();
-    } else {
-      setInternalCollapsed(!internalCollapsed);
-    }
-  };
+  // Auto-expand module if the active path matches any subtask
+  useEffect(() => {
+    SIDEBAR_MODULE_CONFIG.forEach((mod) => {
+      if (
+        mod.subtasks?.some(
+          (st) =>
+            location.pathname === st.path ||
+            (location.pathname.startsWith(st.path + '/') && st.path !== '/')
+        )
+      ) {
+        setExpandedModules((prev) => {
+          if (prev[mod.id]) return prev;
+          return { ...prev, [mod.id]: true };
+        });
+      }
+    });
+  }, [location.pathname]);
 
   const handleNavItemClick = () => {
     if (onCloseMobile) {
@@ -53,12 +309,24 @@ export const Sidebar = ({
     }));
   };
 
+  const normUserRole = String(userRole).toUpperCase().replace(/[\s_-]+/g, '_');
+  const isSuperAdmin = normUserRole === 'SUPER_ADMIN' || normUserRole === 'SUPERADMIN';
+
+  const displayLogoUrl = !isSuperAdmin
+    ? user?.organization?.logoUrl || user?.organizationLogo || user?.logoUrl
+    : null;
+  const displayName = !isSuperAdmin
+    ? user?.organization?.name || user?.organizationName || 'SalonFlow Pro'
+    : 'SalonFlow Pro';
+  const displayType = !isSuperAdmin
+    ? user?.organization?.businessType || user?.organizationType || 'ENTERPRISE'
+    : 'ENTERPRISE';
+
   const filteredModules = SIDEBAR_MODULE_CONFIG.filter((module) => {
     if (!module.allowedRoles || module.allowedRoles.length === 0) return true;
     if (!userRole) return false;
-    const normUserRole = String(userRole).toUpperCase().replace(/\s+/g, '_');
     return module.allowedRoles.some(
-      (r) => r.toUpperCase().replace(/\s+/g, '_') === normUserRole
+      (r) => r.toUpperCase().replace(/[\s_-]+/g, '_') === normUserRole
     );
   });
 
@@ -81,134 +349,48 @@ export const Sidebar = ({
       >
         {/* Brand Header (Matches Navbar h-16 / 64px Height Exactly) */}
         <div className="h-16 px-5 border-b border-white/10 flex items-center justify-between overflow-hidden shrink-0">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-9 h-9 min-w-[36px] rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center shadow-md">
-              <Crown size={22} />
-            </div>
-            {!isCollapsed && (
-              <div className="overflow-hidden whitespace-nowrap">
-                <h1 className="font-extrabold text-lg text-white tracking-tight">SalonFlow Pro</h1>
-                <span className="text-[10px] text-primary-400 font-bold tracking-widest block">ENTERPRISE</span>
+          <Tooltip content={`${displayName} (${displayType})`} position="right">
+            <div className="flex items-center gap-3 overflow-hidden cursor-pointer">
+              <div className="w-9 h-9 min-w-[36px] rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center shadow-md overflow-hidden">
+                {displayLogoUrl ? (
+                  <img
+                    src={displayLogoUrl}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Crown size={22} />
+                )}
               </div>
-            )}
-          </div>
+              {!isCollapsed && (
+                <div className="overflow-hidden whitespace-nowrap">
+                  <h1 className="font-extrabold text-lg text-white tracking-tight truncate max-w-[170px]">
+                    {displayName}
+                  </h1>
+                  <span className="text-[10px] text-primary-400 font-bold tracking-widest block uppercase truncate">
+                    {displayType}
+                  </span>
+                </div>
+              )}
+            </div>
+          </Tooltip>
         </div>
 
         {/* Modules & Subtasks Navigation List */}
         <nav className="flex-1 p-3 overflow-y-auto space-y-1.5 scrollbar-none">
-          {filteredModules.map((mod) => {
-            const IconComponent = mod.icon;
-            const isSubtaskActive = mod.subtasks?.some((st) => location.pathname.startsWith(st.path));
-            const isDirectPathActive = mod.path && location.pathname === mod.path;
-            const isModuleActive = isDirectPathActive || isSubtaskActive;
-            const isExpanded = expandedModules[mod.id];
-
-            return (
-              <div
-                key={mod.id}
-                className="relative"
-                onMouseEnter={() => isCollapsed && setHoveredModule(mod.id)}
-                onMouseLeave={() => isCollapsed && setHoveredModule(null)}
-              >
-                {/* Module Nav Item */}
-                {mod.subtasks && mod.subtasks.length > 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => !isCollapsed && toggleModuleExpand(mod.id)}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
-                      isModuleActive
-                        ? 'bg-white/10 text-white font-bold border border-white/10'
-                        : 'text-white/80 hover:bg-white/10 hover:text-white'
-                    } ${isCollapsed ? 'justify-center px-0' : ''}`}
-                  >
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <IconComponent size={20} className="shrink-0 text-primary-400" />
-                      {!isCollapsed && <span className="truncate">{mod.label}</span>}
-                    </div>
-                    {!isCollapsed && (
-                      <span className="text-current opacity-80">
-                        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                      </span>
-                    )}
-                  </button>
-                ) : (
-                  <NavLink
-                    to={mod.path}
-                    onClick={handleNavItemClick}
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
-                        isActive
-                          ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 font-bold'
-                          : 'text-white/80 hover:bg-white/10 hover:text-white'
-                      } ${isCollapsed ? 'justify-center px-0' : ''}`
-                    }
-                    title={isCollapsed ? mod.label : undefined}
-                  >
-                    <IconComponent size={20} className="shrink-0" />
-                    {!isCollapsed && <span className="truncate">{mod.label}</span>}
-                  </NavLink>
-                )}
-
-                {/* Sub-tasks Tree View (Expanded Mode) */}
-                {!isCollapsed && isExpanded && mod.subtasks && (
-                  <div className="ml-5 pl-2.5 border-l border-white/15 my-1 space-y-1">
-                    {mod.subtasks.map((st) => (
-                      <NavLink
-                        key={st.id}
-                        to={st.path}
-                        onClick={handleNavItemClick}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all ${
-                            isActive
-                              ? 'bg-primary-500 text-white font-bold shadow-md'
-                              : 'text-white/70 hover:text-white hover:bg-white/10'
-                          }`
-                        }
-                      >
-                        <Circle
-                          size={5}
-                          className={
-                            location.pathname.startsWith(st.path)
-                              ? 'fill-white text-white'
-                              : 'text-white/40'
-                          }
-                        />
-                        <span className="truncate">{st.label}</span>
-                      </NavLink>
-                    ))}
-                  </div>
-                )}
-
-                {/* Hover Popover Tree View (Collapsed Mode) */}
-                {isCollapsed && hoveredModule === mod.id && mod.subtasks && (
-                  <div className="absolute left-16 top-0 w-60 bg-[var(--bg-sidebar)] border border-white/20 rounded-xl shadow-2xl p-3.5 z-50 text-white">
-                    <div className="font-bold text-sm text-white mb-2">{mod.label}</div>
-                    <div className="border-l border-white/15 pl-2.5 space-y-1">
-                      {mod.subtasks.map((st) => (
-                        <NavLink
-                          key={st.id}
-                          to={st.path}
-                          onClick={() => {
-                            setHoveredModule(null);
-                            handleNavItemClick();
-                          }}
-                          className={({ isActive }) =>
-                            `block px-2.5 py-1.5 rounded-lg text-xs transition-all ${
-                              isActive
-                                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold shadow-sm'
-                                : 'text-white/80 hover:text-white hover:bg-white/10'
-                            }`
-                          }
-                        >
-                          • {st.label}
-                        </NavLink>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {filteredModules.map((mod) => (
+            <SidebarModuleItem
+              key={mod.id}
+              mod={mod}
+              isCollapsed={isCollapsed}
+              isExpanded={!!expandedModules[mod.id]}
+              onToggleExpand={toggleModuleExpand}
+              onNavItemClick={handleNavItemClick}
+              hoveredModule={hoveredModule}
+              setHoveredModule={setHoveredModule}
+              location={location}
+            />
+          ))}
         </nav>
 
         {/* Sidebar Copyright Footer */}

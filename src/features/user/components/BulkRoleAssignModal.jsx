@@ -148,7 +148,7 @@ export const BulkRoleAssignModal = ({
               <select
                 value={selectedRoleId}
                 onChange={(e) => setSelectedRoleId(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs font-medium bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                className="w-full px-3.5 py-2.5 text-xs font-medium bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl  focus:ring-primary-500 text-slate-800 dark:text-slate-100"
               >
                 <option value="">-- Choose Role --</option>
                 {availableRoles.map((role) => (
@@ -194,7 +194,7 @@ export const BulkRoleAssignModal = ({
                 placeholder="Filter users by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl  focus:ring-primary-500 text-slate-800 dark:text-slate-100"
               />
 
               <div className="flex-1 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl divide-y divide-slate-100 dark:divide-slate-800">
@@ -209,17 +209,16 @@ export const BulkRoleAssignModal = ({
                       <div
                         key={u.id}
                         onClick={() => handleToggleUser(u.id)}
-                        className={`flex items-center justify-between p-3 text-xs cursor-pointer transition-colors ${
-                          isChecked
+                        className={`flex items-center justify-between p-3 text-xs cursor-pointer transition-colors ${isChecked
                             ? 'bg-primary-50/40 dark:bg-primary-950/30 font-semibold'
                             : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-3">
                           <input
                             type="checkbox"
                             checked={isChecked}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             className="w-4 h-4 rounded text-primary-600 focus:ring-primary-500 border-slate-300 dark:border-slate-600"
                           />
                           <div>

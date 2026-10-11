@@ -52,7 +52,7 @@ export const EffectivePermissionsDrawer = ({
             placeholder="Search permissions..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+            className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl  focus:ring-primary-500 text-slate-800 dark:text-slate-100"
           />
         </div>
       </div>
@@ -104,11 +104,10 @@ export const EffectivePermissionsDrawer = ({
                         {p.grantedByRoles.map((g) => (
                           <span
                             key={g.roleId}
-                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                              g.isPrimary
+                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${g.isPrimary
                                 ? 'bg-primary-100 text-primary-800 dark:bg-primary-950 dark:text-primary-300'
                                 : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
-                            }`}
+                              }`}
                           >
                             {g.roleName}
                           </span>

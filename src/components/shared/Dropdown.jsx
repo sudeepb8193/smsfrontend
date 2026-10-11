@@ -50,11 +50,10 @@ export default function Dropdown({
         aria-expanded={open}
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
-        className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-xl border bg-white px-3.5 py-2 text-left text-sm transition focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:bg-slate-800 ${
-          error
+        className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-xl border bg-white px-3.5 py-2 text-left text-sm transition focus:outline-none  focus:ring-primary-500/20 dark:bg-slate-800 ${error
             ? 'border-rose-500'
             : 'border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600'
-        } ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}
+          } ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}
       >
         <span className={selected ? 'truncate text-slate-900 dark:text-white' : 'truncate text-slate-400'}>
           {selected?.label || placeholder}
@@ -89,11 +88,10 @@ export default function Dropdown({
                   setOpen(false);
                   setQuery('');
                 }}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition ${
-                  option.value === value
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition ${option.value === value
                     ? 'bg-primary-50 font-semibold text-primary-700 dark:bg-primary-500/10 dark:text-primary-300'
                     : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800'
-                }`}
+                  }`}
               >
                 {option.label}
                 {option.value === value && <Check className="h-3.5 w-3.5" />}

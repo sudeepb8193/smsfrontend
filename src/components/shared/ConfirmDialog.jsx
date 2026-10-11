@@ -17,11 +17,11 @@ export const ConfirmDialog = ({
   const getIcon = () => {
     switch (variant) {
       case 'danger':
-        return <AlertTriangle size={32} className="text-red-500" />;
+        return <AlertTriangle size={32} className="text-danger-500" />;
       case 'warning':
-        return <AlertTriangle size={32} className="text-amber-500" />;
+        return <AlertTriangle size={32} className="text-warning-500" />;
       case 'success':
-        return <CheckCircle2 size={32} className="text-emerald-500" />;
+        return <CheckCircle2 size={32} className="text-success-500" />;
       default:
         return <Info size={32} className="text-primary-500" />;
     }
@@ -48,10 +48,10 @@ export const ConfirmDialog = ({
       footer={footer}
     >
       <div className="flex flex-col items-center text-center gap-4 py-2">
-        <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
           {getIcon()}
         </div>
-        <p className="text-sm text-[#C4B5BE] leading-relaxed">{message}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{message}</p>
       </div>
     </Modal>
   );

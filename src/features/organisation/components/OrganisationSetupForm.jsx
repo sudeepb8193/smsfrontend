@@ -114,13 +114,13 @@ const COMMON_TIMEZONES = [
 const TIMEZONES = (typeof Intl.supportedValuesOf === 'function'
   ? Intl.supportedValuesOf('timeZone')
   : COMMON_TIMEZONES).map((value) => ({
-  value,
-  label: `${value} • ${new Intl.DateTimeFormat(undefined, {
-    timeZone: value,
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date())}`,
-}));
+    value,
+    label: `${value} • ${new Intl.DateTimeFormat(undefined, {
+      timeZone: value,
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date())}`,
+  }));
 const COUNTRIES = [
   { value: 'India', label: 'India' },
   { value: 'United States', label: 'United States' },
@@ -170,9 +170,8 @@ function Field({ label, value, onChange, type = 'text', placeholder, required, h
         type={type}
         placeholder={placeholder}
         aria-invalid={Boolean(error)}
-        className={`h-10 w-full rounded-xl border bg-white px-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 dark:bg-slate-800 dark:text-white ${
-          error ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700'
-        }`}
+        className={`h-10 w-full rounded-xl border bg-white px-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-500  focus:ring-primary-500/15 dark:bg-slate-800 dark:text-white ${error ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700'
+          }`}
         {...props}
       />
       {error && <span role="alert" className="text-xs font-medium text-rose-500">{error}</span>}
@@ -185,7 +184,7 @@ function TextareaField({ label, value, onChange, placeholder, rows = 3 }) {
   return (
     <label className="flex min-w-0 flex-col gap-1.5">
       <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{label}</span>
-      <textarea value={value ?? ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} rows={rows} className="w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
+      <textarea value={value ?? ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} rows={rows} className="w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-primary-500  focus:ring-primary-500/15 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
     </label>
   );
 }
@@ -989,65 +988,65 @@ export default function OrganisationSetupForm({
             savedEmail.toLowerCase() === contact.email.trim().toLowerCase(),
           );
           return (
-          <section key={contact.id || `contact-${index}`} className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <Dropdown label="Contact type" value={contact.contactType} onChange={(value) => setContact(index, 'contactType', value)} options={CONTACT_TYPES} searchable={false} className="w-44" />
-                {contact.emailVerified ? <span className="mt-5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"><BadgeCheck className="h-3 w-3" />Email verified</span> : <span className="mt-5 rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">Email unverified</span>}
-              </div>
-              {contact.contactType !== 'primary' && (
-                <button type="button" aria-label="Remove contact" onClick={() => setForm((current) => ({ ...current, contacts: current.contacts.filter((_, contactIndex) => contactIndex !== index) }))} className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10"><Trash2 className="h-4 w-4" /></button>
-              )}
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Contact person" value={contact.contactName} onChange={(value) => setContact(index, 'contactName', value)} placeholder="Full name" />
-              <div className="flex flex-col gap-1.5">
-                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Phone number</span>
-                  <div className="flex gap-2">
-                  <Dropdown label="Country code" value={contact.phoneCountryCode} onChange={(value) => setContact(index, 'phoneCountryCode', value)} options={PHONE_CODES} className="w-36" disabled={contact.sameAsPrimary} />
-                    <input type="tel" disabled={contact.sameAsPrimary} value={contact.phoneNumber} onChange={(event) => setContact(index, 'phoneNumber', event.target.value)} placeholder="Phone number" className="h-10 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:disabled:bg-slate-900" />
+            <section key={contact.id || `contact-${index}`} className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <Dropdown label="Contact type" value={contact.contactType} onChange={(value) => setContact(index, 'contactType', value)} options={CONTACT_TYPES} searchable={false} className="w-44" />
+                  {contact.emailVerified ? <span className="mt-5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"><BadgeCheck className="h-3 w-3" />Email verified</span> : <span className="mt-5 rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">Email unverified</span>}
                 </div>
+                {contact.contactType !== 'primary' && (
+                  <button type="button" aria-label="Remove contact" onClick={() => setForm((current) => ({ ...current, contacts: current.contacts.filter((_, contactIndex) => contactIndex !== index) }))} className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10"><Trash2 className="h-4 w-4" /></button>
+                )}
               </div>
-              <div>
-                <Field disabled={contact.sameAsPrimary} label="Email address" type="email" value={contact.email} onChange={(value) => setContact(index, 'email', value)} placeholder="name@business.com" />
-                {!contact.emailVerified && (
-                  <div className="mt-2">
-                    <button
-                      type="button"
-                      disabled={!contact.id || !emailIsSaved || !contact.email.trim() || Boolean(verificationSending[index])}
-                      onClick={() => sendContactVerification(contact, index)}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-primary-200 px-2.5 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/20"
-                    >
-                      <Send className="h-3.5 w-3.5" />
-                      {verificationSending[index] ? 'Sending...' : 'Send verification link'}
-                    </button>
-                    {!emailIsSaved && <p className="mt-1 text-[11px] text-slate-500">Save this contact email before requesting verification.</p>}
-                    {verificationMessages[index] && <p role="status" className="mt-1 text-[11px] text-emerald-700">{verificationMessages[index]}</p>}
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="Contact person" value={contact.contactName} onChange={(value) => setContact(index, 'contactName', value)} placeholder="Full name" />
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Phone number</span>
+                  <div className="flex gap-2">
+                    <Dropdown label="Country code" value={contact.phoneCountryCode} onChange={(value) => setContact(index, 'phoneCountryCode', value)} options={PHONE_CODES} className="w-36" disabled={contact.sameAsPrimary} />
+                    <input type="tel" disabled={contact.sameAsPrimary} value={contact.phoneNumber} onChange={(event) => setContact(index, 'phoneNumber', event.target.value)} placeholder="Phone number" className="h-10 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:disabled:bg-slate-900" />
+                  </div>
+                </div>
+                <div>
+                  <Field disabled={contact.sameAsPrimary} label="Email address" type="email" value={contact.email} onChange={(value) => setContact(index, 'email', value)} placeholder="name@business.com" />
+                  {!contact.emailVerified && (
+                    <div className="mt-2">
+                      <button
+                        type="button"
+                        disabled={!contact.id || !emailIsSaved || !contact.email.trim() || Boolean(verificationSending[index])}
+                        onClick={() => sendContactVerification(contact, index)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-primary-200 px-2.5 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/20"
+                      >
+                        <Send className="h-3.5 w-3.5" />
+                        {verificationSending[index] ? 'Sending...' : 'Send verification link'}
+                      </button>
+                      {!emailIsSaved && <p className="mt-1 text-[11px] text-slate-500">Save this contact email before requesting verification.</p>}
+                      {verificationMessages[index] && <p role="status" className="mt-1 text-[11px] text-emerald-700">{verificationMessages[index]}</p>}
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-end rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
+                  <Toggle checked={contact.isDefaultPublic} onChange={(value) => setContact(index, 'isDefaultPublic', value)} label="Show as public contact" description="Display this contact on the customer portal." />
+                </div>
+                {contact.contactType !== 'primary' && (
+                  <div className="md:col-span-2">
+                    <Toggle
+                      checked={contact.sameAsPrimary}
+                      onChange={(checked) => {
+                        setContact(index, 'sameAsPrimary', checked);
+                        if (checked) {
+                          setContact(index, 'phoneCountryCode', primary.phoneCountryCode || '+91');
+                          setContact(index, 'phoneNumber', primary.phoneNumber || '');
+                          setContact(index, 'email', primary.email || '');
+                        }
+                      }}
+                      label="Same as primary"
+                      description="Copy primary phone and email into this contact."
+                    />
                   </div>
                 )}
               </div>
-              <div className="flex items-end rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
-                <Toggle checked={contact.isDefaultPublic} onChange={(value) => setContact(index, 'isDefaultPublic', value)} label="Show as public contact" description="Display this contact on the customer portal." />
-              </div>
-              {contact.contactType !== 'primary' && (
-                <div className="md:col-span-2">
-                  <Toggle
-                    checked={contact.sameAsPrimary}
-                    onChange={(checked) => {
-                      setContact(index, 'sameAsPrimary', checked);
-                      if (checked) {
-                        setContact(index, 'phoneCountryCode', primary.phoneCountryCode || '+91');
-                        setContact(index, 'phoneNumber', primary.phoneNumber || '');
-                        setContact(index, 'email', primary.email || '');
-                      }
-                    }}
-                    label="Same as primary"
-                    description="Copy primary phone and email into this contact."
-                  />
-                </div>
-              )}
-            </div>
-          </section>
+            </section>
           );
         })}
         <p className="rounded-xl bg-blue-50 p-3 text-xs text-blue-800 dark:bg-blue-500/10 dark:text-blue-200">
@@ -1192,11 +1191,10 @@ export default function OrganisationSetupForm({
             </label>
           </div>
           <div className="flex flex-col justify-center rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-            <span className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${
-              form.taxProfile.verificationStatus === 'verified' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+            <span className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${form.taxProfile.verificationStatus === 'verified' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
                 : form.taxProfile.verificationStatus === 'rejected' ? 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
                   : 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'
-            }`}>{form.taxProfile.verificationStatus}</span>
+              }`}>{form.taxProfile.verificationStatus}</span>
             <p className="mt-2 text-xs text-slate-500">{form.taxProfile.verificationNotes || 'Verification status is assigned after manual or authority validation. A valid format alone is not approval.'}</p>
             {isSuperAdmin && <div className="mt-4 space-y-3">
               <Dropdown
@@ -1361,10 +1359,9 @@ export default function OrganisationSetupForm({
         {STEPS.map((item, index) => {
           const Icon = item.icon;
           return (
-            <button key={item.id} type="button" onClick={() => setStep(index)} className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition ${
-              step === index ? 'border-primary-500 bg-primary-50 text-primary-800 dark:bg-primary-500/10 dark:text-primary-200'
+            <button key={item.id} type="button" onClick={() => setStep(index)} className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition ${step === index ? 'border-primary-500 bg-primary-50 text-primary-800 dark:bg-primary-500/10 dark:text-primary-200'
                 : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600'
-            }`}>
+              }`}>
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/80 text-xs font-bold dark:bg-slate-800">{index + 1}</span>
               <span className="min-w-0"><Icon className="mr-1 inline h-3.5 w-3.5" /><span className="text-[11px] font-semibold">{item.label}</span></span>
             </button>

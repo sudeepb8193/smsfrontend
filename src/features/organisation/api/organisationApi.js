@@ -1,47 +1,8 @@
-const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-const CLEAN_BASE = RAW_API_BASE.replace(/\/+$/, '');
-const API_BASE = CLEAN_BASE.endsWith('/sms') ? CLEAN_BASE : `${CLEAN_BASE}/sms`;
+import apiClient from '../../../services/apiClient';
 
-async function request(path, options = {}) {
-  const token =
-    localStorage.getItem('salon_jwt_token') ||
-    localStorage.getItem('salon_access_token');
-
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
+function request(path, options = {}) {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  const res = await fetch(`${API_BASE}${cleanPath}`, {
-    ...options,
-    headers,
-  });
-
-  const body = await res.json().catch(() => null);
-
-  if (!res.ok) {
-    const rawDetails = body?.error?.details || body?.details;
-    const detailsStr = Array.isArray(rawDetails) ? rawDetails.join(', ') : null;
-    const errorMsg =
-      detailsStr ||
-      body?.error?.message ||
-      body?.message ||
-      'An unexpected server error occurred';
-    const error = new Error(
-      typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
-    );
-    error.status = res.status;
-    error.code = body?.error?.code || body?.code;
-    error.data = body;
-    throw error;
-  }
-
-  return body?.data !== undefined ? body.data : body;
+  return apiClient.request(cleanPath, options);
 }
 
 export function fetchOrganisations(params = {}) {
