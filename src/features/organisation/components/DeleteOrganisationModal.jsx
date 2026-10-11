@@ -73,7 +73,7 @@ export const DeleteOrganisationModal = ({
                 setErrorMsg('');
               }}
               placeholder={`Type "${organisation.name}"`}
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all"
+              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:outline-none  focus:ring-rose-500/20 focus:border-rose-500 transition-all"
             />
             {errorMsg && (
               <p className="text-xs font-medium text-rose-600 dark:text-rose-400 mt-1">
@@ -95,11 +95,10 @@ export const DeleteOrganisationModal = ({
           <button
             onClick={handleConfirm}
             disabled={!isMatching || loading}
-            className={`px-4 py-2 text-sm font-semibold rounded-lg shadow-sm transition-all flex items-center gap-2 ${
-              isMatching
+            className={`px-4 py-2 text-sm font-semibold rounded-lg shadow-sm transition-all flex items-center gap-2 ${isMatching
                 ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/20'
                 : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-            }`}
+              }`}
           >
             {loading ? (
               <>

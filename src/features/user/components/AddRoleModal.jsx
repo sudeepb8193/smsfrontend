@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, ShieldPlus, Star, Loader2, CheckCircle2 } from 'lucide-react';
+import Toggle from '../../../components/shared/Toggle';
 
 export const AddRoleModal = ({
   isOpen,
@@ -133,18 +134,25 @@ export const AddRoleModal = ({
 
           {/* Primary Role Option */}
           {selectableRoles.length > 0 && (
-            <div className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40">
-              <input
-                type="checkbox"
-                id="isPrimaryCheckbox"
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40">
+              <div className="flex items-center gap-2">
+                <Star size={14} className="text-warning-500" />
+                <div>
+                  <span className="text-xs font-semibold text-slate-900 dark:text-white block">
+                    Mark as Primary Role
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
+                    Drives the default dashboard view for this user
+                  </span>
+                </div>
+              </div>
+              <Toggle
                 checked={isPrimary}
-                onChange={(e) => setIsPrimary(e.target.checked)}
-                className="w-4 h-4 rounded text-primary-600 focus:ring-primary-500 border-slate-300 dark:border-slate-600"
+                onChange={setIsPrimary}
+                size="md"
+                color="primary"
+                aria-label="Mark as Primary Role"
               />
-              <label htmlFor="isPrimaryCheckbox" className="text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer flex items-center gap-1.5">
-                <Star size={14} className="text-yellow-500" />
-                <span>Mark as Primary Role (drives default dashboard view)</span>
-              </label>
             </div>
           )}
 

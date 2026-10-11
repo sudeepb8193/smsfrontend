@@ -6,10 +6,13 @@ export const UnderlineTabs = ({
   onChange,
   className = '',
   size = 'md',
+  showBorder = false,
 }) => {
   return (
     <div
-      className={`relative flex items-center gap-1 border-b border-slate-200 dark:border-slate-800 overflow-x-auto no-scrollbar ${className}`}
+      className={`relative flex items-center gap-1 ${
+        showBorder ? 'border-b border-slate-200 dark:border-slate-800' : ''
+      } overflow-x-auto no-scrollbar ${className}`}
     >
       {tabs.map((tab) => {
         const Icon = tab.icon;

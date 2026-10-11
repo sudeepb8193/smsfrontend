@@ -199,7 +199,7 @@ export const UserManagementPage = () => {
                   placeholder="Filter users..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl  focus:ring-primary-500 text-slate-800 dark:text-slate-100"
                 />
               </div>
             </div>
@@ -220,22 +220,20 @@ export const UserManagementPage = () => {
                     <div
                       key={u.id}
                       onClick={() => handleSelectUser(u)}
-                      className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-                        isSelected
+                      className={`p-3.5 rounded-xl border cursor-pointer transition-all ${isSelected
                           ? 'border-primary-500 bg-primary-50/40 dark:bg-primary-950/30 shadow-sm'
                           : 'border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <div className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
                             <span>{u.displayName}</span>
                             <span
-                              className={`text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded ${
-                                u.status === 'active'
+                              className={`text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded ${u.status === 'active'
                                   ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
                                   : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
-                              }`}
+                                }`}
                             >
                               {u.status}
                             </span>
@@ -247,9 +245,8 @@ export const UserManagementPage = () => {
 
                         <ChevronRight
                           size={16}
-                          className={`text-slate-400 transition-transform ${
-                            isSelected ? 'translate-x-1 text-primary-600' : ''
-                          }`}
+                          className={`text-slate-400 transition-transform ${isSelected ? 'translate-x-1 text-primary-600' : ''
+                            }`}
                         />
                       </div>
 
@@ -326,11 +323,10 @@ export const UserManagementPage = () => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('effective-permissions')}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all ${
-                    activeTab === 'effective-permissions'
+                  className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all ${activeTab === 'effective-permissions'
                       ? 'border-primary-600 text-primary-600 dark:text-primary-400 font-extrabold'
                       : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                  }`}
+                    }`}
                 >
                   <Sparkles size={15} />
                   <span>Effective Permissions Union</span>
@@ -338,11 +334,10 @@ export const UserManagementPage = () => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('history')}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all ${
-                    activeTab === 'history'
+                  className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all ${activeTab === 'history'
                       ? 'border-primary-600 text-primary-600 dark:text-primary-400 font-extrabold'
                       : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                  }`}
+                    }`}
                 >
                   <History size={15} />
                   <span>Assignment Audit Log</span>

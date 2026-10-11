@@ -7,6 +7,7 @@ import { StaffRoutes } from './StaffRoutes';
 import { AuditRoutes } from './AuditRoutes';
 import { OperationsRoutes } from './OperationsRoutes';
 import { OrganizationRoutes } from './OrganizationRoutes';
+import { RolePermissionRoutes } from './RolePermissionRoutes';
 import DashboardLayout from '../components/layout/DashboardLayout/DashboardLayout';
 import Dashboard from '../pages/Dashboard';
 import NotFound from '../pages/NotFound';
@@ -28,6 +29,7 @@ export const AppRoutes = () => {
 
           {/* Sub-Routes */}
           {OrganizationRoutes}
+          {RolePermissionRoutes}
           {StaffRoutes}
           {AuditRoutes}
           {OperationsRoutes}

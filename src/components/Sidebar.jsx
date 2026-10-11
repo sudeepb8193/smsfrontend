@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { getAuthorizedNavModules } from '../config/sidebar.config';
+import Tooltip from './shared/Tooltip';
 import {
   ChevronLeft,
   ChevronRight,
@@ -15,6 +16,20 @@ export const Sidebar = ({ currentModule: propsCurrentModule, activeSubtask: prop
   const { role, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const userRole = role || user?.role || user?.roleSlug || user?.roleName || '';
+  const normUserRole = String(userRole).toUpperCase().replace(/[\s_-]+/g, '_');
+  const isSuperAdmin = normUserRole === 'SUPER_ADMIN' || normUserRole === 'SUPERADMIN';
+
+  const displayLogoUrl = !isSuperAdmin
+    ? user?.organization?.logoUrl || user?.organizationLogo || user?.logoUrl
+    : null;
+  const displayName = !isSuperAdmin
+    ? user?.organization?.name || user?.organizationName || 'SalonFlow Pro'
+    : 'SalonFlow Pro';
+  const displayType = !isSuperAdmin
+    ? user?.organization?.businessType || user?.organizationType || 'ENTERPRISE PLATFORM'
+    : 'ENTERPRISE PLATFORM';
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedModules, setExpandedModules] = useState({
@@ -77,42 +92,15 @@ export const Sidebar = ({ currentModule: propsCurrentModule, activeSubtask: prop
 
   return (
     <aside
-      style={{
-        width: isCollapsed ? '72px' : '260px',
-        backgroundColor: '#21141A', // Deep plum wine dark background matching specification image
-        borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        position: 'sticky',
-        top: 0,
-        zIndex: 30,
-        boxSizing: 'border-box',
-        transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-        userSelect: 'none',
-      }}
+      className={`fixed lg:sticky top-0 z-30 h-screen bg-[#21141A] text-white border-r border-white/10 flex flex-col transition-all duration-300 select-none ${
+        isCollapsed ? 'w-20' : 'w-64'
+      }`}
     >
       {/* Collapse / Expand Toggle Floating Button */}
       <button
+        type="button"
         onClick={() => setIsCollapsed(!isCollapsed)}
-        style={{
-          position: 'absolute',
-          top: '24px',
-          right: '-14px',
-          width: '28px',
-          height: '28px',
-          borderRadius: '50%',
-          backgroundColor: '#331D27',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          color: '#F9FAFB',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
-          zIndex: 40,
-          transition: 'all 0.2s ease',
-        }}
+        className="absolute top-6 -right-3.5 w-7 h-7 rounded-full bg-[#331D27] border border-white/15 text-gray-100 flex items-center justify-center cursor-pointer shadow-lg z-40 hover:bg-[#442735] transition-all"
         title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         aria-label="Toggle sidebar collapse"
       >
@@ -120,47 +108,37 @@ export const Sidebar = ({ currentModule: propsCurrentModule, activeSubtask: prop
       </button>
 
       {/* Brand Header */}
-      <div
-        style={{
-          padding: isCollapsed ? '20px 14px' : '22px 20px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            width: '38px',
-            height: '38px',
-            minWidth: '38px',
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, #8A4A52 0%, #6E363E 100%)',
-            color: '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 14px rgba(138, 74, 82, 0.45)',
-          }}
-        >
-          <Crown size={22} />
-        </div>
+      <div className={`border-b border-white/10 flex items-center gap-3 overflow-hidden shrink-0 ${isCollapsed ? 'p-4 justify-center' : 'p-5'}`}>
+        <Tooltip content={`${displayName} (${displayType})`} position="right">
+          <div className="flex items-center gap-3 overflow-hidden cursor-pointer">
+            <div className="w-9 h-9 min-w-[36px] rounded-xl bg-gradient-to-br from-[#8A4A52] to-[#6E363E] text-white flex items-center justify-center shadow-md overflow-hidden">
+              {displayLogoUrl ? (
+                <img
+                  src={displayLogoUrl}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Crown size={22} />
+              )}
+            </div>
 
-        {!isCollapsed && (
-          <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-            <div style={{ fontWeight: '800', fontSize: '1.2rem', color: '#FFFFFF', letterSpacing: '-0.02em' }}>
-              SalonFlow Pro
-            </div>
-            <div style={{ fontSize: '0.68rem', color: '#8A4A52', fontWeight: '700', letterSpacing: '0.06em' }}>
-              ENTERPRISE PLATFORM
-            </div>
+            {!isCollapsed && (
+              <div className="overflow-hidden whitespace-nowrap">
+                <div className="font-extrabold text-base text-white tracking-tight truncate max-w-[160px]">
+                  {displayName}
+                </div>
+                <div className="text-[10px] text-[#8A4A52] font-bold tracking-widest uppercase truncate max-w-[160px]">
+                  {displayType}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </Tooltip>
       </div>
 
       {/* Navigation Modules & Sub-tasks */}
-      <nav style={{ padding: '18px 12px', flex: 1, overflowY: 'auto' }}>
+      <nav className="p-3 flex-1 overflow-y-auto space-y-1.5 scrollbar-none">
         {modules.map((mod) => {
           const IconComponent = mod.icon;
           const isSelectedModule = activeModuleName === mod.id;
@@ -169,113 +147,70 @@ export const Sidebar = ({ currentModule: propsCurrentModule, activeSubtask: prop
           return (
             <div
               key={mod.id}
-              style={{ position: 'relative', marginBottom: '8px' }}
+              className="relative"
               onMouseEnter={() => isCollapsed && setHoveredModule(mod.id)}
               onMouseLeave={() => isCollapsed && setHoveredModule(null)}
             >
               {/* Parent Module Row Button */}
-              <button
-                onClick={() => handleModuleClick(mod)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: isCollapsed ? '12px' : '12px 16px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  background: isSelectedModule
-                    ? 'linear-gradient(135deg, #8A4A52 0%, #6E363E 100%)' // Exact Burgundy Rose active pill
-                    : 'transparent',
-                  color: isSelectedModule ? '#FFFFFF' : '#C4B5BE',
-                  fontWeight: isSelectedModule ? '700' : '600',
-                  fontSize: '0.92rem',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.2s ease',
-                  justifyContent: isCollapsed ? 'center' : 'space-between',
-                  boxShadow: isSelectedModule ? '0 4px 16px rgba(138, 74, 82, 0.4)' : 'none',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflow: 'hidden' }}>
-                  <IconComponent size={20} style={{ minWidth: '20px', color: isSelectedModule ? '#FFFFFF' : '#C4B5BE' }} />
-                  {!isCollapsed && (
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {mod.label}
-                    </span>
-                  )}
-                </div>
-
-                {!isCollapsed && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    {mod.badge && !isSelectedModule && (
-                      <span
-                        style={{
-                          fontSize: '0.65rem',
-                          fontWeight: '700',
-                          padding: '2px 6px',
-                          borderRadius: '6px',
-                          backgroundColor: 'rgba(138, 74, 82, 0.25)',
-                          color: '#8A4A52',
-                        }}
-                      >
-                        {mod.badge}
-                      </span>
-                    )}
-                    {mod.subtasks && (
-                      <span style={{ color: isSelectedModule ? '#FFFFFF' : '#8E7A86' }}>
-                        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              <Tooltip content={isCollapsed ? mod.label : null} position="right">
+                <button
+                  type="button"
+                  onClick={() => handleModuleClick(mod)}
+                  className={`w-full flex items-center gap-3 rounded-xl transition-all duration-200 text-sm font-semibold cursor-pointer ${
+                    isCollapsed ? 'p-3 justify-center' : 'px-4 py-3 justify-between'
+                  } ${
+                    isSelectedModule
+                      ? 'bg-gradient-to-r from-[#8A4A52] to-[#6E363E] text-white font-bold shadow-lg shadow-[#8A4A52]/40'
+                      : 'text-rose-100/70 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <IconComponent size={20} className={`shrink-0 ${isSelectedModule ? 'text-white' : 'text-rose-200/70'}`} />
+                    {!isCollapsed && (
+                      <span className="truncate">
+                        {mod.label}
                       </span>
                     )}
                   </div>
-                )}
-              </button>
+
+                  {!isCollapsed && (
+                    <div className="flex items-center gap-1.5">
+                      {mod.badge && !isSelectedModule && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#8A4A52]/25 text-[#8A4A52]">
+                          {mod.badge}
+                        </span>
+                      )}
+                      {mod.subtasks && (
+                        <span className={isSelectedModule ? 'text-white' : 'text-rose-200/60'}>
+                          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </button>
+              </Tooltip>
 
               {/* Expanded Sub-tasks Tree View */}
               {!isCollapsed && isExpanded && mod.subtasks && (
-                <div
-                  style={{
-                    marginLeft: '26px',
-                    paddingLeft: '14px',
-                    borderLeft: '1.5px solid rgba(255, 255, 255, 0.1)',
-                    marginTop: '6px',
-                    marginBottom: '8px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px',
-                  }}
-                >
+                <div className="ml-6 pl-3.5 border-l border-white/10 my-1.5 flex flex-col gap-1">
                   {mod.subtasks.map((st) => {
                     const isSubtaskActive = st.path === currentPath || propsActiveSubtask === st.id;
                     return (
                       <button
                         key={st.id}
+                        type="button"
                         onClick={() => handleSubtaskClick(mod.id, st)}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '8px 10px',
-                          borderRadius: '8px',
-                          border: 'none',
-                          backgroundColor: isSubtaskActive
-                            ? 'rgba(138, 74, 82, 0.22)'
-                            : 'transparent',
-                          color: isSubtaskActive ? '#8A4A52' : '#9E8895',
-                          fontWeight: isSubtaskActive ? '700' : '500',
-                          fontSize: '0.84rem',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'all 0.15s ease',
-                        }}
+                        className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-all cursor-pointer text-left ${
+                          isSubtaskActive
+                            ? 'bg-[#8A4A52]/25 text-[#E598A4] font-bold'
+                            : 'text-rose-200/60 hover:text-white hover:bg-white/5 font-medium'
+                        }`}
                       >
                         <Circle
                           size={6}
-                          fill={isSubtaskActive ? '#8A4A52' : 'none'}
-                          color={isSubtaskActive ? '#8A4A52' : '#9E8895'}
+                          className={isSubtaskActive ? 'fill-[#E598A4] text-[#E598A4]' : 'text-rose-200/40'}
                         />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <span className="truncate">
                           {st.label}
                         </span>
                       </button>
@@ -286,54 +221,20 @@ export const Sidebar = ({ currentModule: propsCurrentModule, activeSubtask: prop
 
               {/* Hover Popover Tree View (Collapsed Mode) */}
               {isCollapsed && hoveredModule === mod.id && mod.subtasks && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: '68px',
-                    top: 0,
-                    width: '240px',
-                    backgroundColor: '#271820',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    borderRadius: '14px',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                    padding: '14px',
-                    zIndex: 100,
-                  }}
-                >
-                  <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#FFFFFF', marginBottom: '10px' }}>
+                <div className="absolute left-16 top-0 w-60 bg-[#271820] border border-white/15 rounded-2xl shadow-2xl p-3.5 z-50 animate-fadeIn">
+                  <div className="font-bold text-sm text-white mb-2.5">
                     {mod.label}
                   </div>
-                  <div
-                    style={{
-                      borderLeft: '1.5px solid rgba(255, 255, 255, 0.1)',
-                      paddingLeft: '10px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '6px',
-                    }}
-                  >
+                  <div className="border-l border-white/10 pl-2.5 flex flex-col gap-1.5">
                     {mod.subtasks.map((st) => (
                       <button
                         key={st.id}
+                        type="button"
                         onClick={() => {
                           handleSubtaskClick(mod.id, st);
                           setHoveredModule(null);
                         }}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '6px 8px',
-                          borderRadius: '6px',
-                          border: 'none',
-                          backgroundColor: 'transparent',
-                          color: '#C4B5BE',
-                          fontSize: '0.82rem',
-                          fontWeight: '500',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                        }}
+                        className="w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium text-rose-100/70 hover:text-white hover:bg-white/10 transition cursor-pointer"
                       >
                         • {st.label}
                       </button>
@@ -347,41 +248,25 @@ export const Sidebar = ({ currentModule: propsCurrentModule, activeSubtask: prop
       </nav>
 
       {/* Footer Profile */}
-      <div
-        style={{
-          padding: isCollapsed ? '16px 12px' : '16px 16px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          backgroundColor: '#190E14',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            width: '36px',
-            height: '36px',
-            minWidth: '36px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(138, 74, 82, 0.22)',
-            color: '#8A4A52',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <ShieldCheck size={18} />
-        </div>
-        {!isCollapsed && (
-          <div style={{ overflow: 'hidden' }}>
-            <div style={{ fontSize: '0.7rem', color: '#8E7A86', fontWeight: '600' }}>Active Session</div>
-            <div style={{ fontWeight: '700', fontSize: '0.88rem', color: '#FFFFFF', truncate: true }}>
-              {user?.displayName || 'Super Admin'}
+      <div className={`border-t border-white/10 bg-[#190E14] flex items-center gap-2.5 overflow-hidden shrink-0 ${isCollapsed ? 'p-3 justify-center' : 'p-4'}`}>
+        <Tooltip content={user?.displayName || 'User Profile'} position="right">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 min-w-[36px] rounded-full bg-[#8A4A52]/25 text-[#E598A4] flex items-center justify-center shrink-0">
+              <ShieldCheck size={18} />
             </div>
+            {!isCollapsed && (
+              <div className="overflow-hidden text-left">
+                <div className="text-[10px] text-rose-200/50 font-semibold">Active Session</div>
+                <div className="font-bold text-xs text-white truncate max-w-[140px]">
+                  {user?.displayName || 'Super Admin'}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </Tooltip>
       </div>
     </aside>
   );
 };
+
+export default Sidebar;

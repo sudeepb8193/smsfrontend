@@ -35,9 +35,8 @@ export const Select = ({
           onChange={onChange}
           required={required}
           disabled={disabled}
-          className={`w-full h-10 pl-3.5 pr-10 text-sm font-sans text-[var(--text-primary)] bg-[var(--bg-input)] border ${
-            error ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/20' : 'border-[var(--border-color)] focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20'
-          } rounded-xl appearance-none outline-none cursor-pointer transition-all disabled:opacity-60 disabled:cursor-not-allowed`}
+          className={`w-full h-10 pl-3.5 pr-10 text-sm font-sans text-[var(--text-primary)] bg-[var(--bg-input)] border ${error ? 'border-rose-500  focus:ring-rose-500/20' : 'border-[var(--border-color)] focus:border-primary-500  focus:ring-primary-500/20'
+            } rounded-xl appearance-none outline-none cursor-pointer transition-all disabled:opacity-60 disabled:cursor-not-allowed`}
           aria-invalid={!!error}
           {...props}
         >

@@ -1,6 +1,10 @@
 import {
   LayoutDashboard,
   Building2,
+  Shield,
+  ShieldCheck,
+  BookOpen,
+  UserCheck,
 } from 'lucide-react';
 
 export const SIDEBAR_MODULE_CONFIG = [
@@ -17,6 +21,18 @@ export const SIDEBAR_MODULE_CONFIG = [
     icon: Building2,
     allowedRoles: ['SUPER_ADMIN'],
     path: '/super-admin/organisations',
+  },
+  {
+    id: 'super-admin-roles',
+    label: 'Roles & Access Control',
+    icon: ShieldCheck,
+    allowedRoles: ['SUPER_ADMIN'],
+    path: '/super-admin/roles',
+    subtasks: [
+      { id: 'sa-role-catalog', label: 'Role Catalog & Scopes', path: '/super-admin/roles' },
+      { id: 'sa-perm-catalog', label: 'Permission Catalog', path: '/super-admin/permissions' },
+      { id: 'sa-staff-overrides', label: 'Staff Overrides', path: '/super-admin/staff-overrides' },
+    ],
   },
   {
     id: 'my-organisation',
