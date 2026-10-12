@@ -33,12 +33,15 @@ const SidebarModuleItem = ({
   const isFirstRender = useRef(true);
 
   const IconComponent = mod.icon;
+  const currentFullPath = location.pathname + (location.search || '');
   const isSubtaskActive = mod.subtasks?.some(
     (st) =>
       location.pathname === st.path ||
+      currentFullPath === st.path ||
+      (st.path.includes('?') && (!location.search && st.path.endsWith('tab=overview') && location.pathname === st.path.split('?')[0])) ||
       (location.pathname.startsWith(st.path + '/') && st.path !== '/')
   );
-  const isDirectPathActive = mod.path && location.pathname === mod.path;
+  const isDirectPathActive = mod.path && (location.pathname === mod.path || currentFullPath === mod.path);
   const isModuleActive = isDirectPathActive || isSubtaskActive;
 
   // GSAP Accordion Animation
@@ -190,26 +193,38 @@ const SidebarModuleItem = ({
                 to={st.path}
                 end
                 onClick={onNavItemClick}
-                className={({ isActive }) =>
-                  `gsap-subtask-item group/sub flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
-                    isActive
+                className={({ isActive }) => {
+                  const isQueryMatched = st.path.includes('?') && (
+                    currentFullPath === st.path ||
+                    (!location.search && st.path.endsWith('tab=overview') && location.pathname === st.path.split('?')[0])
+                  );
+                  const isCurrent = isQueryMatched || (!st.path.includes('?') && isActive);
+                  return `gsap-subtask-item group/sub flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                    isCurrent
                       ? 'bg-primary-500 text-white font-bold shadow-md shadow-primary-500/25 translate-x-0.5'
                       : 'text-white/70 hover:text-white hover:bg-white/10 hover:translate-x-0.5'
-                  }`
-                }
+                  }`;
+                }}
               >
-                {({ isActive }) => (
-                  <>
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-200 ${
-                        isActive
-                          ? 'bg-white ring-2 ring-white/30 scale-110'
-                          : 'border border-white/40 bg-transparent group-hover/sub:border-white'
-                      }`}
-                    />
-                    <span className="truncate">{st.label}</span>
-                  </>
-                )}
+                {({ isActive }) => {
+                  const isQueryMatched = st.path.includes('?') && (
+                    currentFullPath === st.path ||
+                    (!location.search && st.path.endsWith('tab=overview') && location.pathname === st.path.split('?')[0])
+                  );
+                  const isCurrent = isQueryMatched || (!st.path.includes('?') && isActive);
+                  return (
+                    <>
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-200 ${
+                          isCurrent
+                            ? 'bg-white ring-2 ring-white/30 scale-110'
+                            : 'border border-white/40 bg-transparent group-hover/sub:border-white'
+                        }`}
+                      />
+                      <span className="truncate">{st.label}</span>
+                    </>
+                  );
+                }}
               </NavLink>
             ))}
           </div>
@@ -263,11 +278,14 @@ export const Sidebar = ({
 
   const [expandedModules, setExpandedModules] = useState(() => {
     const initial = {};
+    const fullPath = location.pathname + (location.search || '');
     SIDEBAR_MODULE_CONFIG.forEach((mod) => {
       if (
         mod.subtasks?.some(
           (st) =>
             location.pathname === st.path ||
+            fullPath === st.path ||
+            (st.path.includes('?') && (!location.search && st.path.endsWith('tab=overview') && location.pathname === st.path.split('?')[0])) ||
             (location.pathname.startsWith(st.path + '/') && st.path !== '/')
         )
       ) {
@@ -280,11 +298,14 @@ export const Sidebar = ({
 
   // Auto-expand module if the active path matches any subtask
   useEffect(() => {
+    const fullPath = location.pathname + (location.search || '');
     SIDEBAR_MODULE_CONFIG.forEach((mod) => {
       if (
         mod.subtasks?.some(
           (st) =>
             location.pathname === st.path ||
+            fullPath === st.path ||
+            (st.path.includes('?') && (!location.search && st.path.endsWith('tab=overview') && location.pathname === st.path.split('?')[0])) ||
             (location.pathname.startsWith(st.path + '/') && st.path !== '/')
         )
       ) {
@@ -294,7 +315,7 @@ export const Sidebar = ({
         });
       }
     });
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   const handleNavItemClick = () => {
     if (onCloseMobile) {
