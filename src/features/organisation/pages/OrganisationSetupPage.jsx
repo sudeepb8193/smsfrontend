@@ -50,19 +50,19 @@ export default function OrganisationSetupPage() {
   }
 
   return (
-    <div className="space-y-5 pb-8">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600">{isOwner ? 'My organization settings' : 'Module 01 • Organization / Business Setup'}</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{organisation.name}</h1>
-          <p className="mt-1 text-sm text-slate-500">{isOwner ? 'Update your organization profile, contacts, addresses, hours, and regional preferences.' : 'Configure identity, communication, legal, regional, and schedule defaults.'}</p>
-        </div>
-        {!isOwner && (
+    <div className="space-y-4 pb-8">
+      {!isOwner && (
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600">Module 01 • Organization / Business Setup</p>
+            <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{organisation.name}</h1>
+            <p className="mt-1 text-sm text-slate-500">Configure identity, communication, legal, regional, and schedule defaults.</p>
+          </div>
           <button type="button" onClick={() => navigate(overviewRoute)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
             <ArrowLeft className="mr-1 inline h-4 w-4" />Organization overview
           </button>
-        )}
-      </header>
+        </header>
+      )}
       {saveMessage && <p role="status" className="rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">{saveMessage}</p>}
       <OrganisationSetupForm
         organisation={organisation}
