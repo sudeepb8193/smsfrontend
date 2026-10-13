@@ -24,17 +24,17 @@ export const UnauthorizedAccess = ({
         <ShieldAlert size={32} />
       </div>
 
-      <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+      <h2 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] tracking-tight mb-2">
         {title}
       </h2>
 
-      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mb-5 leading-relaxed">
+      <p className="text-sm text-[var(--text-muted)] max-w-md mb-5 leading-relaxed">
         {message}
       </p>
 
       {(requiredPermission || requiredRole || resourceName) && (
-        <div className="w-full max-w-md bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 mb-6 text-left space-y-2">
-          <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <div className="w-full max-w-md bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl p-3.5 mb-6 text-left space-y-2">
+          <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
             <Lock size={12} className="text-danger-500" />
             Security Diagnostic Context
           </div>
@@ -42,7 +42,7 @@ export const UnauthorizedAccess = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
             {requiredPermission && (
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Required Permission:</span>
+                <span className="text-[var(--text-muted)] block text-[10px]">Required Permission:</span>
                 <Badge variant="danger" size="small" className="font-mono mt-0.5">
                   {requiredPermission}
                 </Badge>
@@ -50,7 +50,7 @@ export const UnauthorizedAccess = ({
             )}
             {requiredRole && (
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Required Role:</span>
+                <span className="text-[var(--text-muted)] block text-[10px]">Required Role:</span>
                 <Badge variant="warning" size="small" className="mt-0.5">
                   {requiredRole}
                 </Badge>
@@ -113,7 +113,7 @@ export const UnauthorizedAccess = ({
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl shadow-2xl border-slate-200 dark:border-slate-800">{content}</Card>
+      <Card className="w-full max-w-xl shadow-2xl border-[var(--border-color)]">{content}</Card>
     </div>
   );
 };

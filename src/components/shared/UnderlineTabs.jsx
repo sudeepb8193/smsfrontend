@@ -11,7 +11,7 @@ export const UnderlineTabs = ({
   return (
     <div
       className={`relative flex items-center gap-1 ${
-        showBorder ? 'border-b border-slate-200 dark:border-slate-800' : ''
+        showBorder ? 'border-b border-[var(--border-color)]' : ''
       } overflow-x-auto no-scrollbar ${className}`}
     >
       {tabs.map((tab) => {
@@ -25,14 +25,14 @@ export const UnderlineTabs = ({
             onClick={() => onChange && onChange(tab.id)}
             className={`relative flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-semibold transition-colors duration-200 cursor-pointer whitespace-nowrap group ${
               isActive
-                ? 'text-primary-600 dark:text-primary-400 font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-t-xl'
+                ? 'text-primary-500 font-bold'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-t-xl'
             }`}
           >
             {Icon && (
               <Icon
                 className={`w-4 h-4 transition-colors ${
-                  isActive ? 'text-primary-600 dark:text-primary-400' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'
+                  isActive ? 'text-primary-500' : 'text-[var(--text-muted)] group-hover:text-[var(--text-primary)]'
                 }`}
               />
             )}
@@ -41,8 +41,8 @@ export const UnderlineTabs = ({
               <span
                 className={`px-2 py-0.5 text-[11px] font-bold rounded-full transition-colors ${
                   isActive
-                    ? 'bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                    ? 'bg-primary-500/15 text-primary-500 border border-primary-500/30'
+                    : 'bg-[var(--bg-input)] text-[var(--text-muted)] border border-[var(--border-color)]'
                 }`}
               >
                 {tab.count}

@@ -254,7 +254,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
     }
   };
 
-  // Toggle Single Action Permission
+  // Toggle Single Action Permission (strictly affects only the clicked permission)
   const handleTogglePermission = (moduleCode, action, permission) => {
     const key = permission.permissionKey;
     const isCurrentlyChecked = Boolean(selectedPermissions[key]);
@@ -266,41 +266,12 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
     };
 
     if (isCurrentlyChecked) {
-      // Removing permission
       delete next[key];
-
-      // If removing View, remove all dependent non-view actions in this module
-      if (action === 'view') {
-        const moduleDef = matrixTemplate.find((m) => m.moduleCode === moduleCode);
-        if (moduleDef) {
-          moduleDef.permissions.forEach((p) => {
-            if (p.action !== 'view') {
-              delete next[p.permissionKey];
-            }
-          });
-        }
-      }
     } else {
-      // Adding permission
       next[key] = {
         scope: currentModScope.scope,
         restrictedBranchIds: [...currentModScope.restrictedBranchIds],
       };
-
-      // Dependency Rule: Any non-view action automatically implies and grants View
-      if (action !== 'view') {
-        const viewKey = `${moduleCode}.view`;
-        const viewDef = matrixTemplate
-          .find((m) => m.moduleCode === moduleCode)
-          ?.permissions?.find((p) => p.action === 'view');
-
-        if (viewDef && !next[viewKey]) {
-          next[viewKey] = {
-            scope: currentModScope.scope,
-            restrictedBranchIds: [...currentModScope.restrictedBranchIds],
-          };
-        }
-      }
     }
 
     setSelectedPermissions(next);
@@ -577,11 +548,11 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
         {/* ========================================================= */}
         {/* LEFT SECTION: ALL ROLES (Master Panel)                     */}
         {/* ========================================================= */}
-        <div className="lg:col-span-4 xl:col-span-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col transition-colors lg:sticky lg:top-20 h-[calc(100vh-6rem)] min-h-[500px]">
+        <div className="lg:col-span-3 xl:col-span-3 2xl:col-span-3 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden flex flex-col transition-colors lg:sticky lg:top-20 h-[calc(100vh-6rem)] min-h-[500px]">
           {/* Roles Search & Header */}
-          <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 space-y-2.5 shrink-0">
+          <div className="p-3.5 border-b border-[var(--border-color)] space-y-2.5 shrink-0">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+              <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
                 Roles ({filteredRoles.length})
               </span>
               <Button
@@ -596,26 +567,26 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
             </div>
 
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-muted)]" />
               <input
                 type="text"
                 value={roleSearch}
                 onChange={(e) => setRoleSearch(e.target.value)}
                 placeholder="Search roles..."
-                className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary-500 transition-all"
+                className="w-full pl-9 pr-3 py-1.5 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-primary-500 transition-all"
               />
             </div>
           </div>
 
           {/* Roles Scrollable List */}
-          <div className="flex-1 p-2 space-y-1.5 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/40">
+          <div className="flex-1 p-2 space-y-1.5 overflow-y-auto divide-y divide-[var(--border-color)]">
             {loadingRoles ? (
-              <div className="flex flex-col items-center justify-center p-8 text-slate-400 text-xs">
+              <div className="flex flex-col items-center justify-center p-8 text-[var(--text-muted)] text-xs">
                 <Spinner size="small" />
                 <span className="mt-2 font-medium">Loading roles...</span>
               </div>
             ) : filteredRoles.length === 0 ? (
-              <div className="p-6 text-center text-slate-400 text-xs italic">
+              <div className="p-6 text-center text-[var(--text-muted)] text-xs italic">
                 No matching roles found.
               </div>
             ) : (
@@ -631,26 +602,26 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                   >
                     <div
                       className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${isSelected
-                          ? 'bg-primary-50/80 dark:bg-primary-950/40 border-primary-500 shadow-xs  ring-primary-500/20'
-                          : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/70 dark:hover:bg-slate-800/50'
+                          ? 'bg-primary-500/15 border-primary-500 shadow-xs ring-1 ring-primary-500/30'
+                          : 'bg-[var(--bg-input)] border-[var(--border-color)] hover:border-[var(--border-hover)] hover:bg-white/5'
                         }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
                           className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors ${isSelected
-                              ? 'bg-primary-600 text-white shadow-xs'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:text-primary-600 dark:group-hover:text-primary-400'
+                              ? 'bg-primary-500 text-white shadow-xs'
+                              : 'bg-[var(--bg-card)] text-[var(--text-muted)] group-hover:text-primary-500'
                             }`}
                         >
                           <Shield size={18} />
                         </div>
 
                         <div className="min-w-0">
-                          <span className="font-bold text-xs text-slate-900 dark:text-white truncate block">
+                          <span className="font-bold text-xs text-[var(--text-primary)] truncate block">
                             {role.name}
                           </span>
 
-                          <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)] mt-0.5">
                             <span className="flex items-center gap-0.5">
                               <Users size={11} className="opacity-70" />
                               {role.activeUsersCount || 0} users
@@ -670,7 +641,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                                 e.stopPropagation();
                                 setDeleteConfirmRole(role);
                               }}
-                              className="p-1 rounded-md text-slate-400 hover:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-950/30 transition-colors"
+                              className="p-1 rounded-md text-[var(--text-muted)] hover:text-danger-400 hover:bg-danger-500/10 transition-colors cursor-pointer"
                             >
                               <Trash2 size={13} />
                             </button>
@@ -679,8 +650,8 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                         <ChevronRight
                           size={15}
                           className={`transition-transform ${isSelected
-                              ? 'text-primary-600 dark:text-primary-400 translate-x-0.5'
-                              : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-400'
+                              ? 'text-primary-500 translate-x-0.5'
+                              : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'
                             }`}
                         />
                       </div>
@@ -695,15 +666,15 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
         {/* ========================================================= */}
         {/* RIGHT SECTION: MODULES & ACTION PERMISSIONS (Detail Panel) */}
         {/* ========================================================= */}
-        <div className="lg:col-span-8 xl:col-span-8 space-y-4">
+        <div className="lg:col-span-9 xl:col-span-9 2xl:col-span-9 space-y-4">
           {/* Header on Right Side */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
             <div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Shield className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+              <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <Shield className="w-6 h-6 text-primary-500" />
                 Roles & Access Permissions
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
                 Select a role from the left to configure module action permissions and branch scopes
               </p>
             </div>
@@ -720,33 +691,33 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
             </div>
           </div>
           {!selectedRole ? (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center text-slate-400">
-              <Shield className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
+            <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-12 text-center text-[var(--text-muted)]">
+              <Shield className="w-10 h-10 mx-auto text-[var(--text-muted)] mb-2" />
               <p className="text-sm font-semibold">Select a role from the left to configure permissions</p>
             </div>
           ) : (
             <>
               {/* Selected Role Header & Global Action Bar */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 sm:p-5 transition-colors">
+              <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm p-4 sm:p-5 transition-colors">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   {/* Role Identity & Details */}
                   <div className="flex items-start sm:items-center gap-3 min-w-0">
-                    <div className="w-11 h-11 rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                    <div className="w-11 h-11 rounded-xl bg-primary-500/10 text-primary-500 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
                       <Shield size={22} />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                        <h3 className="text-base font-bold text-[var(--text-primary)]">
                           {selectedRole.name}
                         </h3>
                         <Badge variant={selectedRole.status === 'active' ? 'success' : 'danger'} size="small">
                           {selectedRole.status}
                         </Badge>
-                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200/50 dark:border-slate-700/50">
+                        <span className="text-[11px] font-bold text-[var(--text-secondary)] bg-[var(--bg-input)] px-2 py-0.5 rounded-full border border-[var(--border-color)]">
                           {selectedCount} / {totalAvailableCount} granted
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
+                      <p className="text-xs text-[var(--text-muted)] mt-1 max-w-xl">
                         {selectedRole.description || 'Configure accessible business modules and operations.'}
                       </p>
                     </div>
@@ -755,19 +726,19 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                   {/* Actions Toolbar (Neatly aligned in a single horizontal group) */}
                   <div className="flex items-center gap-2.5 shrink-0 self-start lg:self-center flex-wrap sm:flex-nowrap">
                     {/* Bulk Selection Segmented Group */}
-                    <div className="inline-flex items-center rounded-xl bg-slate-100 dark:bg-slate-800/80 p-0.5 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+                    <div className="inline-flex items-center rounded-xl bg-[var(--bg-input)] p-0.5 border border-[var(--border-color)] shadow-xs">
                       <button
                         type="button"
                         onClick={handleGrantAllGlobal}
-                        className="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-semibold rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/10 transition-all cursor-pointer"
                       >
                         Grant All
                       </button>
-                      <div className="w-px h-3.5 bg-slate-200 dark:bg-slate-700 mx-0.5" />
+                      <div className="w-px h-3.5 bg-[var(--border-color)] mx-0.5" />
                       <button
                         type="button"
                         onClick={handleRevokeAllGlobal}
-                        className="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-semibold rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/10 transition-all cursor-pointer"
                       >
                         Revoke All
                       </button>
@@ -802,7 +773,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
 
                 {/* Unsaved Changes Banner */}
                 {hasUnsavedChanges && (
-                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 text-xs font-semibold text-warning-700 dark:text-warning-300">
+                  <div className="mt-3 pt-3 border-t border-[var(--border-color)] flex items-center gap-2 text-xs font-semibold text-warning-400">
                     <span className="w-2 h-2 rounded-full bg-warning-500 animate-pulse" />
                     <span>Unsaved permission adjustments pending. Remember to click "Save Changes".</span>
                   </div>
@@ -810,22 +781,22 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
               </div>
 
               {/* Modules Filter & Search Toolbar */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-3 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 transition-colors">
+              <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-3 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 transition-colors">
                 {/* Search Bar */}
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
                   <input
                     type="text"
                     value={moduleSearch}
                     onChange={(e) => setModuleSearch(e.target.value)}
                     placeholder="Filter modules (e.g. appointments, customers, billing, inventory)..."
-                    className="w-full pl-9 pr-8 py-1.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-primary-500 transition-all"
+                    className="w-full pl-9 pr-8 py-1.5 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-primary-500 transition-all"
                   />
                   {moduleSearch && (
                     <button
                       type="button"
                       onClick={() => setModuleSearch('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-full cursor-pointer"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] p-0.5 rounded-full cursor-pointer"
                       title="Clear search"
                     >
                       <X size={13} />
@@ -839,21 +810,21 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                     type="button"
                     onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
                     className={`flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${moduleFilter !== 'all'
-                        ? 'bg-primary-50 dark:bg-primary-500/10 border-primary-300 dark:border-primary-500/30 text-primary-700 dark:text-primary-300 shadow-xs'
-                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        ? 'bg-primary-500/10 border-primary-500/30 text-primary-500 shadow-xs'
+                        : 'bg-[var(--bg-input)] border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-white/5'
                       }`}
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <Filter size={13} className={moduleFilter !== 'all' ? 'text-primary-600 dark:text-primary-400' : 'text-slate-400'} />
+                      <Filter size={13} className={moduleFilter !== 'all' ? 'text-primary-500' : 'text-[var(--text-muted)]'} />
                       <span className="truncate max-w-[150px]">{filterLabel}</span>
                     </div>
-                    <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 shrink-0 ${filterDropdownOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={14} className={`text-[var(--text-muted)] transition-transform duration-200 shrink-0 ${filterDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {/* Dropdown Panel */}
                   {filterDropdownOpen && (
-                    <div className="absolute right-0 top-full mt-1.5 w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl z-30 p-2 space-y-1">
-                      <div className="flex items-center justify-between px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    <div className="absolute right-0 top-full mt-1.5 w-72 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-xl z-30 p-2 space-y-1">
+                      <div className="flex items-center justify-between px-2 py-1 text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
                         <span>Filter Modules</span>
                         {moduleFilter !== 'all' && (
                           <button
@@ -862,7 +833,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                               setModuleFilter('all');
                               setFilterDropdownOpen(false);
                             }}
-                            className="text-primary-600 dark:text-primary-400 hover:underline capitalize font-semibold cursor-pointer text-[11px]"
+                            className="text-primary-500 hover:underline capitalize font-semibold cursor-pointer text-[11px]"
                           >
                             Reset
                           </button>
@@ -877,12 +848,12 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                           setFilterDropdownOpen(false);
                         }}
                         className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${moduleFilter === 'all'
-                            ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            ? 'bg-primary-500/10 text-primary-500 font-bold'
+                            : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]'
                           }`}
                       >
                         <span>All Modules</span>
-                        <span className="text-[10px] text-slate-400 font-medium">{matrixTemplate.length}</span>
+                        <span className="text-[10px] text-[var(--text-muted)] font-medium">{matrixTemplate.length}</span>
                       </button>
 
                       <button
@@ -892,12 +863,12 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                           setFilterDropdownOpen(false);
                         }}
                         className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${moduleFilter === 'granted'
-                            ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            ? 'bg-primary-500/10 text-primary-500 font-bold'
+                            : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]'
                           }`}
                       >
                         <span>Granted Only</span>
-                        <span className="text-[10px] px-1.5 py-0.2 bg-success-50 dark:bg-success-950/40 text-success-600 dark:text-success-400 rounded-full font-bold">
+                        <span className="text-[10px] px-1.5 py-0.2 bg-success-500/15 text-success-400 rounded-full font-bold">
                           {grantedModulesCount}
                         </span>
                       </button>
@@ -909,19 +880,19 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                           setFilterDropdownOpen(false);
                         }}
                         className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${moduleFilter === 'revoked'
-                            ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-300 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            ? 'bg-primary-500/10 text-primary-500 font-bold'
+                            : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]'
                           }`}
                       >
                         <span>Revoked / None</span>
-                        <span className="text-[10px] px-1.5 py-0.2 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full font-bold">
+                        <span className="text-[10px] px-1.5 py-0.2 bg-[var(--bg-input)] text-[var(--text-muted)] rounded-full font-bold">
                           {matrixTemplate.length - grantedModulesCount}
                         </span>
                       </button>
 
-                      <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+                      <div className="border-t border-[var(--border-color)] my-1" />
 
-                      <div className="px-2 py-0.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      <div className="px-2 py-0.5 text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
                         Specific Module
                       </div>
 
@@ -941,16 +912,16 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                                 setFilterDropdownOpen(false);
                               }}
                               className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${isSelected
-                                  ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-300 font-bold'
-                                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                                  ? 'bg-primary-500/10 text-primary-500 font-bold'
+                                  : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]'
                                 }`}
                             >
                               <span className="truncate pr-2">{m.moduleLabel}</span>
                               <div className="flex items-center gap-1.5 shrink-0">
-                                <span className={`text-[10px] font-semibold ${grantedInMod > 0 ? 'text-primary-600 dark:text-primary-400' : 'text-slate-400'}`}>
+                                <span className={`text-[10px] font-semibold ${grantedInMod > 0 ? 'text-primary-500' : 'text-[var(--text-muted)]'}`}>
                                   {grantedInMod}/{totalInMod}
                                 </span>
-                                {isSelected && <Check size={12} className="text-primary-600 dark:text-primary-400" />}
+                                {isSelected && <Check size={12} className="text-primary-500" />}
                               </div>
                             </button>
                           );
@@ -963,12 +934,12 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
 
               {/* Modules Cards List */}
               {loadingPermissions ? (
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center text-slate-400">
+                <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-12 text-center text-[var(--text-muted)]">
                   <Spinner size="large" />
                   <span className="mt-3 block text-xs font-semibold">Loading module permissions...</span>
                 </div>
               ) : filteredModules.length === 0 ? (
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center text-slate-400 text-xs">
+                <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-8 text-center text-[var(--text-muted)] text-xs">
                   No modules match "{moduleSearch}".
                 </div>
               ) : (
@@ -985,21 +956,21 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                     return (
                       <div
                         key={module.moduleCode}
-                        className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors"
+                        className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden transition-colors"
                       >
                         {/* Module Card Header */}
-                        <div className="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-800/30">
+                        <div className="p-3.5 sm:p-4 border-b border-[var(--border-color)] flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[var(--bg-input)]">
                           {/* Module Title */}
                           <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0 font-bold text-xs">
+                            <div className="w-8 h-8 rounded-lg bg-primary-500/10 text-primary-500 flex items-center justify-center shrink-0 font-bold text-xs">
                               <Layers size={16} />
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-sm text-slate-900 dark:text-white">
+                                <span className="font-bold text-sm text-[var(--text-primary)]">
                                   {module.moduleLabel}
                                 </span>
-                                <span className="text-[10px] text-slate-400 font-mono">
+                                <span className="text-[10px] text-[var(--text-muted)] font-mono">
                                   ({module.moduleCode})
                                 </span>
                               </div>
@@ -1012,22 +983,22 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                               <button
                                 type="button"
                                 onClick={() => handleGrantModuleAll(module.moduleCode)}
-                                className="px-2.5 py-1 text-xs font-medium rounded-lg text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/40 transition-colors cursor-pointer"
+                                className="px-2.5 py-1 text-xs font-medium rounded-lg text-primary-500 hover:bg-primary-500/10 transition-colors cursor-pointer"
                               >
                                 Select All
                               </button>
-                              <span className="text-slate-300 dark:text-slate-700">•</span>
+                              <span className="text-[var(--text-muted)]">•</span>
                               <button
                                 type="button"
                                 onClick={() => handleRevokeModuleAll(module.moduleCode)}
-                                className="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-500 hover:text-danger-600 dark:hover:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-950/40 transition-colors cursor-pointer"
+                                className="px-2.5 py-1 text-xs font-medium rounded-lg text-[var(--text-muted)] hover:text-danger-400 hover:bg-danger-500/10 transition-colors cursor-pointer"
                               >
                                 Clear All
                               </button>
                             </div>
 
                             {/* Edit & Delete Module Actions */}
-                            <div className="flex items-center gap-1 pl-2 border-l border-slate-200 dark:border-slate-700">
+                            <div className="flex items-center gap-1 pl-2 border-l border-[var(--border-color)]">
                               <Tooltip content="Edit Module">
                                 <button
                                   type="button"
@@ -1035,7 +1006,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                                     e.stopPropagation();
                                     setEditingModule(module);
                                   }}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950/40 transition-colors cursor-pointer"
+                                  className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-primary-500 hover:bg-primary-500/10 transition-colors cursor-pointer"
                                   aria-label="Edit Module"
                                 >
                                   <Pencil size={13} />
@@ -1049,7 +1020,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                                     e.stopPropagation();
                                     setDeleteConfirmModule(module);
                                   }}
-                                  className="p-1.5 rounded-lg text-slate-400 hover:text-danger-600 hover:bg-danger-50 dark:hover:bg-danger-950/40 transition-colors cursor-pointer"
+                                  className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-danger-400 hover:bg-danger-500/10 transition-colors cursor-pointer"
                                   aria-label="Delete Module"
                                 >
                                   <Trash2 size={13} />
@@ -1074,12 +1045,12 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                                   key={actionCol.key}
                                   onClick={() => handleTogglePermission(module.moduleCode, actionCol.key, perm)}
                                   className={`p-2.5 rounded-xl border flex flex-col justify-between cursor-pointer transition-all ${isChecked
-                                      ? 'bg-primary-50/70 dark:bg-primary-950/30 border-primary-500/50 shadow-2xs'
-                                      : 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
+                                      ? 'bg-primary-500/15 border-primary-500 shadow-2xs'
+                                      : 'bg-[var(--bg-input)] border-[var(--border-color)] hover:bg-white/5'
                                     }`}
                                 >
                                   <div className="flex items-center justify-between gap-1 mb-2">
-                                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                                    <span className="text-xs font-bold text-[var(--text-primary)]">
                                       {actionCol.label}
                                     </span>
                                     <Toggle
@@ -1092,12 +1063,12 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                                     />
                                   </div>
 
-                                  <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400">
+                                  <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
                                     <span className="truncate" title={perm.description || perm.label}>
                                       {perm.action}
                                     </span>
                                     {isImpliedView && (
-                                      <span className="text-[9px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-tighter shrink-0">
+                                      <span className="text-[9px] font-bold text-primary-500 uppercase tracking-tighter shrink-0">
                                         Implied
                                       </span>
                                     )}
@@ -1115,7 +1086,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                   <button
                     type="button"
                     onClick={() => setCreateModuleModalOpen(true)}
-                    className="w-full p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-primary-500/50 hover:bg-primary-50/20 dark:hover:bg-primary-950/20 transition-all flex items-center justify-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer"
+                    className="w-full p-4 rounded-2xl border-2 border-dashed border-[var(--border-color)] hover:border-primary-500 hover:bg-primary-500/10 transition-all flex items-center justify-center gap-2 text-xs font-bold text-[var(--text-secondary)] hover:text-primary-500 cursor-pointer"
                   >
                     <Plus size={16} />
                     <span>Add New Module & Permission Actions</span>

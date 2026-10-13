@@ -46,24 +46,30 @@ input, textarea, [contenteditable="true"] {
 }
 
 :root {
-  /* Default Primary Scale (Burgundy Rose) */
-  --color-primary-50: #FAF0F2;
-  --color-primary-100: #F5E1E5;
-  --color-primary-200: #E9C4CB;
-  --color-primary-300: #D79AA4;
-  --color-primary-400: #BF6E7C;
-  --color-primary-500: #8A4A52;
-  --color-primary-600: #753C44;
-  --color-primary-700: #602F36;
-  --color-primary-800: #4E262C;
-  --color-primary-900: #3D1F24;
-  --color-primary-950: #21141A;
+  /* Default Primary Scale (Orange Brand) */
+  --color-primary-50: #FFF7ED;
+  --color-primary-100: #FFEDD5;
+  --color-primary-200: #FED7AA;
+  --color-primary-300: #FDBA74;
+  --color-primary-400: #FB923C;
+  --color-primary-500: #F97316;
+  --color-primary-600: #EA580C;
+  --color-primary-700: #C2410C;
+  --color-primary-800: #9A3412;
+  --color-primary-900: #7C2D12;
+  --color-primary-950: #431407;
 
-  --color-secondary-50: #F8FAFC;
-  --color-secondary-100: #F1F5F9;
-  --color-secondary-500: #64748B;
-  --color-secondary-600: #475569;
-  --color-secondary-700: #334155;
+  --color-secondary-50: #F9F9FB;
+  --color-secondary-100: #F2F2F5;
+  --color-secondary-200: #E4E4E9;
+  --color-secondary-300: #CBCBD4;
+  --color-secondary-400: #9E9EA7;
+  --color-secondary-500: #666670;
+  --color-secondary-600: #484852;
+  --color-secondary-700: #26262C;
+  --color-secondary-800: #18181D;
+  --color-secondary-900: #0E0E12;
+  --color-secondary-950: #08080A;
 
   --color-success-500: #10B981;
   --color-success-600: #059669;
@@ -81,26 +87,40 @@ input, textarea, [contenteditable="true"] {
   --radius-xl: 20px;
   --radius-2xl: 24px;
 }
+
 :root[data-theme='dark'] {
-  --bg-app: #1A1015;
-  --bg-surface: #271820;
-  --bg-sidebar: #21141A;
-  --bg-card: #271820;
-  --bg-card-hover: #36222C;
-  --bg-input: #1D1217;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(138, 74, 82, 0.5);
+  /* Pitch Obsidian NeoVision Luxury Dark Palette */
+  --bg-app: #08080A;
+  --bg-surface: #0E0E12;
+  --bg-sidebar: #0B0B0D;
+  --bg-card: #141417;
+  --bg-card-hover: #18181D;
+  --bg-input: #101013;
+  --border-color: #26262C;
+  --border-hover: rgba(249, 115, 22, 0.45);
 
-  --text-primary: #F9FAFB;
-  --text-secondary: #C4B5BE;
-  --text-muted: #8E7A86;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9E9EA7;
+  --text-muted: #666670;
 
-  --primary: #8A4A52;
-  --primary-hover: #753C44;
-  --primary-gradient: linear-gradient(135deg, #8A4A52 0%, #6E363E 100%);
-  --primary-light: rgba(138, 74, 82, 0.22);
+  --color-secondary-50: #141417;
+  --color-secondary-100: #18181D;
+  --color-secondary-200: #26262C;
+  --color-secondary-300: #484852;
+  --color-secondary-400: #666670;
+  --color-secondary-500: #9E9EA7;
+  --color-secondary-600: #CBCBD4;
+  --color-secondary-700: #E4E4E9;
+  --color-secondary-800: #F2F2F5;
+  --color-secondary-900: #F9F9FB;
+  --color-secondary-950: #FFFFFF;
 
-  --secondary: #64748B;
+  --primary: #F97316;
+  --primary-hover: #EA580C;
+  --primary-gradient: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
+  --primary-light: rgba(249, 115, 22, 0.18);
+
+  --secondary: #9E9EA7;
   --success: #10B981;
   --success-light: rgba(16, 185, 129, 0.18);
   --danger: #EF4444;
@@ -108,10 +128,10 @@ input, textarea, [contenteditable="true"] {
   --warning: #F59E0B;
   --warning-light: rgba(245, 158, 11, 0.18);
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 4px 18px rgba(138, 74, 82, 0.4);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.85);
+  --shadow-glow: 0 4px 20px rgba(249, 115, 22, 0.35);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -122,18 +142,18 @@ input, textarea, [contenteditable="true"] {
 :root[data-theme='light'] {
   --bg-app: #F8FAFC;
   --bg-surface: #FFFFFF;
-  --bg-sidebar: var(--color-primary-950, #21141A);
+  --bg-sidebar: #0F172A;
   --bg-card: #FFFFFF;
   --bg-card-hover: #F1F5F9;
   --bg-input: #F8FAFC;
   --border-color: #E2E8F0;
-  --border-hover: var(--primary, #8A4A52);
+  --border-hover: var(--primary, #EA580C);
 
   --text-primary: #0F172A;
   --text-secondary: #475569;
   --text-muted: #64748B;
 
-  --primary-light: rgba(138, 74, 82, 0.12);
+  --primary-light: rgba(249, 115, 22, 0.12);
   --secondary: #64748B;
   --success: #10B981;
   --success-light: rgba(16, 185, 129, 0.12);
@@ -145,12 +165,69 @@ input, textarea, [contenteditable="true"] {
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
-  --shadow-glow: 0 4px 18px rgba(138, 74, 82, 0.2);
+  --shadow-glow: 0 4px 18px rgba(249, 115, 22, 0.2);
 
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-pill: 24px;
+}
+
+/* ==========================================================================
+   GLOBAL OBSIDIAN THEME OVERRIDES (MATCHES DASHBOARD EVERYWHERE)
+   ========================================================================== */
+:root[data-theme='dark'] .dark\:bg-slate-950,
+.dark .dark\:bg-slate-950 {
+  background-color: var(--bg-app, #08080A) !important;
+}
+
+:root[data-theme='dark'] .dark\:bg-slate-900,
+.dark .dark\:bg-slate-900 {
+  background-color: var(--bg-surface, #0E0E12) !important;
+}
+
+:root[data-theme='dark'] .dark\:bg-slate-800,
+.dark .dark\:bg-slate-800 {
+  background-color: var(--bg-card, #141417) !important;
+}
+
+:root[data-theme='dark'] .dark\:bg-slate-800\/90,
+.dark .dark\:bg-slate-800\/90,
+:root[data-theme='dark'] .dark\:bg-slate-800\/80,
+.dark .dark\:bg-slate-800\/80,
+:root[data-theme='dark'] .dark\:bg-slate-800\/60,
+.dark .dark\:bg-slate-800\/60,
+:root[data-theme='dark'] .dark\:bg-slate-800\/50,
+.dark .dark\:bg-slate-800\/50,
+:root[data-theme='dark'] .dark\:bg-slate-800\/40,
+.dark .dark\:bg-slate-800\/40 {
+  background-color: var(--bg-input, #101013) !important;
+}
+
+:root[data-theme='dark'] .dark\:border-slate-800,
+.dark .dark\:border-slate-800,
+:root[data-theme='dark'] .dark\:border-slate-800\/80,
+.dark .dark\:border-slate-800\/80,
+:root[data-theme='dark'] .dark\:border-slate-700,
+.dark .dark\:border-slate-700,
+:root[data-theme='dark'] .dark\:border-slate-700\/80,
+.dark .dark\:border-slate-700\/80 {
+  border-color: var(--border-color, #26262C) !important;
+}
+
+:root[data-theme='dark'] .dark\:hover\:bg-slate-800,
+.dark .dark\:hover\:bg-slate-800,
+:root[data-theme='dark'] .dark\:hover\:bg-slate-700\/80,
+.dark .dark\:hover\:bg-slate-700\/80,
+:root[data-theme='dark'] .dark\:hover\:bg-slate-800\/40,
+.dark .dark\:hover\:bg-slate-800\/40,
+:root[data-theme='dark'] .dark\:hover\:bg-slate-800\/50,
+.dark .dark\:hover\:bg-slate-800\/50,
+:root[data-theme='dark'] .dark\:hover\:bg-slate-800\/60,
+.dark .dark\:hover\:bg-slate-800\/60,
+:root[data-theme='dark'] .dark\:hover\:bg-slate-800\/70,
+.dark .dark\:hover\:bg-slate-800\/70 {
+  background-color: var(--bg-card-hover, #18181D) !important;
 }
 
 @keyframes slideInRight {

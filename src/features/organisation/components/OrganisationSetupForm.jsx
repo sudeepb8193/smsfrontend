@@ -161,7 +161,7 @@ function ScissorsIcon(props) {
 function Field({ label, value, onChange, type = 'text', placeholder, required, helperText, error, ...props }) {
   return (
     <label className="flex min-w-0 flex-col gap-1.5">
-      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+      <span className="text-xs font-semibold text-[var(--text-secondary)]">
         {label}{required && <span className="ml-1 text-rose-500">*</span>}
       </span>
       <input
@@ -170,12 +170,12 @@ function Field({ label, value, onChange, type = 'text', placeholder, required, h
         type={type}
         placeholder={placeholder}
         aria-invalid={Boolean(error)}
-        className={`h-10 w-full rounded-xl border bg-white px-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-500  focus:ring-primary-500/15 dark:bg-slate-800 dark:text-white ${error ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700'
+        className={`h-10 w-full rounded-xl border bg-[var(--bg-input)] px-3.5 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-primary-500 ${error ? 'border-rose-500' : 'border-[var(--border-color)]'
           }`}
         {...props}
       />
       {error && <span role="alert" className="text-xs font-medium text-rose-500">{error}</span>}
-      {!error && helperText && <span className="text-xs text-slate-500">{helperText}</span>}
+      {!error && helperText && <span className="text-xs text-[var(--text-muted)]">{helperText}</span>}
     </label>
   );
 }
@@ -183,8 +183,8 @@ function Field({ label, value, onChange, type = 'text', placeholder, required, h
 function TextareaField({ label, value, onChange, placeholder, rows = 3 }) {
   return (
     <label className="flex min-w-0 flex-col gap-1.5">
-      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{label}</span>
-      <textarea value={value ?? ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} rows={rows} className="w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-primary-500  focus:ring-primary-500/15 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
+      <span className="text-xs font-semibold text-[var(--text-secondary)]">{label}</span>
+      <textarea value={value ?? ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} rows={rows} className="w-full resize-y rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-primary-500" />
     </label>
   );
 }
@@ -193,10 +193,10 @@ function Toggle({ checked, onChange, label, description }) {
   return (
     <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)} className="flex w-full items-center justify-between gap-4 text-left">
       <span>
-        <span className="block text-sm font-semibold text-slate-800 dark:text-slate-100">{label}</span>
-        {description && <span className="mt-0.5 block text-xs text-slate-500">{description}</span>}
+        <span className="block text-sm font-semibold text-[var(--text-primary)]">{label}</span>
+        {description && <span className="mt-0.5 block text-xs text-[var(--text-muted)]">{description}</span>}
       </span>
-      <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${checked ? 'bg-primary-600' : 'bg-slate-300 dark:bg-slate-600'}`}>
+      <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${checked ? 'bg-primary-500' : 'bg-[var(--bg-card-hover)] border border-[var(--border-color)]'}`}>
         <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition ${checked ? 'left-[22px]' : 'left-0.5'}`} />
       </span>
     </button>
@@ -306,8 +306,8 @@ function setupFromOrganisation(org) {
       logoSquareUrl: org.logoSquareUrl || '',
       logoWideUrl: org.logoWideUrl || '',
       faviconUrl: org.faviconUrl || '',
-      brandPrimaryColor: org.brandPrimaryColor || '#8A4A52',
-      brandSecondaryColor: org.brandSecondaryColor || '#D9A7AE',
+      brandPrimaryColor: org.brandPrimaryColor || '#F97316',
+      brandSecondaryColor: org.brandSecondaryColor || '#9E9EA7',
       status: org.status || 'onboarding',
       onboardingStep: org.onboardingStep || 0,
     },
@@ -852,8 +852,8 @@ export default function OrganisationSetupForm({
   const renderProfile = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Business identity</h2>
-        <p className="mt-1 text-sm text-slate-500">Set the name, portal identity, and brand customers will recognize.</p>
+        <h2 className="text-lg font-bold text-[var(--text-primary)]">Business identity</h2>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">Set the name, portal identity, and brand customers will recognize.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="Business name" required value={form.profile.name} onChange={handleNameChange} placeholder="e.g. Atelier Salon" />
@@ -871,9 +871,9 @@ export default function OrganisationSetupForm({
           disabled={Boolean(organisation.slugChangedAt)}
           helperText={organisation.slugChangedAt ? 'The portal URL has already been changed once.' : `Portal preview: /book/${form.profile.slug || 'your-business'}`}
         />
-        {activeSlugAvailability?.available && form.profile.slug !== organisation.slug && <p className="mt-1 text-xs font-semibold text-emerald-600">Portal URL is available.</p>}
+        {activeSlugAvailability?.available && form.profile.slug !== organisation.slug && <p className="mt-1 text-xs font-semibold text-emerald-500">Portal URL is available.</p>}
         {activeSlugAvailability?.available === false && (
-          <p className="mt-1 text-xs font-semibold text-rose-600">
+          <p className="mt-1 text-xs font-semibold text-rose-500">
             This URL is already in use.
             {activeSlugAvailability.suggestions?.map((slug) => (
               <button key={slug} type="button" onClick={() => { setSlugEdited(true); setSection('profile', 'slug', slug); }} className="ml-2 underline">{slug}</button>
@@ -882,7 +882,7 @@ export default function OrganisationSetupForm({
         )}
       </div>
       <div>
-        <p className="mb-2 text-xs font-semibold text-slate-700 dark:text-slate-300">Business type</p>
+        <p className="mb-2 text-xs font-semibold text-[var(--text-secondary)]">Business type</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {BUSINESS_TYPES.map((type) => (
             <StateCard key={type.value} title={type.label} description={type.detail} icon={type.icon} selected={form.profile.businessType === type.value} onClick={() => setSection('profile', 'businessType', type.value)} />
@@ -890,73 +890,73 @@ export default function OrganisationSetupForm({
         </div>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-white"><ImagePlus className="h-4 w-4 text-primary-600" />Business logo</div>
-          <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 p-4 text-center dark:border-slate-700 dark:bg-slate-800/50">
+        <div className="rounded-2xl border border-[var(--border-color)] p-4 bg-[var(--bg-card)]">
+          <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]"><ImagePlus className="h-4 w-4 text-primary-500" />Business logo</div>
+          <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[var(--border-color)] bg-[var(--bg-input)] p-4 text-center hover:border-primary-500/50 transition-colors">
             {localPreview || assetUrl(form.profile.logoUrl) ? (
-              <img src={localPreview || assetUrl(form.profile.logoUrl)} alt="Business logo preview" className="h-20 w-20 rounded-xl border border-slate-200 bg-white object-cover" />
-            ) : <Upload className="h-6 w-6 text-slate-400" />}
-            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{uploading === 'logo' ? 'Uploading logo...' : 'Click to upload JPG, PNG, or SVG'}</span>
-            <span className="text-[11px] text-slate-500">Square and wide previews • Up to 5 MB</span>
+              <img src={localPreview || assetUrl(form.profile.logoUrl)} alt="Business logo preview" className="h-20 w-20 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] object-cover" />
+            ) : <Upload className="h-6 w-6 text-[var(--text-muted)]" />}
+            <span className="text-xs font-semibold text-[var(--text-secondary)]">{uploading === 'logo' ? 'Uploading logo...' : 'Click to upload JPG, PNG, or SVG'}</span>
+            <span className="text-[11px] text-[var(--text-muted)]">Square and wide previews • Up to 5 MB</span>
             <input type="file" accept=".jpg,.jpeg,.png,.svg,image/jpeg,image/png,image/svg+xml" className="sr-only" onChange={(event) => handleUpload(event, 'logo')} disabled={Boolean(uploading)} />
           </label>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="flex h-16 items-center justify-center rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
-              {(localPreview || form.profile.logoSquareUrl || form.profile.logoUrl) ? <img src={localPreview || assetUrl(form.profile.logoSquareUrl || form.profile.logoUrl)} alt="Square logo" className="h-10 w-10 rounded object-cover" /> : <span className="text-[10px] text-slate-400">Square preview</span>}
+            <div className="flex h-16 items-center justify-center rounded-lg border border-[var(--border-color)] bg-[var(--bg-input)] p-2">
+              {(localPreview || form.profile.logoSquareUrl || form.profile.logoUrl) ? <img src={localPreview || assetUrl(form.profile.logoSquareUrl || form.profile.logoUrl)} alt="Square logo" className="h-10 w-10 rounded object-cover" /> : <span className="text-[10px] text-[var(--text-muted)]">Square preview</span>}
             </div>
-            <div className="flex h-16 items-center justify-center rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
-              {(localPreview || form.profile.logoWideUrl || form.profile.logoUrl) ? <img src={localPreview || assetUrl(form.profile.logoWideUrl || form.profile.logoUrl)} alt="Wide logo" className="h-10 w-full rounded object-cover" /> : <span className="text-[10px] text-slate-400">Wide preview</span>}
+            <div className="flex h-16 items-center justify-center rounded-lg border border-[var(--border-color)] bg-[var(--bg-input)] p-2">
+              {(localPreview || form.profile.logoWideUrl || form.profile.logoUrl) ? <img src={localPreview || assetUrl(form.profile.logoWideUrl || form.profile.logoUrl)} alt="Wide logo" className="h-10 w-full rounded object-cover" /> : <span className="text-[10px] text-[var(--text-muted)]">Wide preview</span>}
             </div>
           </div>
         </div>
-        <div className="space-y-4 rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-white"><ImagePlus className="h-4 w-4 text-primary-600" />Brand colors</div>
+        <div className="space-y-4 rounded-2xl border border-[var(--border-color)] p-4 bg-[var(--bg-card)]">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]"><ImagePlus className="h-4 w-4 text-primary-500" />Brand colors</div>
           <div className="grid grid-cols-2 gap-3">
             {[
               ['Primary color', 'brandPrimaryColor'],
               ['Secondary color', 'brandSecondaryColor'],
             ].map(([label, key]) => (
-              <label key={key} className="flex flex-col gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <label key={key} className="flex flex-col gap-2 text-xs font-semibold text-[var(--text-secondary)]">
                 {label}
-                <span className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 dark:border-slate-700 dark:bg-slate-800">
+                <span className="flex h-11 items-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-2">
                   <input type="color" value={form.profile[key]} onChange={(event) => setSection('profile', key, event.target.value.toUpperCase())} className="h-8 w-9 cursor-pointer border-0 bg-transparent p-0" />
-                  <input value={form.profile[key]} onChange={(event) => setSection('profile', key, event.target.value)} maxLength={7} className="w-full bg-transparent font-mono text-xs outline-none" />
+                  <input value={form.profile[key]} onChange={(event) => setSection('profile', key, event.target.value)} maxLength={7} className="w-full bg-transparent font-mono text-xs text-[var(--text-primary)] outline-none" />
                 </span>
               </label>
             ))}
           </div>
-          {primaryColorWarning && <p className="flex items-center gap-1 text-xs text-amber-600"><AlertCircle className="h-3.5 w-3.5" />Primary color may not meet WCAG AA contrast on light or dark text.</p>}
-          <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+          {primaryColorWarning && <p className="flex items-center gap-1 text-xs text-amber-500"><AlertCircle className="h-3.5 w-3.5" />Primary color may not meet WCAG AA contrast on light or dark text.</p>}
+          <div className="overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)]">
             <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-white" style={{ backgroundColor: form.profile.brandPrimaryColor }}>
               <span className="h-5 w-5 rounded-full bg-white/25" />{form.profile.name || 'Your business'}
               <span className="ml-auto text-[10px]">Portal header preview</span>
             </div>
             <div className="flex items-center justify-between p-3 text-xs">
-              <span className="font-semibold text-slate-700 dark:text-slate-200">Invoice total</span>
+              <span className="font-semibold text-[var(--text-secondary)]">Invoice total</span>
               <strong style={{ color: form.profile.brandPrimaryColor }}>{currencySymbol}125.00</strong>
             </div>
           </div>
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
-          <p className="mb-2 text-xs font-semibold text-slate-700 dark:text-slate-300">Portal favicon</p>
+        <div className="rounded-xl border border-[var(--border-color)] p-4 bg-[var(--bg-card)]">
+          <p className="mb-2 text-xs font-semibold text-[var(--text-secondary)]">Portal favicon</p>
           <div className="flex items-center gap-3">
-            {form.profile.faviconUrl && <img src={assetUrl(form.profile.faviconUrl)} alt="Favicon preview" className="h-8 w-8 rounded border object-contain" />}
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold dark:border-slate-700">
+            {form.profile.faviconUrl && <img src={assetUrl(form.profile.faviconUrl)} alt="Favicon preview" className="h-8 w-8 rounded border border-[var(--border-color)] object-contain" />}
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-input)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
               <Upload className="h-3.5 w-3.5" />{uploading === 'favicon' ? 'Uploading...' : 'Upload favicon'}
               <input type="file" accept=".jpg,.jpeg,.png,.svg,image/jpeg,image/png,image/svg+xml" className="sr-only" onChange={(event) => handleUpload(event, 'favicon')} />
             </label>
           </div>
         </div>
-        <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
-          <p className="mb-2 text-xs font-semibold text-slate-700 dark:text-slate-300">Organization ID & creation date</p>
-          <p className="font-mono text-xs text-slate-600 dark:text-slate-300">{organisation.id}</p>
-          <p className="mt-1 text-xs text-slate-500">{new Date(organisation.createdAt).toLocaleDateString()}</p>
+        <div className="rounded-xl border border-[var(--border-color)] p-4 bg-[var(--bg-card)]">
+          <p className="mb-2 text-xs font-semibold text-[var(--text-secondary)]">Organization ID & creation date</p>
+          <p className="font-mono text-xs text-[var(--text-secondary)]">{organisation.id}</p>
+          <p className="mt-1 text-xs text-[var(--text-muted)]">{new Date(organisation.createdAt).toLocaleDateString()}</p>
         </div>
       </div>
       <div>
-        <p className="mb-2 text-xs font-semibold text-slate-700 dark:text-slate-300">Organization status</p>
+        <p className="mb-2 text-xs font-semibold text-[var(--text-secondary)]">Organization status</p>
         {isSuperAdmin ? <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {[
             { value: 'onboarding', title: 'Onboarding', description: 'Setup in progress', icon: Clock3 },
@@ -966,7 +966,7 @@ export default function OrganisationSetupForm({
           ].map((status) => (
             <StateCard key={status.value} title={status.title} description={status.description} icon={status.icon} selected={form.profile.status === status.value} onClick={() => setSection('profile', 'status', status.value)} />
           ))}
-        </div> : <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold capitalize text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">{form.profile.status.replace('_', ' ')} — managed by your Super Admin</p>}
+        </div> : <p className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-4 py-3 text-sm font-semibold capitalize text-[var(--text-primary)]">{form.profile.status.replace('_', ' ')} — managed by your Super Admin</p>}
       </div>
     </div>
   );
@@ -976,8 +976,8 @@ export default function OrganisationSetupForm({
     return (
       <div className="space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div><h2 className="text-lg font-bold text-slate-900 dark:text-white">Business contacts</h2><p className="mt-1 text-sm text-slate-500">Keep support, billing, and emergency details close to your primary contact.</p></div>
-          <button type="button" onClick={addContact} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold dark:border-slate-700"><Plus className="h-4 w-4" />Add contact</button>
+          <div><h2 className="text-lg font-bold text-[var(--text-primary)]">Business contacts</h2><p className="mt-1 text-sm text-[var(--text-muted)]">Keep support, billing, and emergency details close to your primary contact.</p></div>
+          <button type="button" onClick={addContact} className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><Plus className="h-4 w-4" />Add contact</button>
         </div>
         {form.contacts.map((contact, index) => {
           const savedEmail = organisation.organizationContacts?.find(
@@ -988,23 +988,23 @@ export default function OrganisationSetupForm({
             savedEmail.toLowerCase() === contact.email.trim().toLowerCase(),
           );
           return (
-            <section key={contact.id || `contact-${index}`} className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+            <section key={contact.id || `contact-${index}`} className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <Dropdown label="Contact type" value={contact.contactType} onChange={(value) => setContact(index, 'contactType', value)} options={CONTACT_TYPES} searchable={false} className="w-44" />
-                  {contact.emailVerified ? <span className="mt-5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"><BadgeCheck className="h-3 w-3" />Email verified</span> : <span className="mt-5 rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">Email unverified</span>}
+                  {contact.emailVerified ? <span className="mt-5 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20"><BadgeCheck className="h-3 w-3" />Email verified</span> : <span className="mt-5 rounded-full bg-amber-500/10 px-2 py-1 text-[10px] font-semibold text-amber-400 border border-amber-500/20">Email unverified</span>}
                 </div>
                 {contact.contactType !== 'primary' && (
-                  <button type="button" aria-label="Remove contact" onClick={() => setForm((current) => ({ ...current, contacts: current.contacts.filter((_, contactIndex) => contactIndex !== index) }))} className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10"><Trash2 className="h-4 w-4" /></button>
+                  <button type="button" aria-label="Remove contact" onClick={() => setForm((current) => ({ ...current, contacts: current.contacts.filter((_, contactIndex) => contactIndex !== index) }))} className="rounded-lg p-2 text-[var(--text-muted)] hover:bg-rose-500/10 hover:text-rose-500 transition-colors"><Trash2 className="h-4 w-4" /></button>
                 )}
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <Field label="Contact person" value={contact.contactName} onChange={(value) => setContact(index, 'contactName', value)} placeholder="Full name" />
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Phone number</span>
+                  <span className="text-xs font-semibold text-[var(--text-secondary)]">Phone number</span>
                   <div className="flex gap-2">
                     <Dropdown label="Country code" value={contact.phoneCountryCode} onChange={(value) => setContact(index, 'phoneCountryCode', value)} options={PHONE_CODES} className="w-36" disabled={contact.sameAsPrimary} />
-                    <input type="tel" disabled={contact.sameAsPrimary} value={contact.phoneNumber} onChange={(event) => setContact(index, 'phoneNumber', event.target.value)} placeholder="Phone number" className="h-10 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:disabled:bg-slate-900" />
+                    <input type="tel" disabled={contact.sameAsPrimary} value={contact.phoneNumber} onChange={(event) => setContact(index, 'phoneNumber', event.target.value)} placeholder="Phone number" className="h-10 min-w-0 flex-1 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-3 text-sm text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50" />
                   </div>
                 </div>
                 <div>
@@ -1015,17 +1015,17 @@ export default function OrganisationSetupForm({
                         type="button"
                         disabled={!contact.id || !emailIsSaved || !contact.email.trim() || Boolean(verificationSending[index])}
                         onClick={() => sendContactVerification(contact, index)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-primary-200 px-2.5 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-900/20"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-primary-500/30 px-2.5 py-1.5 text-xs font-semibold text-primary-500 hover:bg-primary-500/10 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                       >
                         <Send className="h-3.5 w-3.5" />
                         {verificationSending[index] ? 'Sending...' : 'Send verification link'}
                       </button>
-                      {!emailIsSaved && <p className="mt-1 text-[11px] text-slate-500">Save this contact email before requesting verification.</p>}
-                      {verificationMessages[index] && <p role="status" className="mt-1 text-[11px] text-emerald-700">{verificationMessages[index]}</p>}
+                      {!emailIsSaved && <p className="mt-1 text-[11px] text-[var(--text-muted)]">Save this contact email before requesting verification.</p>}
+                      {verificationMessages[index] && <p role="status" className="mt-1 text-[11px] text-emerald-400">{verificationMessages[index]}</p>}
                     </div>
                   )}
                 </div>
-                <div className="flex items-end rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
+                <div className="flex items-end rounded-xl bg-[var(--bg-input)] border border-[var(--border-color)] p-3">
                   <Toggle checked={contact.isDefaultPublic} onChange={(value) => setContact(index, 'isDefaultPublic', value)} label="Show as public contact" description="Display this contact on the customer portal." />
                 </div>
                 {contact.contactType !== 'primary' && (
@@ -1049,7 +1049,7 @@ export default function OrganisationSetupForm({
             </section>
           );
         })}
-        <p className="rounded-xl bg-blue-50 p-3 text-xs text-blue-800 dark:bg-blue-500/10 dark:text-blue-200">
+        <p className="rounded-xl bg-primary-500/10 border border-primary-500/20 p-3 text-xs text-primary-400">
           Verification links are sent to the saved contact email. Links expire after 30 minutes and can only be used once.
         </p>
       </div>
@@ -1069,25 +1069,25 @@ export default function OrganisationSetupForm({
           helperText="Choose a suggestion to fill the address fields, or enter the address manually."
         />
         {addressSearchLoading[index] && (
-          <p className="mt-1 text-xs text-slate-500">Searching Google Places...</p>
+          <p className="mt-1 text-xs text-[var(--text-muted)]">Searching Google Places...</p>
         )}
         {addressSearchErrors[index] && (
-          <p role="alert" className="mt-1 text-xs font-medium text-rose-600">{addressSearchErrors[index]}</p>
+          <p role="alert" className="mt-1 text-xs font-medium text-rose-500">{addressSearchErrors[index]}</p>
         )}
         {addressSuggestions[index]?.length > 0 && (
-          <ul role="listbox" className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+          <ul role="listbox" className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-1 shadow-xl">
             {addressSuggestions[index].map((suggestion) => (
               <li key={suggestion.placeId} role="option" aria-selected="false">
                 <button
                   type="button"
                   disabled={Boolean(addressSelectionLoading[index])}
                   onClick={() => selectAddressSuggestion(index, suggestion)}
-                  className="flex w-full items-start gap-2 rounded-lg px-3 py-2 text-left hover:bg-slate-50 disabled:opacity-60 dark:hover:bg-slate-800"
+                  className="flex w-full items-start gap-2 rounded-lg px-3 py-2 text-left hover:bg-white/5 disabled:opacity-50 transition-colors"
                 >
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-500" />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{suggestion.primaryText}</span>
-                    {suggestion.secondaryText && <span className="block truncate text-xs text-slate-500">{suggestion.secondaryText}</span>}
+                    <span className="block truncate text-sm font-semibold text-[var(--text-primary)]">{suggestion.primaryText}</span>
+                    {suggestion.secondaryText && <span className="block truncate text-xs text-[var(--text-muted)]">{suggestion.secondaryText}</span>}
                   </span>
                 </button>
               </li>
@@ -1136,13 +1136,13 @@ export default function OrganisationSetupForm({
 
   const renderAddresses = () => (
     <div className="space-y-5">
-      <div><h2 className="text-lg font-bold text-slate-900 dark:text-white">Organization addresses</h2><p className="mt-1 text-sm text-slate-500">Registered and correspondence addresses are separate from branch locations.</p></div>
-      <section className="space-y-4 rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-        <div><h3 className="text-sm font-bold text-slate-900 dark:text-white">Registered office</h3><p className="text-xs text-slate-500">Printed on tax invoices and legal documents.</p></div>
+      <div><h2 className="text-lg font-bold text-[var(--text-primary)]">Organization addresses</h2><p className="mt-1 text-sm text-[var(--text-muted)]">Registered and correspondence addresses are separate from branch locations.</p></div>
+      <section className="space-y-4 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
+        <div><h3 className="text-sm font-bold text-[var(--text-primary)]">Registered office</h3><p className="text-xs text-[var(--text-muted)]">Printed on tax invoices and legal documents.</p></div>
         {renderAddressFields(form.addresses[0], 0)}
       </section>
-      <section className="space-y-4 rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-        <div><h3 className="text-sm font-bold text-slate-900 dark:text-white">Billing / correspondence</h3><p className="text-xs text-slate-500">Optional mailing address for invoices and correspondence.</p></div>
+      <section className="space-y-4 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
+        <div><h3 className="text-sm font-bold text-[var(--text-primary)]">Billing / correspondence</h3><p className="text-xs text-[var(--text-muted)]">Optional mailing address for invoices and correspondence.</p></div>
         <Toggle
           checked={form.addresses[1].sameAsRegistered}
           onChange={(checked) => {
@@ -1158,44 +1158,44 @@ export default function OrganisationSetupForm({
           label="Same as registered office"
         />
         {!form.addresses[1].sameAsRegistered && renderAddressFields(form.addresses[1], 1, true)}
-        {form.addresses[1].sameAsRegistered && <p className="rounded-lg bg-slate-50 p-3 text-xs text-slate-500 dark:bg-slate-800">Billing address matches the registered office.</p>}
+        {form.addresses[1].sameAsRegistered && <p className="rounded-lg bg-[var(--bg-input)] border border-[var(--border-color)] p-3 text-xs text-[var(--text-muted)]">Billing address matches the registered office.</p>}
       </section>
-      <p className="rounded-xl bg-blue-50 p-3 text-xs text-blue-800 dark:bg-blue-500/10 dark:text-blue-200">Google Places suggestions fill the structured fields. Review every suggested field before saving; manual address entry remains available.</p>
+      <p className="rounded-xl bg-primary-500/10 border border-primary-500/20 p-3 text-xs text-primary-400">Google Places suggestions fill the structured fields. Review every suggested field before saving; manual address entry remains available.</p>
     </div>
   );
 
   const renderTax = () => (
     <div className="space-y-5">
-      <div><h2 className="text-lg font-bold text-slate-900 dark:text-white">Tax information & registration</h2><p className="mt-1 text-sm text-slate-500">Add the business tax identity shown on compliant invoices.</p></div>
+      <div><h2 className="text-lg font-bold text-[var(--text-primary)]">Tax information & registration</h2><p className="mt-1 text-sm text-[var(--text-muted)]">Add the business tax identity shown on compliant invoices.</p></div>
       <div className="grid gap-4 md:grid-cols-2">
         <Dropdown label="Tax identifier type" value={form.taxProfile.taxIdentifierType} onChange={(value) => setSection('taxProfile', 'taxIdentifierType', value)} options={[{ value: 'gstin', label: 'GSTIN' }, { value: 'vat', label: 'VAT' }, { value: 'ein', label: 'EIN' }, { value: 'tin', label: 'TIN' }, { value: 'pan', label: 'PAN' }, { value: 'other', label: 'Other' }]} />
         <Field label="Tax identifier number" value={form.taxProfile.taxIdentifierNumber} onChange={(value) => setSection('taxProfile', 'taxIdentifierNumber', value.toUpperCase())} placeholder={form.taxProfile.taxIdentifierType === 'gstin' ? '15-character GSTIN' : 'Tax registration number'} helperText={form.taxProfile.taxIdentifierType === 'gstin' ? 'GSTIN is checked against the 15-character format.' : 'Format checks vary by tax authority.'} />
         <Field label="Registered business name" value={form.taxProfile.registeredBusinessName} onChange={(value) => setSection('taxProfile', 'registeredBusinessName', value)} placeholder={form.profile.legalName || form.profile.name} />
         <DatePicker label="Tax registration date" value={form.taxProfile.taxRegistrationDate} onChange={(value) => setSection('taxProfile', 'taxRegistrationDate', value)} />
       </div>
-      <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+      <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
         <Toggle checked={form.taxProfile.isTaxExempt} onChange={(value) => setSection('taxProfile', 'isTaxExempt', value)} label="Tax exempt" description="Tax lines should be suppressed for this business where applicable." />
       </div>
       {form.taxProfile.taxIdentifierNumber && (
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-            <p className="mb-3 text-xs font-semibold text-slate-700 dark:text-slate-300">Registration certificate <span className="text-rose-500">*</span></p>
+          <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
+            <p className="mb-3 text-xs font-semibold text-[var(--text-secondary)]">Registration certificate <span className="text-rose-500">*</span></p>
             {form.taxProfile.documentUrl && (
-              <a href={assetUrl(form.taxProfile.documentUrl)} target="_blank" rel="noreferrer" className="mb-3 inline-flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs font-semibold text-primary-700 dark:bg-slate-800 dark:text-primary-300">
+              <a href={assetUrl(form.taxProfile.documentUrl)} target="_blank" rel="noreferrer" className="mb-3 inline-flex items-center gap-2 rounded-lg bg-[var(--bg-input)] border border-[var(--border-color)] px-3 py-2 text-xs font-semibold text-primary-500 hover:border-primary-500/50 transition-colors">
                 <ShieldCheck className="h-4 w-4" />View uploaded document
               </a>
             )}
-            <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-slate-300 px-3 py-3 text-xs font-semibold dark:border-slate-600">
+            <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-[var(--border-color)] bg-[var(--bg-input)] px-3 py-3 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/50 transition-colors">
               <Upload className="h-4 w-4" />{uploading === 'tax' ? 'Uploading...' : 'Upload PDF, JPG, or PNG (max 10 MB)'}
               <input type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" className="sr-only" onChange={(event) => handleUpload(event, 'tax')} />
             </label>
           </div>
-          <div className="flex flex-col justify-center rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-            <span className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${form.taxProfile.verificationStatus === 'verified' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
-                : form.taxProfile.verificationStatus === 'rejected' ? 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
-                  : 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'
+          <div className="flex flex-col justify-center rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
+            <span className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${form.taxProfile.verificationStatus === 'verified' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                : form.taxProfile.verificationStatus === 'rejected' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                  : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
               }`}>{form.taxProfile.verificationStatus}</span>
-            <p className="mt-2 text-xs text-slate-500">{form.taxProfile.verificationNotes || 'Verification status is assigned after manual or authority validation. A valid format alone is not approval.'}</p>
+            <p className="mt-2 text-xs text-[var(--text-muted)]">{form.taxProfile.verificationNotes || 'Verification status is assigned after manual or authority validation. A valid format alone is not approval.'}</p>
             {isSuperAdmin && <div className="mt-4 space-y-3">
               <Dropdown
                 label="Manual verification decision"
@@ -1219,17 +1219,17 @@ export default function OrganisationSetupForm({
           </div>
         </div>
       )}
-      <p className="rounded-xl bg-amber-50 p-3 text-xs text-amber-800 dark:bg-amber-500/10 dark:text-amber-200">Submitting a tax ID and certificate marks it pending. This screen does not automatically approve a tax registration.</p>
+      <p className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-3 text-xs text-amber-400">Submitting a tax ID and certificate marks it pending. This screen does not automatically approve a tax registration.</p>
     </div>
   );
 
   const renderSettings = () => (
     <div className="space-y-5">
-      <div><h2 className="text-lg font-bold text-slate-900 dark:text-white">Currency & regional settings</h2><p className="mt-1 text-sm text-slate-500">Defaults used for pricing, dates, time, and reports across the organization.</p></div>
+      <div><h2 className="text-lg font-bold text-[var(--text-primary)]">Currency & regional settings</h2><p className="mt-1 text-sm text-[var(--text-muted)]">Defaults used for pricing, dates, time, and reports across the organization.</p></div>
       <div className="grid gap-4 md:grid-cols-2">
         <Dropdown label="Default currency" value={form.settings.currencyCode} onChange={(value) => setSection('settings', 'currencyCode', value)} options={CURRENCIES} />
-        <div className="flex items-end rounded-xl bg-primary-50 p-3 dark:bg-primary-500/10">
-          <p className="text-xs text-primary-800 dark:text-primary-200">Preview: <strong className="ml-1 text-base">{form.settings.currencySymbolPosition === 'prefix' ? `${currencySymbol} ` : ''}{(1234.5).toLocaleString(undefined, { minimumFractionDigits: Number(form.settings.currencyDecimalPlaces), maximumFractionDigits: Number(form.settings.currencyDecimalPlaces) })}{form.settings.currencySymbolPosition === 'suffix' ? ` ${currencySymbol}` : ''}</strong></p>
+        <div className="flex items-end rounded-xl bg-primary-500/10 border border-primary-500/20 p-3">
+          <p className="text-xs text-primary-400">Preview: <strong className="ml-1 text-base">{form.settings.currencySymbolPosition === 'prefix' ? `${currencySymbol} ` : ''}{(1234.5).toLocaleString(undefined, { minimumFractionDigits: Number(form.settings.currencyDecimalPlaces), maximumFractionDigits: Number(form.settings.currencyDecimalPlaces) })}{form.settings.currencySymbolPosition === 'suffix' ? ` ${currencySymbol}` : ''}</strong></p>
         </div>
         <Dropdown label="Currency symbol position" value={form.settings.currencySymbolPosition} onChange={(value) => setSection('settings', 'currencySymbolPosition', value)} options={[{ value: 'prefix', label: 'Before amount (₹100)' }, { value: 'suffix', label: 'After amount (100 ₹)' }]} searchable={false} />
         <Dropdown label="Decimal places" value={String(form.settings.currencyDecimalPlaces)} onChange={(value) => setSection('settings', 'currencyDecimalPlaces', Number(value))} options={[0, 1, 2, 3].map((value) => ({ value: String(value), label: `${value} decimal ${value === 1 ? 'place' : 'places'}` }))} searchable={false} />
@@ -1241,7 +1241,7 @@ export default function OrganisationSetupForm({
         <Dropdown label="Fiscal year starts" value={String(form.settings.fiscalYearStartMonth)} onChange={(value) => setSection('settings', 'fiscalYearStartMonth', Number(value))} options={MONTHS} />
       </div>
       {form.settings.currencyCode !== originalCurrency && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-100">
+        <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-400">
           Changing currency does not convert existing transactions. Historical amounts must remain associated with their original currency.
         </div>
       )}
@@ -1251,16 +1251,16 @@ export default function OrganisationSetupForm({
   const renderHours = () => (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div><h2 className="text-lg font-bold text-slate-900 dark:text-white">Weekly business hours</h2><p className="mt-1 text-sm text-slate-500">Organization defaults are inherited by branches unless overridden.</p></div>
-        <button type="button" onClick={copyMonday} className="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:text-slate-200">Copy Monday to all days</button>
+        <div><h2 className="text-lg font-bold text-[var(--text-primary)]">Weekly business hours</h2><p className="mt-1 text-sm text-[var(--text-muted)]">Organization defaults are inherited by branches unless overridden.</p></div>
+        <button type="button" onClick={copyMonday} className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Copy Monday to all days</button>
       </div>
-      <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
+      <div className="overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)]">
         {WEEKDAYS.map((day, index) => {
           const hour = form.businessHours.find((item) => item.dayOfWeek === day.value);
           return (
-            <div key={day.value} className={`grid gap-3 p-4 md:grid-cols-[110px_100px_1fr] md:items-center ${index ? 'border-t border-slate-100 dark:border-slate-800' : ''}`}>
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{day.label}</span>
-              <button type="button" role="switch" aria-checked={hour.isOpen} onClick={() => setHour(day.value, 'isOpen', !hour.isOpen)} className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${hour.isOpen ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-slate-100 text-slate-500 dark:bg-slate-800'}`}>
+            <div key={day.value} className={`grid gap-3 p-4 md:grid-cols-[110px_100px_1fr] md:items-center ${index ? 'border-t border-[var(--border-color)]' : ''}`}>
+              <span className="text-sm font-semibold text-[var(--text-primary)]">{day.label}</span>
+              <button type="button" role="switch" aria-checked={hour.isOpen} onClick={() => setHour(day.value, 'isOpen', !hour.isOpen)} className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${hour.isOpen ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-[var(--bg-input)] text-[var(--text-muted)] border border-[var(--border-color)]'}`}>
                 {hour.isOpen ? 'Open' : 'Closed'}
               </button>
               {hour.isOpen ? (
@@ -1270,26 +1270,26 @@ export default function OrganisationSetupForm({
                     <TimePicker label="Closes" value={hour.closeTime} onChange={(value) => setHour(day.value, 'closeTime', value)} step={15} timeFormat="24h" />
                   </div>
                   <Toggle checked={hour.spansMidnight} onChange={(value) => setHour(day.value, 'spansMidnight', value)} label="Spans midnight" />
-                  <details className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-                    <summary className="cursor-pointer text-xs font-semibold text-slate-600 dark:text-slate-300">Add a break window</summary>
+                  <details className="rounded-lg bg-[var(--bg-input)] border border-[var(--border-color)] p-3">
+                    <summary className="cursor-pointer text-xs font-semibold text-[var(--text-secondary)]">Add a break window</summary>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <TimePicker label="Break starts" value={hour.breakStartTime} onChange={(value) => setHour(day.value, 'breakStartTime', value)} step={15} timeFormat="24h" />
                       <TimePicker label="Break ends" value={hour.breakEndTime} onChange={(value) => setHour(day.value, 'breakEndTime', value)} step={15} timeFormat="24h" />
                     </div>
                   </details>
                 </div>
-              ) : <p className="text-xs text-slate-400 md:col-span-1">Closed all day</p>}
+              ) : <p className="text-xs text-[var(--text-muted)] md:col-span-1">Closed all day</p>}
             </div>
           );
         })}
       </div>
-      <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-        <p className="mb-3 text-xs font-semibold text-slate-700 dark:text-slate-300">Weekly pattern preview</p>
+      <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
+        <p className="mb-3 text-xs font-semibold text-[var(--text-secondary)]">Weekly pattern preview</p>
         <div className="flex h-24 items-end gap-2">
           {dayPreview.map((day) => (
             <div key={day.dayOfWeek} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
-              <div className={`w-full rounded-t-md ${day.isOpen ? 'bg-primary-500/80' : 'bg-slate-100 dark:bg-slate-800'}`} style={{ height: day.isOpen ? `${Math.min(90, Math.max(16, ((parseInt(day.closeTime) || 18) - (parseInt(day.openTime) || 9)) * 5))}%` : '8%' }} />
-              <span className="text-[10px] text-slate-500">{day.label}</span>
+              <div className={`w-full rounded-t-md ${day.isOpen ? 'bg-primary-500/80' : 'bg-[var(--bg-input)] border border-[var(--border-color)]'}`} style={{ height: day.isOpen ? `${Math.min(90, Math.max(16, ((parseInt(day.closeTime) || 18) - (parseInt(day.openTime) || 9)) * 5))}%` : '8%' }} />
+              <span className="text-[10px] text-[var(--text-muted)]">{day.label}</span>
             </div>
           ))}
         </div>
@@ -1299,47 +1299,47 @@ export default function OrganisationSetupForm({
 
   const renderHolidays = () => (
     <div className="space-y-5">
-      <div><h2 className="text-lg font-bold text-slate-900 dark:text-white">Holiday calendar</h2><p className="mt-1 text-sm text-slate-500">Add closures that should block schedules and booking availability.</p></div>
-      <section className="space-y-4 rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-white">Add a holiday</h3>
+      <div><h2 className="text-lg font-bold text-[var(--text-primary)]">Holiday calendar</h2><p className="mt-1 text-sm text-[var(--text-muted)]">Add closures that should block schedules and booking availability.</p></div>
+      <section className="space-y-4 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
+        <h3 className="text-sm font-bold text-[var(--text-primary)]">Add a holiday</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Holiday name" value={holidayDraft.name} onChange={(value) => setHolidayDraft((draft) => ({ ...draft, name: value }))} placeholder="e.g. New Year's Day" />
           <DatePicker label="Date" value={holidayDraft.holidayDate} onChange={(value) => setHolidayDraft((draft) => ({ ...draft, holidayDate: value }))} />
           <Dropdown label="Applies to" value={holidayDraft.branchId} onChange={(value) => setHolidayDraft((draft) => ({ ...draft, branchId: value }))} options={[{ value: '', label: 'All branches' }, ...(organisation.branches || []).map((branch) => ({ value: branch.id, label: branch.name }))]} />
           <TextareaField label="Description (optional)" value={holidayDraft.description} onChange={(value) => setHolidayDraft((draft) => ({ ...draft, description: value }))} placeholder="Additional notes" rows={2} />
-          <div className="flex items-center rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
+          <div className="flex items-center rounded-xl bg-[var(--bg-input)] border border-[var(--border-color)] p-3">
             <Toggle checked={holidayDraft.isRecurringAnnually} onChange={(value) => setHolidayDraft((draft) => ({ ...draft, isRecurringAnnually: value }))} label="Repeat every year" description="Useful for fixed-date public holidays." />
           </div>
-          <div className="flex items-end"><button type="button" onClick={addHoliday} className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary-600 px-4 text-xs font-semibold text-white hover:bg-primary-700"><Plus className="h-4 w-4" />Add holiday</button></div>
+          <div className="flex items-end"><button type="button" onClick={addHoliday} className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary-500 px-4 text-xs font-semibold text-white hover:bg-primary-600 transition-colors"><Plus className="h-4 w-4" />Add holiday</button></div>
         </div>
       </section>
-      <section className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
-        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 dark:border-slate-800">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">Organization holidays</h3><span className="text-xs text-slate-500">{form.holidays.filter((holiday) => holiday.status === 'active').length} active</span>
+      <section className="overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)]">
+        <div className="flex items-center justify-between border-b border-[var(--border-color)] px-4 py-3">
+          <h3 className="text-sm font-bold text-[var(--text-primary)]">Organization holidays</h3><span className="text-xs text-[var(--text-muted)]">{form.holidays.filter((holiday) => holiday.status === 'active').length} active</span>
         </div>
         {(() => {
           const today = new Date().toISOString().slice(0, 10);
           const upcoming = orderedHolidays.filter((holiday) => holiday.status === 'active' && holiday.holidayDate >= today);
           const history = orderedHolidays.filter((holiday) => holiday.status !== 'active' || holiday.holidayDate < today);
           const renderHolidayRow = (holiday, index, isHistory = false) => (
-            <div key={holiday.id || `${holiday.holidayDate}-${holiday.name}-${index}`} className={`flex flex-wrap items-center justify-between gap-3 px-4 py-3 ${index ? 'border-t border-slate-100 dark:border-slate-800' : ''} ${isHistory ? 'opacity-60' : ''}`}>
+            <div key={holiday.id || `${holiday.holidayDate}-${holiday.name}-${index}`} className={`flex flex-wrap items-center justify-between gap-3 px-4 py-3 ${index ? 'border-t border-[var(--border-color)]' : ''} ${isHistory ? 'opacity-60' : ''}`}>
               <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 flex-col items-center justify-center rounded-xl bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300"><span className="text-[9px] font-bold uppercase">{new Date(`${holiday.holidayDate}T00:00:00`).toLocaleString(undefined, { month: 'short' })}</span><span className="text-sm font-bold">{new Date(`${holiday.holidayDate}T00:00:00`).getDate()}</span></span>
-                <div><p className="text-sm font-semibold text-slate-900 dark:text-white">{holiday.name} {holiday.isRecurringAnnually && <span className="ml-1 text-primary-600">↻</span>}</p><p className="text-xs text-slate-500">{holiday.description || (holiday.branchId ? 'Specific branch' : 'All branches')} • {isHistory ? 'History' : 'Upcoming'}</p></div>
+                <span className="flex h-11 w-11 flex-col items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 border border-primary-500/20"><span className="text-[9px] font-bold uppercase">{new Date(`${holiday.holidayDate}T00:00:00`).toLocaleString(undefined, { month: 'short' })}</span><span className="text-sm font-bold">{new Date(`${holiday.holidayDate}T00:00:00`).getDate()}</span></span>
+                <div><p className="text-sm font-semibold text-[var(--text-primary)]">{holiday.name} {holiday.isRecurringAnnually && <span className="ml-1 text-primary-500">↻</span>}</p><p className="text-xs text-[var(--text-muted)]">{holiday.description || (holiday.branchId ? 'Specific branch' : 'All branches')} • {isHistory ? 'History' : 'Upcoming'}</p></div>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold capitalize ${holiday.status === 'active' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-slate-100 text-slate-500 dark:bg-slate-800'}`}>{holiday.status}</span>
-                {holiday.status === 'active' && <button type="button" aria-label={`Cancel ${holiday.name}`} onClick={() => setForm((current) => ({ ...current, holidays: current.holidays.map((item) => item === holiday ? { ...item, status: 'cancelled' } : item) }))} className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10"><X className="h-4 w-4" /></button>}
+                <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold capitalize ${holiday.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-[var(--bg-input)] text-[var(--text-muted)] border border-[var(--border-color)]'}`}>{holiday.status}</span>
+                {holiday.status === 'active' && <button type="button" aria-label={`Cancel ${holiday.name}`} onClick={() => setForm((current) => ({ ...current, holidays: current.holidays.map((item) => item === holiday ? { ...item, status: 'cancelled' } : item) }))} className="rounded-lg p-2 text-[var(--text-muted)] hover:bg-rose-500/10 hover:text-rose-500 transition-colors"><X className="h-4 w-4" /></button>}
               </div>
             </div>
           );
-          if (!orderedHolidays.length) return <p className="p-8 text-center text-sm text-slate-400">No holidays have been added.</p>;
+          if (!orderedHolidays.length) return <p className="p-8 text-center text-sm text-[var(--text-muted)]">No holidays have been added.</p>;
           return (
             <>
-              {upcoming.length ? upcoming.map((holiday, index) => renderHolidayRow(holiday, index)) : <p className="p-5 text-center text-sm text-slate-400">No upcoming holidays.</p>}
+              {upcoming.length ? upcoming.map((holiday, index) => renderHolidayRow(holiday, index)) : <p className="p-5 text-center text-sm text-[var(--text-muted)]">No upcoming holidays.</p>}
               {history.length > 0 && (
-                <details className="border-t border-slate-100 dark:border-slate-800">
-                  <summary className="cursor-pointer px-4 py-3 text-xs font-semibold text-slate-500">History ({history.length})</summary>
+                <details className="border-t border-[var(--border-color)]">
+                  <summary className="cursor-pointer px-4 py-3 text-xs font-semibold text-[var(--text-muted)]">History ({history.length})</summary>
                   {history.map((holiday, index) => renderHolidayRow(holiday, index, true))}
                 </details>
               )}
@@ -1359,45 +1359,45 @@ export default function OrganisationSetupForm({
         {STEPS.map((item, index) => {
           const Icon = item.icon;
           return (
-            <button key={item.id} type="button" onClick={() => setStep(index)} className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition ${step === index ? 'border-primary-500 bg-primary-50 text-primary-800 dark:bg-primary-500/10 dark:text-primary-200'
-                : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600'
+            <button key={item.id} type="button" onClick={() => setStep(index)} className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition ${step === index ? 'border-primary-500 bg-primary-500/15 text-primary-500 font-bold'
+                : 'border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]'
               }`}>
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/80 text-xs font-bold dark:bg-slate-800">{index + 1}</span>
+              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${step === index ? 'bg-primary-500 text-white' : 'bg-[var(--bg-input)] text-[var(--text-muted)]'}`}>{index + 1}</span>
               <span className="min-w-0"><Icon className="mr-1 inline h-3.5 w-3.5" /><span className="text-[11px] font-semibold">{item.label}</span></span>
             </button>
           );
         })}
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-        <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
-          <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-600">Setup task {step + 1} of {STEPS.length}</p><h1 className="mt-1 text-base font-bold text-slate-900 dark:text-white">{currentStep.label}</h1></div>
-          <span className="text-xs font-semibold text-slate-400">{Math.round(((step + 1) / STEPS.length) * 100)}%</span>
+      <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4 shadow-sm sm:p-6 text-[var(--text-primary)]">
+        <div className="mb-5 flex items-center justify-between border-b border-[var(--border-color)] pb-4">
+          <div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-500">Setup task {step + 1} of {STEPS.length}</p><h1 className="mt-1 text-base font-bold text-[var(--text-primary)]">{currentStep.label}</h1></div>
+          <span className="text-xs font-semibold text-[var(--text-muted)]">{Math.round(((step + 1) / STEPS.length) * 100)}%</span>
         </div>
         {renderers[step]()}
         {(serverError || uploadError) && (
-          <div role="alert" className="mt-5 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 dark:border-rose-900 dark:bg-rose-500/10 dark:text-rose-200">
+          <div role="alert" className="mt-5 flex items-start gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-400">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{serverError || uploadError}
             {uploadError && <button type="button" aria-label="Dismiss error" onClick={() => setUploadError('')} className="ml-auto"><X className="h-4 w-4" /></button>}
           </div>
         )}
         {uploadError && (uploading || uploadError.includes('Choose')) && <div className="sr-only">{uploading}</div>}
-        <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
-          <button type="button" onClick={onCancel} className="rounded-xl px-3 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"><ArrowLeft className="mr-1 inline h-4 w-4" />Back to organization</button>
+        <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-color)] pt-4">
+          <button type="button" onClick={onCancel} className="rounded-xl px-3 py-2 text-xs font-semibold text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)]"><ArrowLeft className="mr-1 inline h-4 w-4" />Back to organization</button>
           <div className="flex items-center gap-2">
-            {step > 0 && <button type="button" onClick={() => setStep((current) => current - 1)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-semibold dark:border-slate-700">Previous</button>}
-            {step < STEPS.length - 1 && <button type="button" onClick={() => setStep((current) => current + 1)} className="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"><ArrowRight className="mr-1 inline h-4 w-4" />Next section</button>}
-            <button type="button" disabled={saving || Boolean(uploading)} onClick={() => onSaveClick(false)} className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"><Save className="h-4 w-4" />{saving ? 'Saving...' : 'Save setup'}</button>
+            {step > 0 && <button type="button" onClick={() => setStep((current) => current - 1)} className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-4 py-2.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)]">Previous</button>}
+            {step < STEPS.length - 1 && <button type="button" onClick={() => setStep((current) => current + 1)} className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-4 py-2.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)]"><ArrowRight className="mr-1 inline h-4 w-4" />Next section</button>}
+            <button type="button" disabled={saving || Boolean(uploading)} onClick={() => onSaveClick(false)} className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60 transition-colors"><Save className="h-4 w-4" />{saving ? 'Saving...' : 'Save setup'}</button>
           </div>
         </div>
       </div>
 
       {currencyConfirmation && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/50 p-4">
-          <div role="dialog" aria-modal="true" aria-labelledby="currency-confirm-title" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-900">
-            <div className="flex items-start justify-between gap-3"><div><h2 id="currency-confirm-title" className="text-lg font-bold text-slate-900 dark:text-white">Confirm currency change</h2><p className="mt-2 text-sm text-slate-500">Historical transactions will not be converted. Type <strong className="text-slate-800 dark:text-white">{currencyConfirmation}</strong> to confirm.</p></div><button type="button" aria-label="Close confirmation" onClick={() => setCurrencyConfirmation('')}><X className="h-5 w-5 text-slate-400" /></button></div>
-            <input value={currencyConfirmation} onChange={(event) => setCurrencyConfirmation(event.target.value.toUpperCase())} className="mt-4 h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm uppercase dark:border-slate-700 dark:bg-slate-800" placeholder="Currency code" />
-            <div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setCurrencyConfirmation('')} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold dark:border-slate-700">Cancel</button><button type="button" disabled={currencyConfirmation !== form.settings.currencyCode} onClick={() => onSaveClick(true)} className="rounded-xl bg-primary-600 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50">Confirm and save</button></div>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div role="dialog" aria-modal="true" aria-labelledby="currency-confirm-title" className="w-full max-w-md rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-3"><div><h2 id="currency-confirm-title" className="text-lg font-bold text-[var(--text-primary)]">Confirm currency change</h2><p className="mt-2 text-sm text-[var(--text-muted)]">Historical transactions will not be converted. Type <strong className="text-[var(--text-primary)]">{currencyConfirmation}</strong> to confirm.</p></div><button type="button" aria-label="Close confirmation" onClick={() => setCurrencyConfirmation('')}><X className="h-5 w-5 text-[var(--text-muted)]" /></button></div>
+            <input value={currencyConfirmation} onChange={(event) => setCurrencyConfirmation(event.target.value.toUpperCase())} className="mt-4 h-10 w-full rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] px-3 text-sm uppercase text-[var(--text-primary)] outline-none" placeholder="Currency code" />
+            <div className="mt-5 flex justify-end gap-2"><button type="button" onClick={() => setCurrencyConfirmation('')} className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-secondary)] px-4 py-2 text-xs font-semibold hover:text-[var(--text-primary)]">Cancel</button><button type="button" disabled={currencyConfirmation !== form.settings.currencyCode} onClick={() => onSaveClick(true)} className="rounded-xl bg-primary-500 px-4 py-2 text-xs font-semibold text-white hover:bg-primary-600 disabled:opacity-50 transition-colors">Confirm and save</button></div>
           </div>
         </div>
       )}

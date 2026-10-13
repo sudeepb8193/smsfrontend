@@ -14,7 +14,7 @@ export const Badge = ({
     danger: 'bg-danger-500/10 text-danger-600 dark:text-danger-400 border border-danger-500/20',
     warning: 'bg-warning-500/10 text-warning-700 dark:text-warning-400 border border-warning-500/20',
     brand: 'bg-brand-500/10 text-brand-700 dark:text-brand-300 border border-brand-500/20',
-    neutral: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700',
+    neutral: 'bg-[var(--bg-input)] text-[var(--text-secondary)] border border-[var(--border-color)]',
     // Compatibility aliases
     purple: 'bg-primary-500/10 text-primary-700 dark:text-primary-300 border border-primary-500/20',
     blue: 'bg-secondary-500/10 text-secondary-700 dark:text-secondary-300 border border-secondary-500/20',

@@ -30,11 +30,11 @@ export const CreateOrganisationPage = () => {
     <div className="space-y-4 pb-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <Building2 className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+        <h1 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+          <Building2 className="w-6 h-6 text-primary-500" />
           Create New Organisation
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-[var(--text-muted)]">
           Register a new salon tenant, owner account, default settings, and subscription entitlements
         </p>
       </div>

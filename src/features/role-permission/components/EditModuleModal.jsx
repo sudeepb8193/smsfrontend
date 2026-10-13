@@ -88,21 +88,21 @@ export const EditModuleModal = ({
       size="medium"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800/40 rounded-xl p-3.5 flex items-center gap-3 text-primary-800 dark:text-primary-200 text-xs">
-          <Layers size={18} className="shrink-0 text-primary-600 dark:text-primary-400" />
+        <div className="bg-primary-500/10 border border-primary-500/20 rounded-xl p-3.5 flex items-center gap-3 text-primary-400 text-xs">
+          <Layers size={18} className="shrink-0 text-primary-500" />
           <p>
             Update the display name, description, and available operation actions for this module. Changes will synchronize across all role permission matrixes.
           </p>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">
             Module Identifier Code
           </label>
-          <div className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-mono text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/80 select-none">
+          <div className="px-3.5 py-2 rounded-xl bg-[var(--bg-input)] text-xs font-mono text-[var(--text-muted)] border border-[var(--border-color)] select-none">
             {module?.moduleCode || ''}
           </div>
-          <span className="text-[10px] text-slate-400 mt-1 block">Module identifier code is immutable to preserve system integrity.</span>
+          <span className="text-[10px] text-[var(--text-muted)] mt-1 block">Module identifier code is immutable to preserve system integrity.</span>
         </div>
 
         <Input
@@ -124,7 +124,7 @@ export const EditModuleModal = ({
 
         {/* Action Capabilities */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-2">
             Supported Action Operations <span className="text-danger-500">*</span>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -136,15 +136,15 @@ export const EditModuleModal = ({
                   onClick={() => handleToggleAction(act.key)}
                   className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                     isChecked
-                      ? 'bg-primary-50/80 dark:bg-primary-950/30 border-primary-500/50 shadow-2xs'
-                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      ? 'bg-primary-500/10 border-primary-500/30 shadow-2xs'
+                      : 'bg-[var(--bg-input)] border-[var(--border-color)] hover:border-[var(--border-hover)] hover:bg-white/5'
                   }`}
                 >
                   <div>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                    <span className="text-xs font-bold text-[var(--text-primary)] block">
                       {act.label}
                     </span>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
+                    <span className="text-[10px] text-[var(--text-muted)] block">
                       {act.desc}
                     </span>
                   </div>
@@ -164,7 +164,7 @@ export const EditModuleModal = ({
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border-color)]">
           <Button variant="secondary" onClick={onClose} disabled={loading}>
             Cancel
           </Button>

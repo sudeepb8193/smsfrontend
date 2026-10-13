@@ -28,9 +28,9 @@ export const DataTable = ({
           <tbody className="divide-y divide-[var(--border-color)] text-sm text-[var(--text-primary)]">
             {loading ? (
               <tr>
-                <td colSpan={columns.length} className="p-12 text-center text-[#8E7A86]">
+                <td colSpan={columns.length} className="p-12 text-center text-[var(--text-muted)]">
                   <div className="flex flex-col items-center justify-center gap-3">
-                    <Spinner size="large" color="#8A4A52" />
+                    <Spinner size="large" color="var(--primary, #F97316)" />
                     <span>Loading records...</span>
                   </div>
                 </td>

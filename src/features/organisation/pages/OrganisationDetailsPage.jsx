@@ -132,17 +132,17 @@ export const OrganisationDetailsPage = () => {
 
   if (!organisation) {
     return (
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center max-w-xl mx-auto my-12">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-12 text-center max-w-xl mx-auto my-12">
         <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-3" />
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">
           Organisation Not Found
         </h2>
-        <p className="text-sm text-slate-500 mb-6">
+        <p className="text-sm text-[var(--text-muted)] mb-6">
           The requested organisation could not be retrieved or has been removed.
         </p>
         <button
           onClick={() => navigate('/super-admin/organisations')}
-          className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-semibold text-sm rounded-xl transition-all"
+          className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm rounded-xl transition-all cursor-pointer"
         >
           Back to Organisations
         </button>
@@ -165,14 +165,14 @@ export const OrganisationDetailsPage = () => {
     <div className="space-y-8 pb-16">
 
       {/* Navigation & Actions Top Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[var(--border-color)] pb-4">
         <div>
           <div className="flex items-center gap-3">
             {(organisation.logoSquareUrl || organisation.logoUrl) ? (
               <img
                 src={getLogoUrl(organisation.logoSquareUrl || organisation.logoUrl)}
                 alt={organisation.name}
-                className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 bg-white shrink-0"
+                className="w-12 h-12 rounded-xl object-cover border border-[var(--border-color)] bg-[var(--bg-input)] shrink-0"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   const fallback = e.target.nextElementSibling;
@@ -181,7 +181,7 @@ export const OrganisationDetailsPage = () => {
               />
             ) : null}
             <div
-              className={`w-12 h-12 rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800/50 items-center justify-center font-bold text-lg shrink-0 ${
+              className={`w-12 h-12 rounded-xl bg-primary-500/10 text-primary-500 border border-primary-500/20 items-center justify-center font-bold text-lg shrink-0 ${
                 organisation.logoUrl ? 'hidden' : 'flex'
               }`}
             >
@@ -189,25 +189,25 @@ export const OrganisationDetailsPage = () => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+                <h1 className="text-xl font-bold text-[var(--text-primary)]">
                   {organisation.name}
                 </h1>
-                <span className="font-mono text-xs font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700">
+                <span className="font-mono text-xs font-bold px-2 py-0.5 bg-[var(--bg-input)] text-[var(--text-secondary)] rounded-md border border-[var(--border-color)]">
                   {organisation.code}
                 </span>
                 <span
                   className={`px-2.5 py-0.5 text-xs font-semibold rounded-full uppercase tracking-wider ${
                     organisation.status === 'active'
-                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       : organisation.status === 'suspended'
-                      ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                      : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                      ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                      : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                   }`}
                 >
                   ● {organisation.status}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 capitalize mt-0.5">
+              <p className="text-xs text-[var(--text-muted)] capitalize mt-0.5">
                 {organisation.businessType?.replace('_', ' ')}
               </p>
             </div>
@@ -218,14 +218,14 @@ export const OrganisationDetailsPage = () => {
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => navigate(`/super-admin/organisations/${organisationId}/setup`)}
-            className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
           >
             <Settings2 className="w-4 h-4" />
             Complete Setup
           </button>
           <button
             onClick={() => navigate(`/super-admin/organisations/${organisationId}/edit`)}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-[var(--bg-input)] hover:bg-white/10 text-[var(--text-secondary)] border border-[var(--border-color)] rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
           >
             <Edit className="w-4 h-4 text-amber-500" />
             Edit Organisation
@@ -261,52 +261,52 @@ export const OrganisationDetailsPage = () => {
 
       {/* STATISTICS CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
+          <div className="flex items-center justify-between text-[var(--text-muted)] mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">Branches</span>
             <Layers className="w-4 h-4 text-primary-500" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-white">
+          <div className="text-2xl font-bold text-[var(--text-primary)]">
             {stats.totalBranches}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
+          <div className="flex items-center justify-between text-[var(--text-muted)] mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">Users</span>
             <Users className="w-4 h-4 text-purple-500" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-white">
+          <div className="text-2xl font-bold text-[var(--text-primary)]">
             {stats.totalUsers}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
+          <div className="flex items-center justify-between text-[var(--text-muted)] mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">Staff</span>
             <UsersRound className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-white">
+          <div className="text-2xl font-bold text-[var(--text-primary)]">
             {stats.totalStaff}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
+          <div className="flex items-center justify-between text-[var(--text-muted)] mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">Customers</span>
             <UserCheck className="w-4 h-4 text-amber-500" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-white">
+          <div className="text-2xl font-bold text-[var(--text-primary)]">
             {stats.totalCustomers}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm col-span-2 md:col-span-1">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm col-span-2 md:col-span-1">
+          <div className="flex items-center justify-between text-[var(--text-muted)] mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">Appointments</span>
             <Calendar className="w-4 h-4 text-rose-500" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 dark:text-white">
+          <div className="text-2xl font-bold text-[var(--text-primary)]">
             {stats.totalAppointments}
           </div>
         </div>
@@ -330,23 +330,23 @@ export const OrganisationDetailsPage = () => {
 
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'overview' && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-6 shadow-sm">
+            <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-6 space-y-6 shadow-sm">
               <div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                <h3 className="text-base font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-primary-500" />
                   Organisation Overview
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                    <span className="text-xs text-slate-400 block mb-0.5">Business Type</span>
-                    <span className="font-semibold text-slate-900 dark:text-white capitalize">
+                  <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl">
+                    <span className="text-xs text-[var(--text-muted)] block mb-0.5">Business Type</span>
+                    <span className="font-semibold text-[var(--text-primary)] capitalize">
                       {organisation.businessType?.replace('_', ' ')}
                     </span>
                   </div>
 
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                    <span className="text-xs text-slate-400 block mb-0.5">Created Date</span>
-                    <span className="font-semibold text-slate-900 dark:text-white">
+                  <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl">
+                    <span className="text-xs text-[var(--text-muted)] block mb-0.5">Created Date</span>
+                    <span className="font-semibold text-[var(--text-primary)]">
                       {new Date(organisation.createdAt).toLocaleDateString('en-US', {
                         day: '2-digit',
                         month: 'long',
@@ -355,36 +355,36 @@ export const OrganisationDetailsPage = () => {
                     </span>
                   </div>
 
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3">
-                    <Mail className="w-4 h-4 text-slate-400" />
+                  <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl flex items-center gap-3">
+                    <Mail className="w-4 h-4 text-[var(--text-muted)]" />
                     <div>
-                      <span className="text-xs text-slate-400 block">Email</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">
+                      <span className="text-xs text-[var(--text-muted)] block">Email</span>
+                      <span className="font-semibold text-[var(--text-primary)]">
                         {organisation.email || 'N/A'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3">
-                    <Phone className="w-4 h-4 text-slate-400" />
+                  <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl flex items-center gap-3">
+                    <Phone className="w-4 h-4 text-[var(--text-muted)]" />
                     <div>
-                      <span className="text-xs text-slate-400 block">Phone</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">
+                      <span className="text-xs text-[var(--text-muted)] block">Phone</span>
+                      <span className="font-semibold text-[var(--text-primary)]">
                         {organisation.phone || 'N/A'}
                       </span>
                     </div>
                   </div>
 
                   {organisation.website && (
-                    <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 md:col-span-2">
-                      <Globe className="w-4 h-4 text-slate-400" />
+                    <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl flex items-center gap-3 md:col-span-2">
+                      <Globe className="w-4 h-4 text-[var(--text-muted)]" />
                       <div>
-                        <span className="text-xs text-slate-400 block">Website</span>
+                        <span className="text-xs text-[var(--text-muted)] block">Website</span>
                         <a
                           href={organisation.website}
                           target="_blank"
                           rel="noreferrer"
-                          className="font-semibold text-primary-600 dark:text-primary-400 hover:underline"
+                          className="font-semibold text-primary-500 hover:underline"
                         >
                           {organisation.website}
                         </a>
@@ -393,11 +393,11 @@ export const OrganisationDetailsPage = () => {
                   )}
 
                   {address && (
-                    <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl flex items-start gap-3 md:col-span-2">
-                      <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
+                    <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl flex items-start gap-3 md:col-span-2">
+                      <MapPin className="w-4 h-4 text-[var(--text-muted)] mt-0.5" />
                       <div>
-                        <span className="text-xs text-slate-400 block mb-0.5">Registered Address</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">
+                        <span className="text-xs text-[var(--text-muted)] block mb-0.5">Registered Address</span>
+                        <span className="font-semibold text-[var(--text-primary)]">
                           {address.addressLine1}, {address.city}, {address.state}, {address.country} - {address.postalCode}
                         </span>
                       </div>
@@ -410,29 +410,29 @@ export const OrganisationDetailsPage = () => {
 
           {/* TAB 2: BRANCHES */}
           {activeTab === 'branches' && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white mb-4">
+            <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-6 shadow-sm">
+              <h3 className="text-base font-bold text-[var(--text-primary)] mb-4">
                 Organisation Branches
               </h3>
 
               {!organisation.branches || organisation.branches.length === 0 ? (
-                <div className="p-8 text-center text-slate-400">
+                <div className="p-8 text-center text-[var(--text-muted)]">
                   <Layers className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">No branches created yet for this organisation.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                <div className="divide-y divide-[var(--border-color)]">
                   {organisation.branches.map((b) => (
                     <div key={b.id} className="py-3.5 flex items-center justify-between">
                       <div>
-                        <div className="font-semibold text-slate-900 dark:text-white">
-                          {b.name} <span className="font-mono text-xs text-slate-400">({b.code})</span>
+                        <div className="font-semibold text-[var(--text-primary)]">
+                          {b.name} <span className="font-mono text-xs text-[var(--text-muted)]">({b.code})</span>
                         </div>
-                        <div className="text-xs text-slate-400 capitalize">
+                        <div className="text-xs text-[var(--text-muted)] capitalize">
                           Type: {b.branchType || 'standard'}
                         </div>
                       </div>
-                      <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-600">
+                      <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                         {b.status || 'Active'}
                       </span>
                     </div>
@@ -444,31 +444,31 @@ export const OrganisationDetailsPage = () => {
 
           {/* TAB 3: USERS */}
           {activeTab === 'users' && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white mb-4">
+            <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-6 shadow-sm">
+              <h3 className="text-base font-bold text-[var(--text-primary)] mb-4">
                 Users & Roles
               </h3>
 
               {!organisation.users || organisation.users.length === 0 ? (
-                <div className="p-8 text-center text-slate-400">
+                <div className="p-8 text-center text-[var(--text-muted)]">
                   <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">No users found for this organisation.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                <div className="divide-y divide-[var(--border-color)]">
                   {organisation.users.map((u) => {
                     const roleName = u.userRolesAssignedToMe?.[0]?.role?.name || 'Staff';
                     return (
                       <div key={u.id} className="py-3.5 flex items-center justify-between">
                         <div>
-                          <div className="font-semibold text-slate-900 dark:text-white">
+                          <div className="font-semibold text-[var(--text-primary)]">
                             {u.displayName}
                           </div>
-                          <div className="text-xs text-slate-400">
+                          <div className="text-xs text-[var(--text-muted)]">
                             {u.email} {u.phoneNumber ? `• ${u.phoneNumber}` : ''}
                           </div>
                         </div>
-                        <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800">
+                        <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-primary-500/10 text-primary-500 border border-primary-500/20">
                           {roleName}
                         </span>
                       </div>
@@ -483,37 +483,37 @@ export const OrganisationDetailsPage = () => {
         {/* Right 1 Col: Owner & Subscription Cards */}
         <div className="space-y-6">
           {/* Owner Account Card */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+          <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-6 shadow-sm">
+            <h3 className="text-base font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
               <UserCheck className="w-5 h-5 text-emerald-500" />
               Organisation Owner
             </h3>
 
             {owner ? (
               <div className="space-y-3 text-sm">
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                  <span className="text-xs text-slate-400 block">Owner Name</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">
+                <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl">
+                  <span className="text-xs text-[var(--text-muted)] block">Owner Name</span>
+                  <span className="font-semibold text-[var(--text-primary)]">
                     {owner.displayName}
                   </span>
                 </div>
 
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-slate-400" />
+                <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl flex items-center gap-2.5">
+                  <Mail className="w-4 h-4 text-[var(--text-muted)]" />
                   <div>
-                    <span className="text-xs text-slate-400 block">Email</span>
-                    <span className="font-semibold text-slate-900 dark:text-white text-xs">
+                    <span className="text-xs text-[var(--text-muted)] block">Email</span>
+                    <span className="font-semibold text-[var(--text-primary)] text-xs">
                       {owner.email}
                     </span>
                   </div>
                 </div>
 
                 {owner.phoneNumber && (
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl flex items-center gap-2.5">
-                    <Phone className="w-4 h-4 text-slate-400" />
+                  <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl flex items-center gap-2.5">
+                    <Phone className="w-4 h-4 text-[var(--text-muted)]" />
                     <div>
-                      <span className="text-xs text-slate-400 block">Phone</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">
+                      <span className="text-xs text-[var(--text-muted)] block">Phone</span>
+                      <span className="font-semibold text-[var(--text-primary)]">
                         {owner.phoneNumber}
                       </span>
                     </div>
@@ -521,49 +521,49 @@ export const OrganisationDetailsPage = () => {
                 )}
               </div>
             ) : (
-              <p className="text-xs text-slate-400">No owner assigned</p>
+              <p className="text-xs text-[var(--text-muted)]">No owner assigned</p>
             )}
           </div>
 
           {/* Subscription Card */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+          <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-6 shadow-sm">
+            <h3 className="text-base font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-amber-500" />
               Subscription Details
             </h3>
 
             <div className="space-y-3 text-sm">
-              <div className="p-3 bg-purple-500/10 border border-purple-200 dark:border-purple-800 rounded-xl flex items-center justify-between">
+              <div className="p-3 bg-primary-500/10 border border-primary-500/20 rounded-xl flex items-center justify-between">
                 <div>
-                  <span className="text-xs text-purple-600 dark:text-purple-400 font-semibold block">Plan Name</span>
-                  <span className="font-bold text-purple-700 dark:text-purple-300 text-base">
+                  <span className="text-xs text-primary-400 font-semibold block">Plan Name</span>
+                  <span className="font-bold text-primary-400 text-base">
                     {sub?.planName || 'Basic Plan'}
                   </span>
                 </div>
-                <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-purple-600 text-white uppercase">
+                <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-primary-500 text-white uppercase">
                   {sub?.status || 'Active'}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                  <span className="text-slate-400 block">Max Branches</span>
-                  <span className="font-bold text-slate-900 dark:text-white text-sm">
+                <div className="p-2.5 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl">
+                  <span className="text-[var(--text-muted)] block">Max Branches</span>
+                  <span className="font-bold text-[var(--text-primary)] text-sm">
                     {sub?.maxBranches || 1}
                   </span>
                 </div>
-                <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                  <span className="text-slate-400 block">Max Users</span>
-                  <span className="font-bold text-slate-900 dark:text-white text-sm">
+                <div className="p-2.5 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl">
+                  <span className="text-[var(--text-muted)] block">Max Users</span>
+                  <span className="font-bold text-[var(--text-primary)] text-sm">
                     {sub?.maxUsers || 5}
                   </span>
                 </div>
               </div>
 
               {sub?.startDate && (
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl text-xs">
-                  <span className="text-slate-400 block mb-0.5">Start Date</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">
+                <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl text-xs">
+                  <span className="text-[var(--text-muted)] block mb-0.5">Start Date</span>
+                  <span className="font-semibold text-[var(--text-primary)]">
                     {new Date(sub.startDate).toLocaleDateString()}
                   </span>
                 </div>

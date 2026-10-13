@@ -103,17 +103,17 @@ export const StaffOverridesPage = () => {
     <div className="space-y-4">
       {/* Top Header */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <UserCheck className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+        <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+          <UserCheck className="w-6 h-6 text-primary-500" />
           Staff Permission Exceptions & Overrides
         </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-sm text-[var(--text-muted)] mt-1">
           Manage individual staff Grant/Revoke access overrides, temporary elevations, and audit histories.
         </p>
       </div>
 
       {/* Staff Lookup Bar Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 transition-colors">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm p-4 transition-colors">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -143,21 +143,21 @@ export const StaffOverridesPage = () => {
       {overridesData && selectedStaff ? (
         <div className="space-y-4">
           {/* Staff Info Banner */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors">
+          <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm p-5 transition-colors">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800/50 flex items-center justify-center font-bold text-base shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-primary-500/10 text-primary-500 border border-primary-500/20 flex items-center justify-center font-bold text-base shrink-0">
                   {selectedStaff.fullName?.charAt(0) || 'S'}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">{selectedStaff.fullName}</h3>
+                    <h3 className="text-lg font-bold text-[var(--text-primary)]">{selectedStaff.fullName}</h3>
                     <Badge variant="primary" size="small">
                       {selectedStaff.employeeCode}
                     </Badge>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Home Branch: <strong className="text-slate-700 dark:text-slate-300">{selectedStaff.homeBranch?.name || 'Unassigned'}</strong>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                    Home Branch: <strong className="text-[var(--text-secondary)]">{selectedStaff.homeBranch?.name || 'Unassigned'}</strong>
                     {overridesData.linkedUser?.email && (
                       <span className="ml-2 font-mono">({overridesData.linkedUser.email})</span>
                     )}
@@ -176,23 +176,23 @@ export const StaffOverridesPage = () => {
           </div>
 
           {/* Active Overrides Table Container */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
-            <div className="p-4 border-b border-slate-200 dark:border-slate-800">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Configured Permission Exceptions</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden transition-colors">
+            <div className="p-4 border-b border-[var(--border-color)]">
+              <h3 className="text-base font-bold text-[var(--text-primary)]">Configured Permission Exceptions</h3>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
                 {overridesData.activeOverridesCount || 0} active exceptions applied to this staff member
               </p>
             </div>
 
             {overridesData.overrides?.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400 italic">
+              <div className="p-8 text-center text-xs text-[var(--text-muted)] italic">
                 No individual permission overrides configured for this employee. Access is determined purely by assigned roles.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
-                    <tr className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    <tr className="bg-[var(--bg-input)] border-b border-[var(--border-color)] text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
                       <th className="py-3 px-3">Type</th>
                       <th className="py-3 px-3">Permission</th>
                       <th className="py-3 px-3">Branch Scope</th>
@@ -201,26 +201,26 @@ export const StaffOverridesPage = () => {
                       <th className="py-3 px-3 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                  <tbody className="divide-y divide-[var(--border-color)] text-xs">
                     {overridesData.overrides.map((ov) => {
                       const isGrant = ov.overrideType === 'grant';
                       return (
-                        <tr key={ov.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                        <tr key={ov.id} className="hover:bg-white/5 transition-colors">
                           <td className="py-3 px-3">
                             <Badge variant={isGrant ? 'success' : 'danger'} size="small">
                               {isGrant ? 'GRANT' : 'REVOKE'}
                             </Badge>
                           </td>
                           <td className="py-3 px-3">
-                            <div className="font-semibold text-slate-900 dark:text-white">{ov.permissionLabel}</div>
-                            <div className="font-mono text-[10px] text-slate-500 dark:text-slate-400">
+                            <div className="font-semibold text-[var(--text-primary)]">{ov.permissionLabel}</div>
+                            <div className="font-mono text-[10px] text-[var(--text-muted)]">
                               {ov.permissionKey}
                             </div>
                           </td>
-                          <td className="py-3 px-3 text-slate-600 dark:text-slate-400">
+                          <td className="py-3 px-3 text-[var(--text-secondary)]">
                             {ov.branchName}
                           </td>
-                          <td className="py-3 px-3 text-slate-700 dark:text-slate-300 max-w-xs">
+                          <td className="py-3 px-3 text-[var(--text-secondary)] max-w-xs">
                             {ov.reason}
                           </td>
                           <td className="py-3 px-3">
@@ -233,11 +233,11 @@ export const StaffOverridesPage = () => {
                                 Expiring Soon: {new Date(ov.expiresAt).toLocaleDateString()}
                               </Badge>
                             ) : ov.expiresAt ? (
-                              <span className="text-slate-700 dark:text-slate-300">
+                              <span className="text-[var(--text-secondary)]">
                                 {new Date(ov.expiresAt).toLocaleDateString()}
                               </span>
                             ) : (
-                              <span className="text-slate-500 dark:text-slate-400 font-mono">Permanent</span>
+                              <span className="text-[var(--text-muted)] font-mono">Permanent</span>
                             )}
                           </td>
                           <td className="py-3 px-3 text-right">
@@ -260,27 +260,27 @@ export const StaffOverridesPage = () => {
           </div>
 
           {/* Effective Permissions Union Preview */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Calculated Effective Permissions Preview</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-4">
+          <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm p-5 transition-colors">
+            <h3 className="text-base font-bold text-[var(--text-primary)]">Calculated Effective Permissions Preview</h3>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5 mb-4">
               Result of base role grants + staff overrides precedence calculation
             </p>
 
             {overridesData.effectivePermissions?.length === 0 ? (
-              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No active effective permissions.</p>
+              <p className="text-xs text-[var(--text-muted)] italic">No active effective permissions.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
                 {overridesData.effectivePermissions.map((ep) => (
                   <div
                     key={ep.permissionKey}
-                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 flex items-start justify-between gap-2"
+                    className="p-3 rounded-xl bg-[var(--bg-input)] border border-[var(--border-color)] flex items-start justify-between gap-2"
                   >
                     <div>
-                      <div className="font-semibold text-slate-900 dark:text-white text-xs">{ep.label}</div>
-                      <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">
+                      <div className="font-semibold text-[var(--text-primary)] text-xs">{ep.label}</div>
+                      <div className="text-[10px] font-mono text-[var(--text-muted)] mt-0.5">
                         {ep.permissionKey}
                       </div>
-                      <div className="text-[10px] text-primary-600 dark:text-primary-400 mt-1 font-medium">
+                      <div className="text-[10px] text-primary-500 mt-1 font-medium">
                         Scope: <span className="font-bold">{ep.isAllBranches ? 'All Branches' : `${ep.allowedBranchIds?.length || 0} branches`}</span>
                       </div>
                     </div>
@@ -297,10 +297,10 @@ export const StaffOverridesPage = () => {
         </div>
       ) : (
         !loading && (
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-12 text-center transition-colors">
-            <UserCheck size={36} className="mx-auto text-slate-400 dark:text-slate-500 mb-3" />
-            <h3 className="font-bold text-slate-900 dark:text-white text-base">Look up a Staff Member</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1">
+          <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm p-12 text-center transition-colors">
+            <UserCheck size={36} className="mx-auto text-[var(--text-muted)] mb-3" />
+            <h3 className="font-bold text-[var(--text-primary)] text-base">Look up a Staff Member</h3>
+            <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto mt-1">
               Enter an employee UUID above to view their active permission overrides, role inheritance, and grant/revoke exceptions.
             </p>
           </div>
