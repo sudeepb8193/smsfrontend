@@ -82,7 +82,7 @@ export const RolePermissionsPage = ({ isSuperAdminView = false }) => {
 
   if (loading && !role) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-500 dark:text-slate-400">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-[var(--text-muted)]">
         <Spinner size="large" />
         <span className="mt-3 text-sm font-semibold">Loading Permission Matrix...</span>
       </div>

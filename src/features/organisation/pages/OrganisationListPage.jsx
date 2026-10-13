@@ -153,11 +153,11 @@ export const OrganisationListPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Building2 className="w-7 h-7 text-primary-600 dark:text-primary-400" />
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+            <Building2 className="w-7 h-7 text-primary-500" />
             Organisations
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-[var(--text-muted)]">
             Manage all registered salon organisations, owner accounts, and active subscriptions
           </p>
         </div>
@@ -172,7 +172,7 @@ export const OrganisationListPage = () => {
       </div>
 
       {/* Unified Card Container (Filters + View Toggle + Table/Grid) */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-md overflow-hidden transition-colors">
         <OrganisationFilters
           filters={filters}
           onChange={handleFilterChange}

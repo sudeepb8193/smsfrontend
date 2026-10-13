@@ -25,7 +25,7 @@ export const ViewToggle = ({
 
   return (
     <div
-      className={`relative inline-flex items-center p-0.5 bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 rounded-xl select-none h-[40px] transition-colors ${className}`}
+      className={`relative inline-flex items-center p-0.5 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl select-none h-[40px] transition-colors ${className}`}
     >
       {/* Sliding Active Primary Background Pill */}
       <div
@@ -49,7 +49,7 @@ export const ViewToggle = ({
               className={`relative z-10 w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-200 cursor-pointer ${
                 isActive
                   ? 'text-white font-bold'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
               {Icon && <Icon className="w-4 h-4" />}

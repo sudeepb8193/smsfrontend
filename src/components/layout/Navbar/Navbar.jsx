@@ -52,7 +52,7 @@ export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOp
           </Tooltip>
 
           {/* Back Navigation Button */}
-          <Tooltip content="Go Back 1 Step" position="bottom">
+          <Tooltip content="Go Back" position="bottom">
             <button
               type="button"
               onClick={() => navigate(-1)}
@@ -66,13 +66,13 @@ export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOp
 
         <div className="flex items-center gap-3">
           {/* Theme Switcher / Customizer Trigger */}
-          <Tooltip content="Open Visual Theme Customizer" position="bottom">
+          <Tooltip content="Theme Customizer" position="bottom">
             <button
               type="button"
               onClick={openThemeModal}
-              className="p-2 px-3 text-[var(--text-secondary)] hover:text-white rounded-lg hover:bg-white/5 transition-all flex items-center gap-2 font-semibold text-xs border border-[var(--border-color)] bg-primary-500/10 text-primary-400 hover:bg-primary-500/20"
+              className="p-2 px-3 rounded-lg transition-all flex items-center gap-2 font-semibold text-xs border border-primary-200 dark:border-primary-500/30 bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-500/20 hover:text-primary-800 dark:hover:text-white cursor-pointer"
             >
-              <Palette size={16} className="text-primary-500 animate-pulse" />
+              <Palette size={16} className="text-primary-600 dark:text-primary-400" />
               <span className="hidden sm:inline">Theme</span>
             </button>
           </Tooltip>
@@ -82,9 +82,9 @@ export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOp
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center gap-2 font-medium text-xs border border-[var(--border-color)]"
+              className="p-2 px-2.5 rounded-lg transition-all flex items-center gap-2 font-medium text-xs border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] cursor-pointer"
             >
-              {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-primary-400" />}
+              {isDark ? <Sun size={17} className="text-amber-500" /> : <Moon size={17} className="text-primary-500" />}
               <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
             </button>
           </Tooltip>

@@ -183,9 +183,78 @@ export const FONT_FAMILIES = {
   'SF Pro': "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif",
 };
 
+// Function to generate full 50-950 palette from any arbitrary hex color
+export const generatePaletteFromHex = (hex) => {
+  if (!hex || typeof hex !== 'string') hex = '#F97316';
+  let c = hex.replace('#', '');
+  if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+  if (c.length !== 6) c = 'F97316';
+  const r = parseInt(c.substring(0, 2), 16) / 255;
+  const g = parseInt(c.substring(2, 4), 16) / 255;
+  const b = parseInt(c.substring(4, 6), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  const hslToHex = (h, s, l) => {
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+    const toHex = (x) => {
+      const hex = Math.round(Math.min(255, Math.max(0, x * 255))).toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+  };
+
+  return {
+    50: hslToHex(h, Math.min(1, s * 0.9), 0.96),
+    100: hslToHex(h, Math.min(1, s * 0.9), 0.91),
+    200: hslToHex(h, Math.min(1, s * 0.92), 0.82),
+    300: hslToHex(h, Math.min(1, s * 0.95), 0.71),
+    400: hslToHex(h, s, 0.59),
+    500: `#${c}`.toUpperCase(),
+    600: hslToHex(h, s, Math.max(0.05, l * 0.85)),
+    700: hslToHex(h, s, Math.max(0.05, l * 0.70)),
+    800: hslToHex(h, s, Math.max(0.04, l * 0.55)),
+    900: hslToHex(h, s, Math.max(0.03, l * 0.40)),
+    950: hslToHex(h, s, Math.max(0.02, l * 0.22)),
+  };
+};
+
 export const ThemeProvider = ({ children }) => {
   const [mode, setMode] = useState(() => localStorage.getItem('salon_theme_mode') || 'dark');
-  const [accentColor, setAccentColor] = useState(() => localStorage.getItem('salon_accent_color') || 'burgundy');
+  const [accentColor, setAccentColor] = useState(() => localStorage.getItem('salon_accent_color') || 'orange');
+  const [customColor, setCustomColor] = useState(() => localStorage.getItem('salon_custom_color') || '#F97316');
   const [density, setDensity] = useState(() => localStorage.getItem('salon_density') || 'tight');
   const [fontFamily, setFontFamily] = useState(() => localStorage.getItem('salon_font_family') || 'Inter');
   const [borderRadius, setBorderRadius] = useState(() => Number(localStorage.getItem('salon_border_radius')) || 12);
@@ -202,16 +271,28 @@ export const ThemeProvider = ({ children }) => {
     if (activeTheme === 'dark') {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
+      document.documentElement.style.setProperty('--bg-sidebar', '#0B0B0D');
     } else {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
+      const palette =
+        accentColor === 'custom'
+          ? { shades: generatePaletteFromHex(customColor) }
+          : (ACCENT_PALETTES[accentColor] || ACCENT_PALETTES.orange);
+      document.documentElement.style.setProperty('--bg-sidebar', palette.shades[950] || '#0F172A');
     }
-  }, [mode]);
+  }, [mode, accentColor, customColor]);
 
   // Sync accent color shade scale variables
   useEffect(() => {
     localStorage.setItem('salon_accent_color', accentColor);
-    const palette = ACCENT_PALETTES[accentColor] || ACCENT_PALETTES.burgundy;
+    localStorage.setItem('salon_custom_color', customColor);
+
+    const palette =
+      accentColor === 'custom'
+        ? { name: 'Custom', hex: customColor, shades: generatePaletteFromHex(customColor) }
+        : (ACCENT_PALETTES[accentColor] || ACCENT_PALETTES.orange);
+
     const root = document.documentElement;
 
     Object.entries(palette.shades).forEach(([shade, hex]) => {
@@ -224,8 +305,14 @@ export const ThemeProvider = ({ children }) => {
     root.style.setProperty('--primary-gradient', `linear-gradient(135deg, ${palette.shades[500]} 0%, ${palette.shades[700]} 100%)`);
     root.style.setProperty('--shadow-glow', `0 4px 18px ${palette.shades[500]}50`);
     root.style.setProperty('--border-hover', `${palette.shades[500]}80`);
-    root.style.setProperty('--bg-sidebar', palette.shades[950]);
-  }, [accentColor]);
+
+    const isCurrentDark = root.getAttribute('data-theme') === 'dark' || root.classList.contains('dark');
+    if (isCurrentDark) {
+      root.style.setProperty('--bg-sidebar', '#0B0B0D');
+    } else {
+      root.style.setProperty('--bg-sidebar', palette.shades[950] || '#0F172A');
+    }
+  }, [accentColor, customColor, mode]);
 
   // Sync font family
   useEffect(() => {
@@ -276,6 +363,8 @@ export const ThemeProvider = ({ children }) => {
         toggleTheme,
         accentColor,
         setAccentColor,
+        customColor,
+        setCustomColor,
         density,
         setDensity,
         fontFamily,

@@ -324,7 +324,7 @@ export const RolePermissionMatrix = ({
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-slate-500 dark:text-slate-400">
+      <div className="flex flex-col items-center justify-center p-12 text-[var(--text-muted)]">
         <Spinner size="large" />
         <span className="mt-3 text-sm font-semibold">Loading Permission Matrix...</span>
       </div>
@@ -339,7 +339,7 @@ export const RolePermissionMatrix = ({
           <div className="flex items-center gap-3">
             <AlertTriangle className="text-warning-500 shrink-0" size={24} />
             <div>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white">Concurrency Conflict Detected</h4>
+              <h4 className="font-bold text-sm text-[var(--text-primary)]">Concurrency Conflict Detected</h4>
               <p className="text-xs text-warning-700 dark:text-warning-300 mt-0.5">
                 {concurrencyConflict.message || 'Another administrator updated this role recently.'}
               </p>
@@ -357,15 +357,15 @@ export const RolePermissionMatrix = ({
       )}
 
       {/* Top Header & Actions Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 transition-colors">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm p-6 transition-colors">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-primary-500/10 text-primary-500 flex items-center justify-center shrink-0">
               <Shield size={24} />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{role?.name}</h3>
+                <h3 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">{role?.name}</h3>
                 <Badge variant={role?.roleType === 'system' ? 'brand' : 'primary'} size="small">
                   {role?.roleType === 'system' ? 'System Role' : 'Custom Role'}
                 </Badge>
@@ -373,7 +373,7 @@ export const RolePermissionMatrix = ({
                   {role?.status}
                 </Badge>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
+              <p className="text-xs text-[var(--text-muted)] mt-1 max-w-xl">
                 {role?.description || 'Configure role access permissions and multi-branch data restrictions.'}
               </p>
             </div>
@@ -408,30 +408,30 @@ export const RolePermissionMatrix = ({
         </div>
 
         {/* Status Metrics Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-[var(--border-color)] text-xs">
           <div>
-            <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Total Granted:</span>
-            <span className="font-extrabold text-slate-900 dark:text-white text-base">
-              {selectedCount} <span className="text-xs text-slate-400 dark:text-slate-500 font-normal">/ {totalAvailableCount}</span>
+            <span className="text-[var(--text-muted)] block text-[11px]">Total Granted:</span>
+            <span className="font-extrabold text-[var(--text-primary)] text-base">
+              {selectedCount} <span className="text-xs text-[var(--text-muted)] font-normal">/ {totalAvailableCount}</span>
             </span>
           </div>
           <div>
-            <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Modules Configured:</span>
-            <span className="font-extrabold text-slate-900 dark:text-white text-base">{matrixTemplate.length}</span>
+            <span className="text-[var(--text-muted)] block text-[11px]">Modules Configured:</span>
+            <span className="font-extrabold text-[var(--text-primary)] text-base">{matrixTemplate.length}</span>
           </div>
           <div>
-            <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Assigned Users:</span>
-            <span className="font-extrabold text-slate-900 dark:text-white text-base">{role?.activeUsersCount || 0} active</span>
+            <span className="text-[var(--text-muted)] block text-[11px]">Assigned Users:</span>
+            <span className="font-extrabold text-[var(--text-primary)] text-base">{role?.activeUsersCount || 0} active</span>
           </div>
           <div>
-            <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Change Status:</span>
+            <span className="text-[var(--text-muted)] block text-[11px]">Change Status:</span>
             {hasUnsavedChanges ? (
-              <span className="text-warning-600 dark:text-warning-400 font-bold flex items-center gap-1">
+              <span className="text-warning-500 font-bold flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-warning-500 animate-pulse" />
                 Unsaved Changes Pending
               </span>
             ) : (
-              <span className="text-success-600 dark:text-success-400 font-semibold flex items-center gap-1">
+              <span className="text-success-500 font-semibold flex items-center gap-1">
                 <CheckCircle size={14} /> Synchronized
               </span>
             )}
@@ -441,7 +441,7 @@ export const RolePermissionMatrix = ({
 
       {/* Zero Permissions Warning */}
       {selectedCount === 0 && (
-        <div className="bg-danger-500/10 border border-danger-500/20 rounded-2xl p-4 flex items-center gap-3 text-danger-700 dark:text-danger-300">
+        <div className="bg-danger-500/10 border border-danger-500/20 rounded-2xl p-4 flex items-center gap-3 text-danger-300">
           <AlertTriangle className="text-danger-500 shrink-0" size={20} />
           <p className="text-xs">
             <strong className="font-bold">Warning:</strong> This role currently has zero permissions assigned. Any user holding only this role will be completely locked out of protected system features.
@@ -451,10 +451,10 @@ export const RolePermissionMatrix = ({
 
       {/* Floating Sticky Unsaved Changes Bar */}
       {hasUnsavedChanges && (
-        <div className="sticky top-20 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-primary-500/40 rounded-2xl p-3 shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+        <div className="sticky top-20 z-30 bg-[var(--bg-card)]/95 backdrop-blur-md border border-primary-500/40 rounded-2xl p-3 shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center gap-2 pl-2 text-xs">
             <span className="w-2.5 h-2.5 rounded-full bg-primary-500 animate-ping" />
-            <span className="font-bold text-slate-900 dark:text-white">You have unsaved changes to this permission matrix.</span>
+            <span className="font-bold text-[var(--text-primary)]">You have unsaved changes to this permission matrix.</span>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -478,12 +478,12 @@ export const RolePermissionMatrix = ({
       )}
 
       {/* Main Permission Matrix Table Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[900px]">
             <thead>
-              <tr className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                <th className="py-3.5 px-4 sticky left-0 z-20 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-800 min-w-[240px]">
+              <tr className="bg-[var(--bg-input)] border-b border-[var(--border-color)] text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                <th className="py-3.5 px-4 sticky left-0 z-20 bg-[var(--bg-input)] border-r border-[var(--border-color)] min-w-[240px]">
                   Module & Branch Scope
                 </th>
                 {STANDARD_ACTIONS.map((action) => (
@@ -496,7 +496,7 @@ export const RolePermissionMatrix = ({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm">
+            <tbody className="divide-y divide-[var(--border-color)] text-sm">
               {matrixTemplate.map((module) => {
                 const currentScope = moduleScopes[module.moduleCode]?.scope || 'own_branch';
                 const restrictedBranchIds = moduleScopes[module.moduleCode]?.restrictedBranchIds || [];
@@ -510,15 +510,15 @@ export const RolePermissionMatrix = ({
 
                 return (
                   <React.Fragment key={module.moduleCode}>
-                    <tr className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors group">
+                    <tr className="hover:bg-white/5 transition-colors group">
                       {/* Sticky Module Column with Scope Selector */}
-                      <td className="py-4 px-4 sticky left-0 z-10 bg-white dark:bg-slate-900 group-hover:bg-slate-50/70 dark:group-hover:bg-slate-800/40 border-r border-slate-200 dark:border-slate-800">
+                      <td className="py-4 px-4 sticky left-0 z-10 bg-[var(--bg-card)] group-hover:bg-white/5 border-r border-[var(--border-color)]">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-900 dark:text-white text-sm">
+                            <span className="font-bold text-[var(--text-primary)] text-sm">
                               {module.moduleLabel}
                             </span>
-                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+                            <span className="text-[10px] text-[var(--text-muted)] font-mono">
                               ({module.moduleCode})
                             </span>
                           </div>
@@ -530,7 +530,7 @@ export const RolePermissionMatrix = ({
                         const perm = module.permissions.find((p) => p.action === actionCol.key);
                         if (!perm) {
                           return (
-                            <td key={actionCol.key} className="py-4 px-3 text-center text-slate-300 dark:text-slate-700 select-none">
+                            <td key={actionCol.key} className="py-4 px-3 text-center text-[var(--text-muted)] opacity-40 select-none">
                               —
                             </td>
                           );
@@ -556,7 +556,7 @@ export const RolePermissionMatrix = ({
                                 </div>
                               </Tooltip>
                               {isImpliedView && (
-                                <span className="text-[9px] text-primary-600 dark:text-primary-400 font-bold uppercase tracking-tighter mt-1 leading-none">
+                                <span className="text-[9px] text-primary-500 font-bold uppercase tracking-tighter mt-1 leading-none">
                                   Implied
                                 </span>
                               )}
@@ -571,15 +571,15 @@ export const RolePermissionMatrix = ({
                           <button
                             type="button"
                             onClick={() => handleGrantModuleAll(module.moduleCode)}
-                            className="text-[11px] font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                            className="text-[11px] font-bold text-primary-500 hover:text-primary-400 px-2 py-1 rounded-md hover:bg-white/10 transition-all cursor-pointer"
                           >
                             All
                           </button>
-                          <span className="text-slate-300 dark:text-slate-700">•</span>
+                          <span className="text-[var(--text-muted)]">•</span>
                           <button
                             type="button"
                             onClick={() => handleRevokeModuleAll(module.moduleCode)}
-                            className="text-[11px] font-bold text-danger-600 dark:text-danger-400 hover:text-danger-700 dark:hover:text-danger-300 px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                            className="text-[11px] font-bold text-danger-500 hover:text-danger-400 px-2 py-1 rounded-md hover:bg-white/10 transition-all cursor-pointer"
                           >
                             None
                           </button>

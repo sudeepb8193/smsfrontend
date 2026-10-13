@@ -27,17 +27,17 @@ export const OrganisationFilters = ({
   ];
 
   return (
-    <div className="p-3.5 sm:p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+    <div className="p-3.5 sm:p-4 border-b border-[var(--border-color)] bg-[var(--bg-card)] transition-colors">
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
         {/* Search Input */}
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
           <input
             type="text"
             value={filters.search}
             onChange={(e) => onChange('search', e.target.value)}
             placeholder="Search by name, code, owner, email, phone..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none  focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-1 focus:ring-primary-500/30 focus:border-primary-500 transition-all"
           />
         </div>
 
@@ -70,7 +70,7 @@ export const OrganisationFilters = ({
             <button
               type="button"
               onClick={onReset}
-              className="w-10 h-[40px] flex items-center justify-center text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 rounded-xl transition-all cursor-pointer shrink-0"
+              className="w-10 h-[40px] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-input)] hover:bg-[var(--bg-card-hover)] border border-[var(--border-color)] rounded-xl transition-all cursor-pointer shrink-0"
             >
               <RotateCcw className="w-4 h-4" />
             </button>

@@ -99,7 +99,7 @@ export const Dashboard = () => {
         <Card>
           <div className="flex items-center justify-between text-xs text-[var(--text-muted)] font-semibold mb-2">
             <span>Today's Revenue</span>
-            <DollarSign size={18} className="text-[#8A4A52]" />
+            <DollarSign size={18} className="text-primary-500" />
           </div>
           <div className="text-2xl font-extrabold text-[var(--text-primary)]">$2,590.00</div>
           <div className="text-xs text-emerald-500 font-bold mt-1">+12.5% from yesterday</div>
@@ -137,7 +137,7 @@ export const Dashboard = () => {
       <Card>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
-            <Filter size={16} className="text-[#8A4A52]" />
+            <Filter size={16} className="text-primary-500" />
             <span>Filter Queue:</span>
           </div>
 

@@ -176,7 +176,7 @@ export const DatePicker = ({
       {/* Calendar Popover */}
       {isOpen && (
         <div
-          className={`absolute left-0 z-50 w-72 p-4 bg-[#271820] border border-white/15 rounded-2xl shadow-2xl animate-fadeIn text-[#F9FAFB] select-none ${
+          className={`absolute left-0 z-50 w-72 p-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl animate-fadeIn text-[var(--text-primary)] select-none ${
             openUpwards ? 'bottom-full mb-2' : 'top-full mt-2'
           }`}
         >
@@ -185,26 +185,26 @@ export const DatePicker = ({
             <button
               type="button"
               onClick={prevMonth}
-              className="p-1.5 text-[#C4B5BE] hover:text-white hover:bg-white/10 rounded-lg transition-all cursor-pointer"
+              className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-all cursor-pointer"
             >
               <ChevronLeft size={18} />
             </button>
 
-            <span className="text-sm font-bold text-white">
+            <span className="text-sm font-bold text-[var(--text-primary)]">
               {monthNames[viewDate.getMonth()]} {viewDate.getFullYear()}
             </span>
 
             <button
               type="button"
               onClick={nextMonth}
-              className="p-1.5 text-[#C4B5BE] hover:text-white hover:bg-white/10 rounded-lg transition-all cursor-pointer"
+              className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-all cursor-pointer"
             >
               <ChevronRight size={18} />
             </button>
           </div>
 
           {/* Weekdays Header */}
-          <div className="grid grid-cols-7 text-center text-xs font-semibold text-[#8E7A86] mb-2">
+          <div className="grid grid-cols-7 text-center text-xs font-semibold text-[var(--text-muted)] mb-2">
             <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
           </div>
 
@@ -244,7 +244,7 @@ export const DatePicker = ({
                       ? 'bg-primary-500 text-white font-bold shadow-md'
                       : isToday
                       ? 'border border-primary-500 text-primary-400 font-bold'
-                      : 'text-[#C4B5BE] hover:bg-white/10 hover:text-white'
+                      : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]'
                   } ${isOutsideRange ? 'cursor-not-allowed opacity-30' : ''}`}
                 >
                   {dayNum}
@@ -254,18 +254,18 @@ export const DatePicker = ({
           </div>
 
           {/* Quick Shortcuts */}
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10 text-xs">
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-[var(--border-color)] text-xs">
             <button
               type="button"
               onClick={handleToday}
-              className="text-primary-400 font-bold hover:underline cursor-pointer"
+              className="text-primary-500 font-bold hover:underline cursor-pointer"
             >
               Select Today
             </button>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="text-[#8E7A86] hover:text-white cursor-pointer"
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
             >
               Close
             </button>

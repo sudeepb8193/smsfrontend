@@ -63,8 +63,8 @@ export const CreateRoleModal = ({
       size="medium"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800/40 rounded-xl p-3.5 flex items-center gap-3 text-primary-800 dark:text-primary-200 text-xs mb-2">
-          <Shield size={18} className="shrink-0 text-primary-600 dark:text-primary-400" />
+        <div className="bg-primary-500/10 border border-primary-500/20 rounded-xl p-3.5 flex items-center gap-3 text-primary-400 text-xs mb-2">
+          <Shield size={18} className="shrink-0 text-primary-500" />
           <p>
             Custom roles allow fine-grained access control tailored to your salon’s team structure. After creating the role, you can customize its module permissions and branch scopes.
           </p>
@@ -88,7 +88,7 @@ export const CreateRoleModal = ({
         />
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
             <Copy size={13} className="text-primary-500" />
             Clone Existing Permissions (Optional)
           </label>
@@ -99,12 +99,12 @@ export const CreateRoleModal = ({
             placeholder="Start from scratch (blank permissions)"
             isClearable={false}
           />
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+          <span className="text-[11px] text-[var(--text-muted)] mt-1 block">
             Select an existing role to copy its permissions as a starting template.
           </span>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border-color)]">
           <Button variant="secondary" onClick={onClose} disabled={loading}>
             Cancel
           </Button>

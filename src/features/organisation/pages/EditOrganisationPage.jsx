@@ -54,7 +54,7 @@ export const EditOrganisationPage = () => {
 
   if (fetchLoading) {
     return (
-      <div className="min-h-[400px] flex flex-col items-center justify-center text-slate-500">
+      <div className="min-h-[400px] flex flex-col items-center justify-center text-[var(--text-muted)]">
         <Loader2 className="w-8 h-8 animate-spin text-primary-500 mb-2" />
         <p className="text-sm font-medium">Loading Organisation Data...</p>
       </div>
@@ -65,11 +65,11 @@ export const EditOrganisationPage = () => {
     <div className="space-y-4 pb-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <Building2 className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+        <h1 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+          <Building2 className="w-6 h-6 text-primary-500" />
           Edit Organisation: {organisation?.name}
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-[var(--text-muted)]">
           Update profile information, address, business details, and subscription parameters
         </p>
       </div>

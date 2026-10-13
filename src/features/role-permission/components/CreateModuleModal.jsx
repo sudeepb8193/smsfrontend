@@ -135,7 +135,7 @@ export const CreateModuleModal = ({
 
         {/* Action Capabilities */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-2">
             Supported Action Operations <span className="text-danger-500">*</span>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -147,15 +147,15 @@ export const CreateModuleModal = ({
                   onClick={() => handleToggleAction(act.key)}
                   className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                     isChecked
-                      ? 'bg-primary-50/80 dark:bg-primary-950/30 border-primary-500/50 shadow-2xs'
-                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      ? 'bg-primary-500/10 border-primary-500/30 shadow-2xs'
+                      : 'bg-[var(--bg-input)] border-[var(--border-color)] hover:border-[var(--border-hover)] hover:bg-white/5'
                   }`}
                 >
                   <div>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                    <span className="text-xs font-bold text-[var(--text-primary)] block">
                       {act.label}
                     </span>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
+                    <span className="text-[10px] text-[var(--text-muted)] block">
                       {act.desc}
                     </span>
                   </div>
@@ -175,7 +175,7 @@ export const CreateModuleModal = ({
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border-color)]">
           <Button variant="secondary" onClick={onClose} disabled={loading}>
             Cancel
           </Button>

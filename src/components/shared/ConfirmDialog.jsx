@@ -48,10 +48,10 @@ export const ConfirmDialog = ({
       footer={footer}
     >
       <div className="flex flex-col items-center text-center gap-4 py-2">
-        <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-[var(--bg-input)] border border-[var(--border-color)] flex items-center justify-center">
           {getIcon()}
         </div>
-        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{message}</p>
+        <p className="text-sm text-[var(--text-muted)] leading-relaxed">{message}</p>
       </div>
     </Modal>
   );

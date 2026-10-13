@@ -52,8 +52,8 @@ export const Pagination = ({
   const endEntry = totalItems ? Math.min(currentPage * pageSize, totalItems) : 0;
 
   return (
-    <div className={`flex flex-wrap items-center justify-between gap-4 py-3 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm ${className}`}>
-      <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400 font-medium">
+    <div className={`flex flex-wrap items-center justify-between gap-4 py-3 px-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-sm ${className}`}>
+      <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--text-muted)] font-medium">
         {onPageSizeChange && (
           <div className="flex items-center gap-2">
             <span>Show</span>
@@ -74,9 +74,9 @@ export const Pagination = ({
 
         {totalItems !== undefined && (
           <div>
-            Showing <span className="text-slate-900 dark:text-white font-semibold">{startEntry}</span> to{' '}
-            <span className="text-slate-900 dark:text-white font-semibold">{endEntry}</span> of{' '}
-            <span className="text-slate-900 dark:text-white font-semibold">{totalItems}</span> entries
+            Showing <span className="text-[var(--text-primary)] font-semibold">{startEntry}</span> to{' '}
+            <span className="text-[var(--text-primary)] font-semibold">{endEntry}</span> of{' '}
+            <span className="text-[var(--text-primary)] font-semibold">{totalItems}</span> entries
           </div>
         )}
       </div>
@@ -86,7 +86,7 @@ export const Pagination = ({
           type="button"
           onClick={handlePrev}
           disabled={currentPage <= 1}
-          className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors border border-slate-200 dark:border-slate-700"
+          className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors border border-[var(--border-color)] bg-[var(--bg-input)]"
           aria-label="Previous page"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -100,7 +100,7 @@ export const Pagination = ({
             className={`w-8 h-8 rounded-lg text-xs font-semibold flex items-center justify-center transition-all ${
               num === currentPage
                 ? 'bg-primary-500 text-white font-bold shadow-md shadow-primary-500/20'
-                : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                : 'bg-[var(--bg-input)] hover:bg-[var(--bg-card-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-color)]'
             }`}
           >
             {num}
@@ -111,7 +111,7 @@ export const Pagination = ({
           type="button"
           onClick={handleNext}
           disabled={currentPage >= totalPages}
-          className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors border border-slate-200 dark:border-slate-700"
+          className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors border border-[var(--border-color)] bg-[var(--bg-input)]"
           aria-label="Next page"
         >
           <ChevronRight className="w-4 h-4" />

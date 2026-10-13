@@ -75,18 +75,18 @@ export const BulkRoleAssignModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-2xl bg-[var(--bg-card)] rounded-2xl shadow-2xl border border-[var(--border-color)] overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-input)]">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-primary-100 text-primary-600 dark:bg-primary-950/60 dark:text-primary-400">
+            <div className="p-2 rounded-xl bg-primary-500/10 text-primary-500">
               <Users size={20} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">
+              <h3 className="font-bold text-[var(--text-primary)] text-base">
                 Bulk Role Assignment
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-[var(--text-muted)]">
                 Onboard or update roles for multiple users at once
               </p>
             </div>
@@ -94,7 +94,7 @@ export const BulkRoleAssignModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -104,8 +104,8 @@ export const BulkRoleAssignModal = ({
         {resultSummary ? (
           /* RESULT SUMMARY VIEW */
           <div className="p-6 space-y-5">
-            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 space-y-2 text-xs">
-              <div className="flex items-center gap-2 font-bold text-sm text-emerald-800 dark:text-emerald-300">
+            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 space-y-2 text-xs">
+              <div className="flex items-center gap-2 font-bold text-sm text-emerald-400">
                 <CheckCircle2 size={18} />
                 <span>Bulk Role Assignment Complete</span>
               </div>
@@ -115,7 +115,7 @@ export const BulkRoleAssignModal = ({
                 {resultSummary.totalRequested} requested users.
               </p>
               {resultSummary.skippedCount > 0 && (
-                <p className="text-amber-700 dark:text-amber-300">
+                <p className="text-amber-400">
                   {resultSummary.skippedCount} users were skipped (already held the role or error).
                 </p>
               )}
@@ -125,7 +125,7 @@ export const BulkRoleAssignModal = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl shadow-md"
+                className="px-5 py-2 text-xs font-bold text-white bg-primary-500 hover:bg-primary-600 rounded-xl shadow-md cursor-pointer"
               >
                 Done
               </button>
@@ -135,20 +135,20 @@ export const BulkRoleAssignModal = ({
           /* SELECTION FORM VIEW */
           <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col p-6 space-y-5">
             {errorMsg && (
-              <div className="p-3 text-xs font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl">
+              <div className="p-3 text-xs font-semibold text-rose-500 bg-rose-500/10 border border-rose-500/20 rounded-xl">
                 {errorMsg}
               </div>
             )}
 
             {/* Target Role Selector */}
             <div className="space-y-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
                 1. Select Target Role to Assign
               </label>
               <select
                 value={selectedRoleId}
                 onChange={(e) => setSelectedRoleId(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs font-medium bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl  focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                className="w-full px-3.5 py-2.5 text-xs font-medium bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl focus:border-primary-500 text-[var(--text-primary)]"
               >
                 <option value="">-- Choose Role --</option>
                 {availableRoles.map((role) => (
@@ -165,10 +165,10 @@ export const BulkRoleAssignModal = ({
                   id="bulkPrimaryCheck"
                   checked={isPrimary}
                   onChange={(e) => setIsPrimary(e.target.checked)}
-                  className="w-4 h-4 rounded text-primary-600 focus:ring-primary-500 border-slate-300 dark:border-slate-600"
+                  className="w-4 h-4 rounded text-primary-500 focus:ring-primary-500 border-[var(--border-color)] bg-[var(--bg-input)]"
                 />
-                <label htmlFor="bulkPrimaryCheck" className="text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1 cursor-pointer">
-                  <Star size={13} className="text-yellow-500" />
+                <label htmlFor="bulkPrimaryCheck" className="text-xs font-semibold text-[var(--text-secondary)] flex items-center gap-1 cursor-pointer">
+                  <Star size={13} className="text-warning-500" />
                   <span>Set as Primary Role for target users</span>
                 </label>
               </div>
@@ -177,13 +177,13 @@ export const BulkRoleAssignModal = ({
             {/* User Selection List */}
             <div className="flex-1 flex flex-col min-h-0 space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
                   2. Select Users ({selectedUserIds.length} of {users.length} selected)
                 </label>
                 <button
                   type="button"
                   onClick={handleToggleSelectAll}
-                  className="text-xs text-primary-600 dark:text-primary-400 font-bold hover:underline"
+                  className="text-xs text-primary-500 font-bold hover:underline cursor-pointer"
                 >
                   {selectedUserIds.length === filteredUsers.length ? 'Deselect All' : 'Select All'}
                 </button>
@@ -194,12 +194,12 @@ export const BulkRoleAssignModal = ({
                 placeholder="Filter users by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl  focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                className="w-full px-3 py-2 text-xs bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl focus:border-primary-500 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
               />
 
-              <div className="flex-1 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl divide-y divide-slate-100 dark:divide-slate-800">
+              <div className="flex-1 overflow-y-auto border border-[var(--border-color)] rounded-xl divide-y divide-[var(--border-color)]">
                 {filteredUsers.length === 0 ? (
-                  <div className="p-4 text-center text-xs text-slate-500">
+                  <div className="p-4 text-center text-xs text-[var(--text-muted)]">
                     No users matching search filter.
                   </div>
                 ) : (
@@ -209,30 +209,31 @@ export const BulkRoleAssignModal = ({
                       <div
                         key={u.id}
                         onClick={() => handleToggleUser(u.id)}
-                        className={`flex items-center justify-between p-3 text-xs cursor-pointer transition-colors ${isChecked
-                            ? 'bg-primary-50/40 dark:bg-primary-950/30 font-semibold'
-                            : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
-                          }`}
+                        className={`flex items-center justify-between p-3 text-xs cursor-pointer transition-colors ${
+                          isChecked
+                            ? 'bg-primary-500/10 font-semibold'
+                            : 'hover:bg-white/5'
+                        }`}
                       >
                         <div className="flex items-center gap-3">
                           <input
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => { }}
-                            className="w-4 h-4 rounded text-primary-600 focus:ring-primary-500 border-slate-300 dark:border-slate-600"
+                            className="w-4 h-4 rounded text-primary-500 focus:ring-primary-500 border-[var(--border-color)] bg-[var(--bg-input)]"
                           />
                           <div>
-                            <div className="font-bold text-slate-800 dark:text-slate-100">
+                            <div className="font-bold text-[var(--text-primary)]">
                               {u.displayName}
                             </div>
-                            <div className="text-slate-500 dark:text-slate-400 text-[11px]">
+                            <div className="text-[var(--text-muted)] text-[11px]">
                               {u.email || 'No email registered'}
                             </div>
                           </div>
                         </div>
 
                         {/* Current roles summary */}
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                        <div className="text-[11px] text-[var(--text-muted)]">
                           {u.activeRolesCount || 0} active role(s)
                         </div>
                       </div>
@@ -243,19 +244,19 @@ export const BulkRoleAssignModal = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border-color)]">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={submitting}
-                className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                className="px-4 py-2 text-xs font-bold text-[var(--text-secondary)] hover:bg-white/5 rounded-xl transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting || selectedUserIds.length === 0 || !selectedRoleId}
-                className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl shadow-md shadow-primary-600/25 disabled:opacity-50 transition-all"
+                className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-primary-500 hover:bg-primary-600 rounded-xl shadow-md shadow-primary-500/20 disabled:opacity-50 transition-all cursor-pointer"
               >
                 {submitting && <Loader2 size={14} className="animate-spin" />}
                 <span>Assign to {selectedUserIds.length} User(s)</span>

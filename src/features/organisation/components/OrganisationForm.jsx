@@ -254,16 +254,16 @@ export const OrganisationForm = ({
       )}
 
       {/* SECTION 1: ORGANISATION INFORMATION */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
-        <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="p-1.5 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm text-[var(--text-primary)]">
+        <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-[var(--border-color)]">
+          <div className="p-1.5 rounded-lg bg-primary-500/10 text-primary-500 border border-primary-500/20">
             <Building2 className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">
               Organisation Information
             </h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-[var(--text-muted)]">
               Basic business profile details and public contact information
             </p>
           </div>
@@ -339,13 +339,13 @@ export const OrganisationForm = ({
 
           {/* Logo Upload Section */}
           <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
               Organisation Logo
             </label>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl">
               {/* Logo Preview Thumbnail */}
               {logoPreview || formData.logoUrl ? (
-                <div className="relative w-14 h-14 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white shrink-0 group">
+                <div className="relative w-14 h-14 rounded-xl border border-[var(--border-color)] overflow-hidden bg-white shrink-0 group">
                   <img
                     src={logoPreview || formData.logoUrl}
                     alt="Logo Preview"
@@ -360,14 +360,14 @@ export const OrganisationForm = ({
                       setLogoPreview(null);
                       handleChange('logoUrl', '');
                     }}
-                    className="absolute inset-0 bg-slate-950/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute inset-0 bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Remove Logo"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
-                <div className="w-14 h-14 rounded-xl bg-slate-200/60 dark:bg-slate-700/60 border border-dashed border-slate-300 dark:border-slate-600 text-slate-400 flex items-center justify-center shrink-0">
+                <div className="w-14 h-14 rounded-xl bg-[var(--bg-card)] border border-dashed border-[var(--border-color)] text-[var(--text-muted)] flex items-center justify-center shrink-0">
                   <Building2 className="w-6 h-6" />
                 </div>
               )}
@@ -375,7 +375,7 @@ export const OrganisationForm = ({
               {/* Upload Action & URL Input */}
               <div className="flex-1 space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <label className="px-3.5 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5">
+                  <label className="px-3.5 py-1.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5">
                     {uploadingLogo ? (
                       <>
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -403,14 +403,14 @@ export const OrganisationForm = ({
                         setLogoPreview(null);
                         handleChange('logoUrl', '');
                       }}
-                      className="px-2.5 py-1.5 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors font-medium"
+                      className="px-2.5 py-1.5 text-xs text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors font-medium"
                     >
                       Remove Logo
                     </button>
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-[var(--text-muted)]">
                   Upload JPG, PNG, WebP or GIF up to 5 MB directly to cloud storage.
                 </p>
                 {logoUploadError && (
@@ -467,16 +467,16 @@ export const OrganisationForm = ({
       </div>
 
       {/* SECTION 2: BUSINESS INFORMATION */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
-        <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm text-[var(--text-primary)]">
+        <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-[var(--border-color)]">
+          <div className="p-1.5 rounded-lg bg-primary-500/10 text-primary-500 border border-primary-500/20">
             <Briefcase className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">
               Business & Financial Information
             </h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-[var(--text-muted)]">
               Tax identification, currency, and localization settings
             </p>
           </div>
@@ -515,16 +515,16 @@ export const OrganisationForm = ({
 
       {/* SECTION 3: OWNER INFORMATION */}
       {!isEditMode && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
-          <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+        <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm text-[var(--text-primary)]">
+          <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-[var(--border-color)]">
+            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
               <UserCheck className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">
                 Initial Owner Account
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] text-[var(--text-muted)]">
                 Credentials for the administrator owner of this organisation
               </p>
             </div>
@@ -563,16 +563,16 @@ export const OrganisationForm = ({
       )}
 
       {/* SECTION 4: SUBSCRIPTION */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
-        <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm text-[var(--text-primary)]">
+        <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-[var(--border-color)]">
+          <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20">
             <CreditCard className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">
               Subscription & Entitlements
             </h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-[var(--text-muted)]">
               Set plan limits, max branches, users, and subscription active status
             </p>
           </div>

@@ -129,11 +129,11 @@ export const PermissionCatalogPage = () => {
       {/* Action Bar Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+          <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+            <BookOpen className="w-6 h-6 text-primary-500" />
             Permission Registry & Reference
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-[var(--text-muted)]">
             System-managed catalog of granular authorization capabilities for all Salon Management System modules
           </p>
         </div>
@@ -149,16 +149,16 @@ export const PermissionCatalogPage = () => {
       </div>
 
       {/* Filter and Search Bar Container */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-3.5 sm:p-4 transition-colors">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm p-3.5 sm:p-4 transition-colors">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
           <div className="relative flex-1 min-w-[240px]">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by permission key, action, description, or module..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none  focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-primary-500 transition-all"
             />
           </div>
 
@@ -197,12 +197,12 @@ export const PermissionCatalogPage = () => {
 
       {/* Permission Catalog Accordions */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center p-16 text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col items-center justify-center p-16 text-[var(--text-muted)]">
           <Spinner size="large" />
           <span className="mt-3 text-sm font-semibold">Loading Permission Catalog...</span>
         </div>
       ) : grouped.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center text-sm text-slate-500 dark:text-slate-400">
+        <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-8 text-center text-sm text-[var(--text-muted)]">
           No permissions match your filter criteria.
         </div>
       ) : (
@@ -213,33 +213,33 @@ export const PermissionCatalogPage = () => {
             return (
               <div
                 key={group.moduleCode}
-                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors"
+                className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden transition-colors"
               >
                 {/* Module Accordion Header */}
                 <button
                   type="button"
                   onClick={() => toggleExpand(group.moduleCode)}
-                  className="w-full flex items-center justify-between p-4 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors text-left cursor-pointer"
+                  className="w-full flex items-center justify-between p-4 bg-[var(--bg-input)] hover:bg-white/5 transition-colors text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800/50 flex items-center justify-center font-bold shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-primary-500/10 text-primary-500 border border-primary-500/20 flex items-center justify-center font-bold shrink-0">
                       <Layers size={18} />
                     </div>
                     <div>
-                      <span className="font-semibold text-sm text-slate-900 dark:text-white">
+                      <span className="font-semibold text-sm text-[var(--text-primary)]">
                         {group.moduleLabel}
                       </span>
-                      <span className="text-xs text-slate-500 dark:text-slate-400 font-mono ml-2">
+                      <span className="text-xs text-[var(--text-muted)] font-mono ml-2">
                         ({group.moduleCode})
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-color)]">
                       {group.items.length} permissions
                     </span>
-                    <span className="text-slate-400 dark:text-slate-500">
+                    <span className="text-[var(--text-muted)]">
                       {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                     </span>
                   </div>
@@ -247,18 +247,18 @@ export const PermissionCatalogPage = () => {
 
                 {/* Expanded Permission List */}
                 {isExpanded && (
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800/60 border-t border-slate-200 dark:border-slate-800">
+                  <div className="divide-y divide-[var(--border-color)] border-t border-[var(--border-color)]">
                     {group.items.map((perm) => (
                       <div
                         key={perm.id}
-                        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
+                        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/5 transition-colors"
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-sm text-slate-900 dark:text-white">
+                            <span className="font-semibold text-sm text-[var(--text-primary)]">
                               {perm.label}
                             </span>
-                            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[var(--bg-input)] text-[var(--text-secondary)] border border-[var(--border-color)]">
                               {perm.permissionKey}
                             </span>
                             {perm.isLegacy && (
@@ -268,7 +268,7 @@ export const PermissionCatalogPage = () => {
                             )}
                           </div>
                           {perm.description && (
-                            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
+                            <p className="text-xs text-[var(--text-muted)] max-w-2xl leading-relaxed">
                               {perm.description}
                             </p>
                           )}
