@@ -16,22 +16,22 @@ export const StatusChangeModal = ({
       title: 'Activate Organisation?',
       description: `Activating "${organisation.name}" will grant users access to login and manage their salon operations.`,
       icon: CheckCircle2,
-      badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
-      btnColor: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+      badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      btnColor: 'bg-emerald-500 hover:bg-emerald-600 text-white',
     },
     inactive: {
       title: 'Deactivate Organisation?',
       description: `Are you sure you want to deactivate "${organisation.name}"? Users of this organisation will NOT be able to access the system, but existing data will remain completely intact. Super Admin can reactivate it at any time.`,
       icon: Power,
-      badgeColor: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800',
-      btnColor: 'bg-rose-600 hover:bg-rose-700 text-white',
+      badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+      btnColor: 'bg-rose-500 hover:bg-rose-600 text-white',
     },
     suspended: {
       title: 'Suspend Organisation?',
       description: `Suspending "${organisation.name}" will freeze tenant activities. Associated users will be blocked from logging in until reactivated.`,
       icon: PauseCircle,
-      badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800',
-      btnColor: 'bg-amber-600 hover:bg-amber-700 text-white',
+      badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+      btnColor: 'bg-amber-500 hover:bg-amber-600 text-white',
     },
   };
 

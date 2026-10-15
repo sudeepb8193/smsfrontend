@@ -41,26 +41,26 @@ export default function SalonSuiteOnboardingWizard({
 
   // Derive initials for avatar
   const initials = useMemo(() => {
-    const name = formData.profile.name?.trim();
+    const name = formData?.profile?.name?.trim();
     if (!name) return 'GB';
     const words = name.split(/\s+/).filter(Boolean);
     if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
     return (words[0][0] + words[1][0]).toUpperCase();
-  }, [formData.profile.name]);
+  }, [formData?.profile?.name]);
 
   const slugText = useMemo(() => {
-    const raw = formData.profile.slug || formData.profile.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'glow-beauty-studio';
+    const raw = formData?.profile?.slug || formData?.profile?.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'glow-beauty-studio';
     return `salon-suite.app/${raw} is available`;
-  }, [formData.profile.slug, formData.profile.name]);
+  }, [formData?.profile?.slug, formData?.profile?.name]);
 
-  const primaryContact = formData.contacts?.[0] || {
+  const primaryContact = formData?.contacts?.[0] || {
     phoneCountryCode: '+91',
     phoneNumber: '98765 43210',
     email: 'hello@glowbeauty.in',
     isDefaultPublic: true,
   };
 
-  const regAddress = formData.addresses?.[0] || {
+  const regAddress = formData?.addresses?.[0] || {
     addressLine1: '12 MG Road',
     addressLine2: 'Near Trinity Circle',
     city: 'Bengaluru',
@@ -95,21 +95,21 @@ export default function SalonSuiteOnboardingWizard({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#1A1616] flex flex-col font-sans selection:bg-[#F3E5E3] selection:text-[#7A3444]">
+    <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-primary-500/20 selection:text-primary-500">
       {/* Top Header Bar */}
-      <header className="w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold tracking-tight text-[#1A1616]">Salon Suite</h1>
+      <header className="w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between border-b border-[var(--border-color)]">
+        <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">Salon Suite</h1>
         <button
           type="button"
           onClick={onExitToSettings}
-          className="text-sm font-medium text-[#1A1616] hover:text-[#7A3444] underline transition"
+          className="text-sm font-medium text-[var(--text-secondary)] hover:text-primary-500 underline transition cursor-pointer"
         >
           Save & exit
         </button>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16 pt-2">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16 pt-6">
         {/* Stepper Bar */}
         <div className="w-full max-w-[760px] mb-8">
           <div className="grid grid-cols-5 gap-3 sm:gap-4 items-center">
@@ -123,16 +123,16 @@ export default function SalonSuiteOnboardingWizard({
                 >
                   <div
                     className={`h-[3.5px] rounded-full transition-all duration-300 ${
-                      isActiveOrDone ? 'bg-[#7A3444]' : 'bg-[#E5DFD9]'
+                      isActiveOrDone ? 'bg-primary-500' : 'bg-[var(--border-color)]'
                     }`}
                   />
                   <span
                     className={`text-xs sm:text-sm tracking-tight transition ${
                       idx === currentStep
-                        ? 'font-bold text-[#1A1616]'
+                        ? 'font-bold text-[var(--text-primary)]'
                         : isActiveOrDone
-                        ? 'font-medium text-[#555050]'
-                        : 'text-[#8C8580]'
+                        ? 'font-medium text-[var(--text-secondary)]'
+                        : 'text-[var(--text-muted)]'
                     }`}
                   >
                     {label}
@@ -144,50 +144,50 @@ export default function SalonSuiteOnboardingWizard({
         </div>
 
         {/* Step Card Container */}
-        <div className="w-full max-w-[760px] bg-white rounded-3xl border border-[#EBE6E1] p-8 sm:p-12 shadow-[0_2px_16px_rgba(0,0,0,0.03)]">
+        <div className="w-full max-w-[760px] bg-[var(--bg-card)] rounded-3xl border border-[var(--border-color)] p-8 sm:p-12 shadow-md">
           {/* STEP 1: BUSINESS */}
           {currentStep === 0 && (
-            <div className="space-y-7 animate-fadeIn">
+            <div className="space-y-7 animate-in fade-in duration-200">
               <div>
-                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[#1A1616]">
+                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
                   Tell us about your business
                 </h2>
-                <p className="mt-1.5 text-sm sm:text-[15px] text-[#6E6864]">
+                <p className="mt-1.5 text-sm sm:text-[15px] text-[var(--text-muted)]">
                   This appears on invoices, your booking page and customer messages.
                 </p>
               </div>
 
               {/* Business Name */}
               <div className="space-y-1.5">
-                <label className="block text-sm font-semibold text-[#1A1616]">
+                <label className="block text-sm font-semibold text-[var(--text-primary)]">
                   Business name
                 </label>
                 <input
                   type="text"
-                  value={formData.profile.name || ''}
+                  value={formData?.profile?.name || ''}
                   onChange={(e) => setSection('profile', 'name', e.target.value)}
                   placeholder="Glow Beauty Studio"
-                  className="w-full h-12 px-4 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] focus:ring-1 focus:ring-[#7A3444] transition bg-white"
+                  className="w-full h-12 px-4 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 transition bg-[var(--bg-input)] placeholder:text-[var(--text-muted)]"
                 />
-                <p className="text-xs font-semibold text-[#1C7446] pt-0.5">
+                <p className="text-xs font-semibold text-emerald-400 pt-0.5">
                   {slugText}
                 </p>
               </div>
 
               {/* Logo Upload Box */}
               <div className="space-y-1.5">
-                <label className="block text-sm font-semibold text-[#1A1616]">
+                <label className="block text-sm font-semibold text-[var(--text-primary)]">
                   Logo
                 </label>
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-[#DED7CE] hover:border-[#7A3444] rounded-2xl p-5 sm:p-6 flex items-center gap-5 bg-[#FCFBF9] cursor-pointer transition"
+                  className="border-2 border-dashed border-[var(--border-color)] hover:border-primary-500 rounded-2xl p-5 sm:p-6 flex items-center gap-5 bg-[var(--bg-input)] cursor-pointer transition"
                 >
                   {/* Initials or Preview Avatar */}
-                  <div className="w-16 h-16 rounded-full bg-[#F3E5E3] text-[#7A3444] flex items-center justify-center font-bold text-xl shrink-0 overflow-hidden">
-                    {logoPreview || formData.profile.logoUrl ? (
+                  <div className="w-16 h-16 rounded-full bg-primary-500/10 text-primary-500 border border-primary-500/20 flex items-center justify-center font-bold text-xl shrink-0 overflow-hidden">
+                    {logoPreview || formData?.profile?.logoUrl ? (
                       <img
-                        src={logoPreview || formData.profile.logoUrl}
+                        src={logoPreview || formData?.profile?.logoUrl}
                         alt="Logo"
                         className="w-full h-full object-cover"
                       />
@@ -196,12 +196,12 @@ export default function SalonSuiteOnboardingWizard({
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#1A1616]">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
                       {uploadingLogo
                         ? 'Uploading logo...'
-                        : <>Drag a logo here or <span className="underline font-semibold cursor-pointer">browse</span></>}
+                        : <>Drag a logo here or <span className="underline font-semibold text-primary-500 cursor-pointer">browse</span></>}
                     </p>
-                    <p className="text-xs text-[#8C8580] mt-0.5">
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">
                       PNG, JPG or SVG · up to 5 MB
                     </p>
                   </div>
@@ -217,15 +217,15 @@ export default function SalonSuiteOnboardingWizard({
 
               {/* Business Type */}
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-[#1A1616]">
+                <label className="block text-sm font-semibold text-[var(--text-primary)]">
                   Business type
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                   {BUSINESS_TYPES.map((type) => {
                     const isSelected =
-                      (formData.profile.businessType || '').toLowerCase() ===
+                      (formData?.profile?.businessType || '').toLowerCase() ===
                       type.toLowerCase().replace(/\s+/g, '_') ||
-                      (formData.profile.businessType || '').toLowerCase() ===
+                      (formData?.profile?.businessType || '').toLowerCase() ===
                       type.toLowerCase();
                     return (
                       <button
@@ -238,10 +238,10 @@ export default function SalonSuiteOnboardingWizard({
                             type.toLowerCase().replace(/\s+/g, '_')
                           )
                         }
-                        className={`h-12 px-3 rounded-xl border text-sm font-medium transition flex items-center justify-center text-center ${
+                        className={`h-12 px-3 rounded-xl border text-sm font-medium transition flex items-center justify-center text-center cursor-pointer ${
                           isSelected
-                            ? 'bg-[#F9EFEF] border-[#7A3444] text-[#7A3444] font-semibold'
-                            : 'bg-white border-[#DED7CE] text-[#1A1616] hover:border-[#B5ACA4]'
+                            ? 'bg-primary-500/10 border-primary-500 text-primary-500 font-semibold'
+                            : 'bg-[var(--bg-input)] border-[var(--border-color)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]'
                         }`}
                       >
                         {type}
@@ -256,14 +256,14 @@ export default function SalonSuiteOnboardingWizard({
                 <button
                   type="button"
                   disabled
-                  className="px-6 py-2.5 rounded-xl border border-[#EBE6E1] text-[#C5BFB8] text-sm font-medium cursor-not-allowed"
+                  className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-muted)] text-sm font-medium cursor-not-allowed"
                 >
                   Back
                 </button>
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-8 py-2.5 rounded-xl bg-[#7A3444] hover:bg-[#682B38] text-white text-sm font-medium transition shadow-sm"
+                  className="px-8 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition shadow-sm cursor-pointer"
                 >
                   Next
                 </button>
@@ -273,12 +273,12 @@ export default function SalonSuiteOnboardingWizard({
 
           {/* STEP 2: CONTACT */}
           {currentStep === 1 && (
-            <div className="space-y-7 animate-fadeIn">
+            <div className="space-y-7 animate-in fade-in duration-200">
               <div>
-                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[#1A1616]">
+                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
                   How can customers reach you?
                 </h2>
-                <p className="mt-1.5 text-sm sm:text-[15px] text-[#6E6864]">
+                <p className="mt-1.5 text-sm sm:text-[15px] text-[var(--text-muted)]">
                   Your main business contact. You can verify it later.
                 </p>
               </div>
@@ -286,14 +286,14 @@ export default function SalonSuiteOnboardingWizard({
               {/* Country code and Phone number */}
               <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-4">
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     Country code
                   </label>
                   <div className="relative">
                     <select
                       value={primaryContact.phoneCountryCode || '+91'}
                       onChange={(e) => setContact(0, 'phoneCountryCode', e.target.value)}
-                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] bg-white appearance-none cursor-pointer"
+                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 bg-[var(--bg-input)] appearance-none cursor-pointer"
                     >
                       <option value="+91">+91 India</option>
                       <option value="+1">+1 United States</option>
@@ -302,12 +302,12 @@ export default function SalonSuiteOnboardingWizard({
                       <option value="+65">+65 Singapore</option>
                       <option value="+61">+61 Australia</option>
                     </select>
-                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[#8C8580] pointer-events-none" />
+                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     Phone number
                   </label>
                   <input
@@ -315,14 +315,14 @@ export default function SalonSuiteOnboardingWizard({
                     value={primaryContact.phoneNumber || ''}
                     onChange={(e) => setContact(0, 'phoneNumber', e.target.value)}
                     placeholder="98765 43210"
-                    className="w-full h-12 px-4 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] focus:ring-1 focus:ring-[#7A3444] transition bg-white"
+                    className="w-full h-12 px-4 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 transition bg-[var(--bg-input)] placeholder:text-[var(--text-muted)]"
                   />
                 </div>
               </div>
 
               {/* Business email */}
               <div className="space-y-1.5">
-                <label className="block text-sm font-semibold text-[#1A1616]">
+                <label className="block text-sm font-semibold text-[var(--text-primary)]">
                   Business email
                 </label>
                 <input
@@ -330,7 +330,7 @@ export default function SalonSuiteOnboardingWizard({
                   value={primaryContact.email || ''}
                   onChange={(e) => setContact(0, 'email', e.target.value)}
                   placeholder="hello@glowbeauty.in"
-                  className="w-full h-12 px-4 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] focus:ring-1 focus:ring-[#7A3444] transition bg-white"
+                  className="w-full h-12 px-4 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 transition bg-[var(--bg-input)] placeholder:text-[var(--text-muted)]"
                 />
               </div>
 
@@ -343,15 +343,15 @@ export default function SalonSuiteOnboardingWizard({
                     }
                     className={`w-5 h-5 rounded flex items-center justify-center transition border ${
                       primaryContact.isDefaultPublic !== false
-                        ? 'bg-[#7A3444] border-[#7A3444] text-white'
-                        : 'border-[#C5BFB8] bg-white'
+                        ? 'bg-primary-500 border-primary-500 text-white'
+                        : 'border-[var(--border-color)] bg-[var(--bg-input)]'
                     }`}
                   >
                     {primaryContact.isDefaultPublic !== false && (
                       <Check className="h-3.5 w-3.5 stroke-[3]" />
                     )}
                   </div>
-                  <span className="text-sm font-medium text-[#1A1616]">
+                  <span className="text-sm font-medium text-[var(--text-primary)]">
                     Show this contact on my booking page
                   </span>
                 </label>
@@ -362,14 +362,14 @@ export default function SalonSuiteOnboardingWizard({
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="px-6 py-2.5 rounded-xl border border-[#DED7CE] hover:bg-[#F9F7F5] text-[#1A1616] text-sm font-medium transition"
+                  className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] hover:bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition cursor-pointer"
                 >
                   Back
                 </button>
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-8 py-2.5 rounded-xl bg-[#7A3444] hover:bg-[#682B38] text-white text-sm font-medium transition shadow-sm"
+                  className="px-8 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition shadow-sm cursor-pointer"
                 >
                   Next
                 </button>
@@ -379,37 +379,37 @@ export default function SalonSuiteOnboardingWizard({
 
           {/* STEP 3: ADDRESS */}
           {currentStep === 2 && (
-            <div className="space-y-6 animate-fadeIn">
+            <div className="space-y-6 animate-in fade-in duration-200">
               <div>
-                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[#1A1616]">
+                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
                   Where are you registered?
                 </h2>
-                <p className="mt-1.5 text-sm sm:text-[15px] text-[#6E6864]">
+                <p className="mt-1.5 text-sm sm:text-[15px] text-[var(--text-muted)]">
                   Used on tax invoices and legal documents. Branch addresses come next.
                 </p>
               </div>
 
               {/* Search address */}
               <div className="space-y-1.5">
-                <label className="block text-sm font-semibold text-[#1A1616]">
+                <label className="block text-sm font-semibold text-[var(--text-primary)]">
                   Search address
                 </label>
                 <input
                   type="text"
                   placeholder="12 MG Road, Bengaluru"
                   defaultValue="12 MG Road, Bengaluru"
-                  className="w-full h-12 px-4 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] transition bg-white"
+                  className="w-full h-12 px-4 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 transition bg-[var(--bg-input)] placeholder:text-[var(--text-muted)]"
                 />
               </div>
 
               {/* Map Preview Box */}
-              <div className="w-full h-28 rounded-xl bg-[#EFE8E1] flex items-center justify-center text-sm font-medium text-[#7E7770]">
+              <div className="w-full h-28 rounded-xl bg-[var(--bg-input)] border border-[var(--border-color)] flex items-center justify-center text-sm font-medium text-[var(--text-muted)]">
                 Map preview · pin placed
               </div>
 
               {/* Address Line 1 */}
               <div className="space-y-1.5">
-                <label className="block text-sm font-semibold text-[#1A1616]">
+                <label className="block text-sm font-semibold text-[var(--text-primary)]">
                   Address line 1
                 </label>
                 <input
@@ -417,13 +417,13 @@ export default function SalonSuiteOnboardingWizard({
                   value={regAddress.addressLine1 || ''}
                   onChange={(e) => setAddress(0, 'addressLine1', e.target.value)}
                   placeholder="12 MG Road"
-                  className="w-full h-12 px-4 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] transition bg-white"
+                  className="w-full h-12 px-4 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 transition bg-[var(--bg-input)] placeholder:text-[var(--text-muted)]"
                 />
               </div>
 
               {/* Address Line 2 */}
               <div className="space-y-1.5">
-                <label className="block text-sm font-semibold text-[#1A1616]">
+                <label className="block text-sm font-semibold text-[var(--text-primary)]">
                   Address line 2
                 </label>
                 <input
@@ -431,14 +431,14 @@ export default function SalonSuiteOnboardingWizard({
                   value={regAddress.addressLine2 || ''}
                   onChange={(e) => setAddress(0, 'addressLine2', e.target.value)}
                   placeholder="Near Trinity Circle"
-                  className="w-full h-12 px-4 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] transition bg-white"
+                  className="w-full h-12 px-4 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 transition bg-[var(--bg-input)] placeholder:text-[var(--text-muted)]"
                 />
               </div>
 
               {/* City, State, Postal code */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     City
                   </label>
                   <input
@@ -446,11 +446,11 @@ export default function SalonSuiteOnboardingWizard({
                     value={regAddress.city || ''}
                     onChange={(e) => setAddress(0, 'city', e.target.value)}
                     placeholder="Bengaluru"
-                    className="w-full h-12 px-4 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] transition bg-white"
+                    className="w-full h-12 px-4 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 transition bg-[var(--bg-input)] placeholder:text-[var(--text-muted)]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     State
                   </label>
                   <input
@@ -458,11 +458,11 @@ export default function SalonSuiteOnboardingWizard({
                     value={regAddress.state || ''}
                     onChange={(e) => setAddress(0, 'state', e.target.value)}
                     placeholder="Karnataka"
-                    className="w-full h-12 px-4 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] transition bg-white"
+                    className="w-full h-12 px-4 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 transition bg-[var(--bg-input)] placeholder:text-[var(--text-muted)]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     Postal code
                   </label>
                   <input
@@ -470,21 +470,21 @@ export default function SalonSuiteOnboardingWizard({
                     value={regAddress.postalCode || ''}
                     onChange={(e) => setAddress(0, 'postalCode', e.target.value)}
                     placeholder="560001"
-                    className="w-full h-12 px-4 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] transition bg-white"
+                    className="w-full h-12 px-4 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 transition bg-[var(--bg-input)] placeholder:text-[var(--text-muted)]"
                   />
                 </div>
               </div>
 
               {/* Country */}
               <div className="space-y-1.5">
-                <label className="block text-sm font-semibold text-[#1A1616]">
+                <label className="block text-sm font-semibold text-[var(--text-primary)]">
                   Country
                 </label>
                 <div className="relative">
                   <select
                     value={regAddress.country || 'India'}
                     onChange={(e) => setAddress(0, 'country', e.target.value)}
-                    className="w-full h-12 px-4 pr-9 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] bg-white appearance-none cursor-pointer"
+                    className="w-full h-12 px-4 pr-9 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 bg-[var(--bg-input)] appearance-none cursor-pointer"
                   >
                     <option value="India">India</option>
                     <option value="United States">United States</option>
@@ -494,7 +494,7 @@ export default function SalonSuiteOnboardingWizard({
                     <option value="Australia">Australia</option>
                     <option value="Singapore">Singapore</option>
                   </select>
-                  <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[#8C8580] pointer-events-none" />
+                  <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
                 </div>
               </div>
 
@@ -503,14 +503,14 @@ export default function SalonSuiteOnboardingWizard({
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="px-6 py-2.5 rounded-xl border border-[#DED7CE] hover:bg-[#F9F7F5] text-[#1A1616] text-sm font-medium transition"
+                  className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] hover:bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition cursor-pointer"
                 >
                   Back
                 </button>
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-8 py-2.5 rounded-xl bg-[#7A3444] hover:bg-[#682B38] text-white text-sm font-medium transition shadow-sm"
+                  className="px-8 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition shadow-sm cursor-pointer"
                 >
                   Next
                 </button>
@@ -520,12 +520,12 @@ export default function SalonSuiteOnboardingWizard({
 
           {/* STEP 4: REGIONAL */}
           {currentStep === 3 && (
-            <div className="space-y-6 animate-fadeIn">
+            <div className="space-y-6 animate-in fade-in duration-200">
               <div>
-                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[#1A1616]">
+                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
                   Currency and region
                 </h2>
-                <p className="mt-1.5 text-sm sm:text-[15px] text-[#6E6864]">
+                <p className="mt-1.5 text-sm sm:text-[15px] text-[var(--text-muted)]">
                   Every price, invoice and report follows these settings.
                 </p>
               </div>
@@ -533,14 +533,14 @@ export default function SalonSuiteOnboardingWizard({
               {/* Currency and Timezone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     Currency
                   </label>
                   <div className="relative">
                     <select
-                      value={formData.settings.currencyCode || 'INR'}
+                      value={formData?.settings?.currencyCode || 'INR'}
                       onChange={(e) => setSection('settings', 'currencyCode', e.target.value)}
-                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] bg-white appearance-none cursor-pointer"
+                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 bg-[var(--bg-input)] appearance-none cursor-pointer"
                     >
                       <option value="INR">₹ INR · Indian rupee</option>
                       <option value="USD">$ USD · US Dollar</option>
@@ -548,19 +548,19 @@ export default function SalonSuiteOnboardingWizard({
                       <option value="GBP">£ GBP · British Pound</option>
                       <option value="AED">د.إ AED · UAE Dirham</option>
                     </select>
-                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[#8C8580] pointer-events-none" />
+                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     Timezone
                   </label>
                   <div className="relative">
                     <select
-                      value={formData.settings.timezone || 'Asia/Kolkata'}
+                      value={formData?.settings?.timezone || 'Asia/Kolkata'}
                       onChange={(e) => setSection('settings', 'timezone', e.target.value)}
-                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] bg-white appearance-none cursor-pointer"
+                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 bg-[var(--bg-input)] appearance-none cursor-pointer"
                     >
                       <option value="Asia/Kolkata">Asia/Kolkata · 6:42 PM now</option>
                       <option value="UTC">UTC</option>
@@ -568,69 +568,69 @@ export default function SalonSuiteOnboardingWizard({
                       <option value="Europe/London">Europe/London</option>
                       <option value="Asia/Dubai">Asia/Dubai</option>
                     </select>
-                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[#8C8580] pointer-events-none" />
+                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
                   </div>
                 </div>
               </div>
 
               {/* Price Example Notice */}
-              <p className="text-xs sm:text-[13px] text-[#6E6864] pt-0.5">
-                A price will show as <strong className="text-[#1A1616]">₹1,200.00</strong>. Changing currency later does not convert past invoices.
+              <p className="text-xs sm:text-[13px] text-[var(--text-muted)] pt-0.5">
+                A price will show as <strong className="text-[var(--text-primary)]">₹1,200.00</strong>. Changing currency later does not convert past invoices.
               </p>
 
               {/* Date Format, First day of week, Language */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     Date format
                   </label>
                   <div className="relative">
                     <select
-                      value={formData.settings.dateFormat || 'DD/MM/YYYY'}
+                      value={formData?.settings?.dateFormat || 'DD/MM/YYYY'}
                       onChange={(e) => setSection('settings', 'dateFormat', e.target.value)}
-                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] bg-white appearance-none cursor-pointer"
+                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 bg-[var(--bg-input)] appearance-none cursor-pointer"
                     >
                       <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                       <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                       <option value="YYYY-MM-DD">YYYY-MM-DD</option>
                     </select>
-                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[#8C8580] pointer-events-none" />
+                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     First day of week
                   </label>
                   <div className="relative">
                     <select
-                      value={String(formData.settings.firstDayOfWeek ?? 1)}
+                      value={String(formData?.settings?.firstDayOfWeek ?? 1)}
                       onChange={(e) => setSection('settings', 'firstDayOfWeek', Number(e.target.value))}
-                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] bg-white appearance-none cursor-pointer"
+                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 bg-[var(--bg-input)] appearance-none cursor-pointer"
                     >
                       <option value="1">Monday</option>
                       <option value="0">Sunday</option>
                     </select>
-                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[#8C8580] pointer-events-none" />
+                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-[#1A1616]">
+                  <label className="block text-sm font-semibold text-[var(--text-primary)]">
                     Language
                   </label>
                   <div className="relative">
                     <select
-                      value={formData.settings.languageCode || 'en'}
+                      value={formData?.settings?.languageCode || 'en'}
                       onChange={(e) => setSection('settings', 'languageCode', e.target.value)}
-                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[#DED7CE] text-[#1A1616] text-sm sm:text-[15px] focus:outline-none focus:border-[#7A3444] bg-white appearance-none cursor-pointer"
+                      className="w-full h-12 px-4 pr-9 rounded-xl border border-[var(--border-color)] text-[var(--text-primary)] text-sm sm:text-[15px] focus:outline-none focus:border-primary-500 bg-[var(--bg-input)] appearance-none cursor-pointer"
                     >
                       <option value="en">English</option>
                       <option value="hi">Hindi</option>
                       <option value="ar">Arabic</option>
                       <option value="fr">French</option>
                     </select>
-                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[#8C8580] pointer-events-none" />
+                    <ChevronDown className="absolute right-3.5 top-4 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
                   </div>
                 </div>
               </div>
@@ -640,14 +640,14 @@ export default function SalonSuiteOnboardingWizard({
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="px-6 py-2.5 rounded-xl border border-[#DED7CE] hover:bg-[#F9F7F5] text-[#1A1616] text-sm font-medium transition"
+                  className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] hover:bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition cursor-pointer"
                 >
                   Back
                 </button>
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-8 py-2.5 rounded-xl bg-[#7A3444] hover:bg-[#682B38] text-white text-sm font-medium transition shadow-sm"
+                  className="px-8 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition shadow-sm cursor-pointer"
                 >
                   Next
                 </button>
@@ -657,12 +657,12 @@ export default function SalonSuiteOnboardingWizard({
 
           {/* STEP 5: HOURS */}
           {currentStep === 4 && (
-            <div className="space-y-6 animate-fadeIn">
+            <div className="space-y-6 animate-in fade-in duration-200">
               <div>
-                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[#1A1616]">
+                <h2 className="text-2xl sm:text-[26px] font-bold tracking-tight text-[var(--text-primary)]">
                   When are you open?
                 </h2>
-                <p className="mt-1.5 text-sm sm:text-[15px] text-[#6E6864]">
+                <p className="mt-1.5 text-sm sm:text-[15px] text-[var(--text-muted)]">
                   Branches inherit these hours unless you change them.
                 </p>
               </div>
@@ -672,16 +672,16 @@ export default function SalonSuiteOnboardingWizard({
                 <button
                   type="button"
                   onClick={copyMonday}
-                  className="px-4 py-2 rounded-xl border border-[#DED7CE] hover:bg-[#F9F7F5] text-sm font-medium text-[#1A1616] transition"
+                  className="px-4 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] hover:bg-white/5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer"
                 >
                   Copy Monday to all days
                 </button>
               </div>
 
               {/* Schedule Table */}
-              <div className="divide-y divide-[#F0EAE3] border-t border-b border-[#F0EAE3]">
+              <div className="divide-y divide-[var(--border-color)] border-t border-b border-[var(--border-color)]">
                 {days.map((d) => {
-                  const hour = formData.businessHours?.find((h) => h.dayOfWeek === d.value) || {
+                  const hour = formData?.businessHours?.find((h) => h.dayOfWeek === d.value) || {
                     isOpen: d.value !== 0,
                     openTime: '09:00',
                     closeTime: '19:00',
@@ -692,7 +692,7 @@ export default function SalonSuiteOnboardingWizard({
                       className="py-3.5 flex items-center justify-between gap-3"
                     >
                       {/* Day Label */}
-                      <span className="w-12 text-sm font-semibold text-[#1A1616]">
+                      <span className="w-12 text-sm font-semibold text-[var(--text-primary)]">
                         {d.label}
                       </span>
 
@@ -701,8 +701,8 @@ export default function SalonSuiteOnboardingWizard({
                         onClick={() => setHour(d.value, 'isOpen', !hour.isOpen)}
                         className={`w-5 h-5 rounded flex items-center justify-center cursor-pointer transition border ${
                           hour.isOpen
-                            ? 'bg-[#7A3444] border-[#7A3444] text-white'
-                            : 'border-[#C5BFB8] bg-white'
+                            ? 'bg-primary-500 border-primary-500 text-white'
+                            : 'border-[var(--border-color)] bg-[var(--bg-input)]'
                         }`}
                       >
                         {hour.isOpen && <Check className="h-3.5 w-3.5 stroke-[3]" />}
@@ -717,15 +717,15 @@ export default function SalonSuiteOnboardingWizard({
                             onChange={(e) => setHour(d.value, 'openTime', e.target.value)}
                             className={`h-11 px-4 pr-8 rounded-xl border text-sm focus:outline-none transition appearance-none ${
                               hour.isOpen
-                                ? 'bg-white border-[#DED7CE] text-[#1A1616] focus:border-[#7A3444] cursor-pointer'
-                                : 'bg-[#F7F5F2] border-[#E8E2DB] text-[#B0A9A3] cursor-not-allowed'
+                                ? 'bg-[var(--bg-input)] border-[var(--border-color)] text-[var(--text-primary)] focus:border-primary-500 cursor-pointer'
+                                : 'bg-[var(--bg-card)] border-[var(--border-color)] text-[var(--text-muted)] cursor-not-allowed'
                             }`}
                           >
                             {TIME_OPTIONS.map((time) => (
                               <option key={time} value={time}>{time}</option>
                             ))}
                           </select>
-                          <ChevronDown className="absolute right-3 top-3.5 h-4 w-4 text-[#8C8580] pointer-events-none" />
+                          <ChevronDown className="absolute right-3 top-3.5 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
                         </div>
 
                         <div className="relative">
@@ -735,22 +735,22 @@ export default function SalonSuiteOnboardingWizard({
                             onChange={(e) => setHour(d.value, 'closeTime', e.target.value)}
                             className={`h-11 px-4 pr-8 rounded-xl border text-sm focus:outline-none transition appearance-none ${
                               hour.isOpen
-                                ? 'bg-white border-[#DED7CE] text-[#1A1616] focus:border-[#7A3444] cursor-pointer'
-                                : 'bg-[#F7F5F2] border-[#E8E2DB] text-[#B0A9A3] cursor-not-allowed'
+                                ? 'bg-[var(--bg-input)] border-[var(--border-color)] text-[var(--text-primary)] focus:border-primary-500 cursor-pointer'
+                                : 'bg-[var(--bg-card)] border-[var(--border-color)] text-[var(--text-muted)] cursor-not-allowed'
                             }`}
                           >
                             {TIME_OPTIONS.map((time) => (
                               <option key={time} value={time}>{time}</option>
                             ))}
                           </select>
-                          <ChevronDown className="absolute right-3 top-3.5 h-4 w-4 text-[#8C8580] pointer-events-none" />
+                          <ChevronDown className="absolute right-3 top-3.5 h-4 w-4 text-[var(--text-muted)] pointer-events-none" />
                         </div>
                       </div>
 
                       {/* Closed Status text */}
                       <div className="w-16 text-right">
                         {!hour.isOpen && (
-                          <span className="text-sm font-medium text-[#7E7770]">
+                          <span className="text-sm font-medium text-[var(--text-muted)]">
                             Closed
                           </span>
                         )}
@@ -765,7 +765,7 @@ export default function SalonSuiteOnboardingWizard({
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="px-6 py-2.5 rounded-xl border border-[#DED7CE] hover:bg-[#F9F7F5] text-[#1A1616] text-sm font-medium transition"
+                  className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] hover:bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition cursor-pointer"
                 >
                   Back
                 </button>
@@ -773,7 +773,7 @@ export default function SalonSuiteOnboardingWizard({
                   type="button"
                   disabled={saving}
                   onClick={() => onSave(true)}
-                  className="px-7 py-2.5 rounded-xl bg-[#7A3444] hover:bg-[#682B38] text-white text-sm font-medium transition shadow-sm disabled:opacity-50"
+                  className="px-7 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition shadow-sm disabled:opacity-50 cursor-pointer"
                 >
                   {saving ? 'Saving...' : 'Next: add your first branch'}
                 </button>

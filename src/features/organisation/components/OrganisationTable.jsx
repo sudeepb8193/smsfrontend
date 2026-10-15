@@ -148,7 +148,7 @@ export const OrganisationTable = ({
                       <img
                         src={getLogoUrl(org.logoUrl)}
                         alt={org.name}
-                        className="w-10 h-10 rounded-xl object-cover border border-[var(--border-color)] bg-white shrink-0"
+                        className="w-10 h-10 rounded-xl object-cover border border-[var(--border-color)] bg-[var(--bg-input)] shrink-0"
                         onError={(e) => {
                           e.target.style.display = 'none';
                           const fallback = e.target.nextElementSibling;

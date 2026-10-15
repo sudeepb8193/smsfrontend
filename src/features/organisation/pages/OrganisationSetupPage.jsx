@@ -29,8 +29,8 @@ export default function OrganisationSetupPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[420px] flex-col items-center justify-center text-slate-500">
-        <Loader2 className="mb-3 h-8 w-8 animate-spin text-primary-600" />
+      <div className="flex min-h-[420px] flex-col items-center justify-center text-[var(--text-muted)]">
+        <Loader2 className="mb-3 h-8 w-8 animate-spin text-primary-500" />
         <p className="text-sm font-semibold">Loading organization setup...</p>
       </div>
     );
@@ -42,7 +42,7 @@ export default function OrganisationSetupPage() {
         <Building2 className="mx-auto mb-3 h-9 w-9 text-rose-500" />
         <h1 className="text-lg font-bold text-[var(--text-primary)]">Organization not found</h1>
         <p className="mt-2 text-sm text-[var(--text-muted)]">{error || 'This organization could not be loaded.'}</p>
-        <button type="button" onClick={() => navigate(isOwner ? '/dashboard' : '/super-admin/organisations')} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary-600 hover:bg-primary-700 px-4 py-2 text-xs font-semibold text-white">
+        <button type="button" onClick={() => navigate(isOwner ? '/dashboard' : '/super-admin/organisations')} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary-500 hover:bg-primary-600 px-4 py-2 text-xs font-semibold text-white transition-colors">
           <ArrowLeft className="h-4 w-4" />{isOwner ? 'Back to dashboard' : 'Back to organizations'}
         </button>
       </div>
@@ -54,16 +54,15 @@ export default function OrganisationSetupPage() {
       {!isOwner && (
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600">Module 01 • Organization / Business Setup</p>
-            <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{organisation.name}</h1>
-            <p className="mt-1 text-sm text-slate-500">Configure identity, communication, legal, regional, and schedule defaults.</p>
+            <h1 className="mt-1 text-2xl font-bold text-[var(--text-primary)]">{organisation.name}</h1>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">Configure identity, communication, legal, regional, and schedule defaults.</p>
           </div>
-          <button type="button" onClick={() => navigate(overviewRoute)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+          <button type="button" onClick={() => navigate(overviewRoute)} className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] hover:bg-white/5 px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
             <ArrowLeft className="mr-1 inline h-4 w-4" />Organization overview
           </button>
         </header>
       )}
-      {saveMessage && <p role="status" className="rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">{saveMessage}</p>}
+      {saveMessage && <p role="status" className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3 text-sm font-semibold text-emerald-400">{saveMessage}</p>}
       <OrganisationSetupForm
         organisation={organisation}
         saving={saving}
