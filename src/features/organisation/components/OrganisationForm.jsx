@@ -345,7 +345,7 @@ export const OrganisationForm = ({
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl">
               {/* Logo Preview Thumbnail */}
               {logoPreview || formData.logoUrl ? (
-                <div className="relative w-14 h-14 rounded-xl border border-[var(--border-color)] overflow-hidden bg-white shrink-0 group">
+                <div className="relative w-14 h-14 rounded-xl border border-[var(--border-color)] overflow-hidden bg-[var(--bg-input)] shrink-0 group">
                   <img
                     src={logoPreview || formData.logoUrl}
                     alt="Logo Preview"

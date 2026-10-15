@@ -121,9 +121,9 @@ export const OrganisationDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[500px] flex flex-col items-center justify-center text-slate-500">
+      <div className="min-h-[500px] flex flex-col items-center justify-center text-[var(--text-muted)]">
         <Loader2 className="w-10 h-10 animate-spin text-primary-500 mb-3" />
-        <p className="text-sm font-semibold tracking-wide uppercase text-slate-400">
+        <p className="text-sm font-semibold tracking-wide uppercase text-[var(--text-muted)]">
           Loading Organisation Profile...
         </p>
       </div>
@@ -234,7 +234,7 @@ export const OrganisationDetailsPage = () => {
           {organisation.status === 'active' ? (
             <button
               onClick={() => setStatusModal({ isOpen: true, targetStatus: 'inactive', loading: false })}
-              className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
+              className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
             >
               <Power className="w-4 h-4" />
               Deactivate
@@ -242,7 +242,7 @@ export const OrganisationDetailsPage = () => {
           ) : (
             <button
               onClick={() => setStatusModal({ isOpen: true, targetStatus: 'active', loading: false })}
-              className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
+              className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
             >
               <Power className="w-4 h-4" />
               Activate
@@ -251,7 +251,7 @@ export const OrganisationDetailsPage = () => {
 
           <button
             onClick={() => setDeleteModal({ isOpen: true, loading: false })}
-            className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
             Delete Organisation
