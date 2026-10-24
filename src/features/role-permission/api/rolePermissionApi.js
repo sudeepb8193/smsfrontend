@@ -107,7 +107,12 @@ export const rolePermissionApi = {
     return apiClient.post('/api/super-admin/roles', data);
   },
 
-
+  getBranches: (organizationId) => {
+    const query = new URLSearchParams();
+    if (organizationId) query.append('organizationId', organizationId);
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return apiClient.get(`/branches${queryString}`);
+  },
 
   getOrganizations: () => {
     return apiClient.get('/api/super-admin/organisations');

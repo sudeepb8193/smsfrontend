@@ -5,6 +5,8 @@ import { useAuth } from './hooks/useAuth';
 import AppRoutes from './routes/AppRoutes';
 import Loader from './components/shared/Loader';
 import { Toaster } from 'sonner';
+import { OrganisationProvider } from './features/organisation/context/OrganisationContext';
+import { BranchProvider } from './features/branch/context/BranchContext';
 
 const MainShell = () => {
   const { loading } = useAuth();
@@ -25,7 +27,11 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <MainShell />
+        <OrganisationProvider>
+          <BranchProvider>
+            <MainShell />
+          </BranchProvider>
+        </OrganisationProvider>
       </ThemeProvider>
     </AuthProvider>
   );

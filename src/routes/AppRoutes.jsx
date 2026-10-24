@@ -5,9 +5,10 @@ import ContactEmailVerificationPage from '../features/auth/pages/ContactEmailVer
 import { ProtectedRoute } from './ProtectedRoute';
 import { StaffRoutes } from './StaffRoutes';
 import { AuditRoutes } from './AuditRoutes';
-import { OperationsRoutes } from './OperationsRoutes';
 import { OrganizationRoutes } from './OrganizationRoutes';
+import { BranchRoutes } from './BranchRoutes';
 import { RolePermissionRoutes } from './RolePermissionRoutes';
+import { OperationsRoutes } from './OperationsRoutes';
 import DashboardLayout from '../components/layout/DashboardLayout/DashboardLayout';
 import Dashboard from '../pages/Dashboard';
 import NotFound from '../pages/NotFound';
@@ -29,6 +30,7 @@ export const AppRoutes = () => {
 
           {/* Sub-Routes */}
           {OrganizationRoutes}
+          {BranchRoutes}
           {RolePermissionRoutes}
           {StaffRoutes}
           {AuditRoutes}

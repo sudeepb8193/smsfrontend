@@ -953,8 +953,8 @@ export default function OrganisationSetupForm({
           </div>
         </div>
         <div className="rounded-xl border border-[var(--border-color)] p-4 bg-[var(--bg-card)]">
-          <p className="mb-2 text-xs font-semibold text-[var(--text-secondary)]">Organization ID & creation date</p>
-          <p className="font-mono text-xs text-[var(--text-secondary)]">{organisation.id}</p>
+          <p className="mb-2 text-xs font-semibold text-[var(--text-secondary)]">Organization code & created date</p>
+          <p className="font-mono text-xs font-bold text-primary-500">{organisation.code || 'N/A'}</p>
           <p className="mt-1 text-xs text-[var(--text-muted)]">{new Date(organisation.createdAt).toLocaleDateString()}</p>
         </div>
       </div>

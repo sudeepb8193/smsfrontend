@@ -5,6 +5,8 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import ThemeSettingsModal from '../../shared/ThemeSettingsModal';
 import Tooltip from '../../shared/Tooltip';
+import BranchSwitcher from '../../../features/branch/components/BranchSwitcher';
+import OrganisationPicker from '../../../features/organisation/components/OrganisationPicker';
 
 export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOpenSecurityModal }) => {
   const { isDark, toggleTheme, openThemeModal } = useTheme();
@@ -62,6 +64,16 @@ export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOp
               <ArrowLeft size={20} className="hover:-translate-x-0.5 transition-transform" />
             </button>
           </Tooltip>
+
+          {/* Global Organization Picker for Super Admin */}
+          <div className="ml-1 sm:ml-2">
+            <OrganisationPicker />
+          </div>
+
+          {/* Persistent Branch Switcher */}
+          <div className="ml-1 sm:ml-2">
+            <BranchSwitcher />
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

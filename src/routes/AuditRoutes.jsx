@@ -22,7 +22,7 @@ const ModulePlaceholder = ({ title, description, icon: Icon }) => (
 );
 
 export const AuditRoutes = [
-  <Route key="audit-history" path="/audit/history" element={<ModulePlaceholder title="Audit Activity History" description="Comprehensive system audit log history (Module 50 logging)." icon={FileText} />} />,
+  <Route key="audit-history" path="/audit/history" element={<ModulePlaceholder title="Audit Activity History" description="Comprehensive system audit log history and administrative activity records." icon={FileText} />} />,
   <Route key="audit-incidents" path="/audit/incidents" element={<ModulePlaceholder title="Security Incident Log" description="Real-time security alert events and incident activity logs." icon={ShieldAlert} />} />,
   <Route key="audit-redirect" path="/audit" element={<Navigate to="/audit/history" replace />} />,
 ];
