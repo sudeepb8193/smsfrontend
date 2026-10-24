@@ -123,7 +123,7 @@ export const StaffOverridesPage = () => {
         >
           <div className="flex-1 w-full">
             <Input
-              placeholder="Enter Staff UUID (e.g. from Staff HR Directory)..."
+              placeholder="Enter Staff ID or Employee Code (e.g. from Staff HR Directory)..."
               value={staffIdInput}
               onChange={(e) => setStaffIdInput(e.target.value)}
             />
@@ -301,7 +301,7 @@ export const StaffOverridesPage = () => {
             <UserCheck size={36} className="mx-auto text-[var(--text-muted)] mb-3" />
             <h3 className="font-bold text-[var(--text-primary)] text-base">Look up a Staff Member</h3>
             <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto mt-1">
-              Enter an employee UUID above to view their active permission overrides, role inheritance, and grant/revoke exceptions.
+              Enter an employee code or ID above to view their active permission overrides, role inheritance, and grant/revoke exceptions.
             </p>
           </div>
         )

@@ -50,7 +50,7 @@ export const UserRoleChips = ({
 
                 {isInactive && (
                   <span
-                    title="Role deactivated in Module 03"
+                    title="Role is currently inactive"
                     className="flex items-center gap-0.5 bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1 font-bold"
                   >
                     <ShieldAlert size={11} /> Inactive
@@ -81,7 +81,7 @@ export const UserRoleChips = ({
 
                 {isInactive && (
                   <span
-                    title="Role deactivated in Module 03 - review required"
+                    title="Role is currently inactive - review required"
                     className="flex items-center gap-0.5 text-amber-400 font-bold text-[10px] bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full"
                   >
                     <ShieldAlert size={11} /> Inactive

@@ -5,6 +5,7 @@ import {
   ShieldCheck,
   BookOpen,
   UserCheck,
+  Store,
 } from 'lucide-react';
 
 export const SIDEBAR_MODULE_CONFIG = [
@@ -40,6 +41,13 @@ export const SIDEBAR_MODULE_CONFIG = [
     icon: Building2,
     allowedRoles: ['OWNER'],
     path: '/owner/organisation/setup',
+  },
+  {
+    id: 'branches',
+    label: 'Branch Management',
+    icon: Store,
+    allowedRoles: ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER', 'ACCOUNTANT', 'FRONT_DESK'],
+    path: '/branches',
   },
 ];
 
