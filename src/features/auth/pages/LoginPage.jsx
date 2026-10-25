@@ -14,7 +14,16 @@ export const LoginPage = () => {
   });
 
   const [fieldErrors, setFieldErrors] = useState({});
-  const [serverError, setServerError] = useState('');
+  const [serverError, setServerError] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const msg = sessionStorage.getItem('auth_error_message');
+      if (msg) {
+        sessionStorage.removeItem('auth_error_message');
+        return msg;
+      }
+    }
+    return '';
+  });
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {

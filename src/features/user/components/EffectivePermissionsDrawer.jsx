@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Search, Key, Sparkles, Layers } from 'lucide-react';
+import { Key, Sparkles, Layers } from 'lucide-react';
+import Card from '../../../components/shared/Card';
+import Badge from '../../../components/shared/Badge';
+import SearchInput from '../../../components/shared/SearchInput';
+import EmptyState from '../../../components/shared/EmptyState';
 
 export const EffectivePermissionsDrawer = ({
   effectivePermissions = [],
@@ -24,47 +28,55 @@ export const EffectivePermissionsDrawer = ({
     return acc;
   }, {});
 
-  return (
-    <div className="space-y-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-5 shadow-xs">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--border-color)] pb-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-            <Sparkles size={16} />
-          </div>
-          <div>
-            <h3 className="font-bold text-[var(--text-primary)] text-sm flex items-center gap-2">
-              Effective Permissions (Union)
-              <span className="text-xs bg-emerald-500/10 text-emerald-400 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/20">
-                {effectivePermissions.length} Grants
-              </span>
-            </h3>
-            <p className="text-[11px] text-[var(--text-muted)]">
-              Computed union of all active assigned roles for {userDisplayName}
-            </p>
-          </div>
-        </div>
+  const headerTitle = (
+    <div className="flex items-center gap-2">
+      <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+        <Sparkles size={16} />
+      </div>
+      <div>
+        <h3 className="font-bold text-[var(--text-primary)] text-sm flex items-center gap-2">
+          Effective Permissions (Union)
+          <Badge variant="success" size="small">
+            {effectivePermissions.length} Grants
+          </Badge>
+        </h3>
+        <p className="text-[11px] text-[var(--text-muted)]">
+          Computed union of all active assigned roles for {userDisplayName}
+        </p>
+      </div>
+    </div>
+  );
 
-        {/* Filter Input */}
-        <div className="relative w-full sm:w-60">
-          <Search size={14} className="absolute left-3 top-2.5 text-[var(--text-muted)]" />
-          <input
-            type="text"
-            placeholder="Search permissions..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl focus:border-primary-500 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
-          />
-        </div>
+  const searchAction = (
+    <div className="w-full sm:w-60">
+      <SearchInput
+        placeholder="Search permissions..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onClear={() => setSearchQuery('')}
+      />
+    </div>
+  );
+
+  return (
+    <Card className="shadow-xs p-5 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--border-color)] pb-3">
+        {headerTitle}
+        {searchAction}
       </div>
 
       {effectivePermissions.length === 0 ? (
-        <div className="p-6 text-center text-xs text-[var(--text-muted)]">
-          No effective permissions granted. Assign an active role to grant permissions.
-        </div>
+        <EmptyState
+          title="No Effective Permissions"
+          description="No effective permissions granted. Assign an active role to grant permissions."
+          className="py-8"
+        />
       ) : Object.keys(groupedModules).length === 0 ? (
-        <div className="p-4 text-center text-xs text-[var(--text-muted)]">
-          No permissions matching search filter.
-        </div>
+        <EmptyState
+          title="No Matches Found"
+          description="No permissions matching your current search filter."
+          className="py-8"
+        />
       ) : (
         <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
           {Object.entries(groupedModules).map(([moduleName, perms]) => (
@@ -86,9 +98,9 @@ export const EffectivePermissionsDrawer = ({
                         <Key size={12} className="text-primary-500 shrink-0" />
                         <span>{p.label || p.permissionKey}</span>
                       </div>
-                      <span className="text-[10px] uppercase font-mono font-extrabold px-1.5 py-0.5 rounded bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-secondary)] shrink-0">
+                      <Badge variant="neutral" size="small" className="font-mono uppercase font-extrabold shrink-0">
                         {p.action}
-                      </span>
+                      </Badge>
                     </div>
 
                     {p.description && (
@@ -102,16 +114,13 @@ export const EffectivePermissionsDrawer = ({
                       <div className="flex flex-wrap items-center gap-1 pt-1">
                         <span className="text-[10px] text-[var(--text-muted)] font-medium">Granted by:</span>
                         {p.grantedByRoles.map((g) => (
-                          <span
+                          <Badge
                             key={g.roleId}
-                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                              g.isPrimary
-                                ? 'bg-primary-500/15 text-primary-500 border border-primary-500/20'
-                                : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-color)]'
-                            }`}
+                            variant={g.isPrimary ? 'primary' : 'neutral'}
+                            size="small"
                           >
                             {g.roleName}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
                     )}
@@ -122,7 +131,7 @@ export const EffectivePermissionsDrawer = ({
           ))}
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

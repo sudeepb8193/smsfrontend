@@ -1,5 +1,8 @@
 import React from 'react';
-import { History, Calendar, CheckCircle2, Clock, UserCheck } from 'lucide-react';
+import { History, CheckCircle2, Clock, UserCheck } from 'lucide-react';
+import Card from '../../../components/shared/Card';
+import Badge from '../../../components/shared/Badge';
+import EmptyState from '../../../components/shared/EmptyState';
 
 export const RoleAssignmentHistoryLog = ({ activeRoles = [], historicalRoles = [] }) => {
   const formatDateTime = (dateStr) => {
@@ -14,7 +17,7 @@ export const RoleAssignmentHistoryLog = ({ activeRoles = [], historicalRoles = [
   const hasEntries = activeRoles.length > 0 || historicalRoles.length > 0;
 
   return (
-    <div className="space-y-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-5 shadow-xs">
+    <Card className="shadow-xs p-5 space-y-4">
       <div className="flex items-center gap-2 border-b border-[var(--border-color)] pb-3">
         <History size={18} className="text-primary-500" />
         <h3 className="font-bold text-[var(--text-primary)] text-sm">
@@ -23,9 +26,11 @@ export const RoleAssignmentHistoryLog = ({ activeRoles = [], historicalRoles = [
       </div>
 
       {!hasEntries ? (
-        <div className="p-6 text-center text-xs text-[var(--text-muted)]">
-          No role assignment history found for this user.
-        </div>
+        <EmptyState
+          title="No Assignment History"
+          description="No role assignment history found for this user."
+          className="py-8"
+        />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
@@ -45,15 +50,15 @@ export const RoleAssignmentHistoryLog = ({ activeRoles = [], historicalRoles = [
                   <td className="py-3 px-3 font-bold text-[var(--text-primary)]">
                     {r.name}
                     {r.isPrimary && (
-                      <span className="ml-2 text-[10px] bg-primary-500/15 text-primary-500 border border-primary-500/20 px-2 py-0.5 rounded-full font-bold">
+                      <Badge variant="primary" size="small" className="ml-2">
                         Primary
-                      </span>
+                      </Badge>
                     )}
                   </td>
                   <td className="py-3 px-3">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                    <Badge variant="success" size="small">
                       <CheckCircle2 size={11} /> Active
-                    </span>
+                    </Badge>
                   </td>
                   <td className="py-3 px-3 text-[var(--text-secondary)] font-mono">
                     {formatDateTime(r.assignedAt)}
@@ -75,9 +80,9 @@ export const RoleAssignmentHistoryLog = ({ activeRoles = [], historicalRoles = [
                     {r.name}
                   </td>
                   <td className="py-3 px-3">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--text-muted)] bg-[var(--bg-input)] border border-[var(--border-color)] px-2 py-0.5 rounded-full">
+                    <Badge variant="neutral" size="small">
                       <Clock size={11} /> Removed
-                    </span>
+                    </Badge>
                   </td>
                   <td className="py-3 px-3 text-[var(--text-muted)] font-mono">
                     {formatDateTime(r.assignedAt)}
@@ -94,7 +99,7 @@ export const RoleAssignmentHistoryLog = ({ activeRoles = [], historicalRoles = [
           </table>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

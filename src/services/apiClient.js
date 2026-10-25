@@ -68,6 +68,11 @@ export const apiClient = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    const activeOrgId = localStorage.getItem('sms_active_organization_id');
+    if (activeOrgId && !headers['x-organization-id']) {
+      headers['x-organization-id'] = activeOrgId;
+    }
+
     // Handle endpoints that already include /sms or are relative
     const cleanEndpoint = endpoint.startsWith('/sms/')
       ? endpoint.slice(4)
@@ -89,35 +94,95 @@ export const apiClient = {
       throw new Error(`Network error: ${networkErr.message}`);
     }
 
-    // Silent automatic token refresh on 401 Unauthorized / Token Expired
-    if (response.status === 401 && !isRetry && !cleanEndpoint.includes('/auth/')) {
-      const storedRefreshToken = localStorage.getItem('salon_refresh_token');
-      if (storedRefreshToken) {
-        try {
-          if (!refreshPromise) {
-            refreshPromise = executeTokenRefresh().finally(() => {
-              refreshPromise = null;
-            });
-          }
-          const newToken = await refreshPromise;
+    // Handle 401 Unauthorized (Account Deactivated / Token Expired)
+    if (response.status === 401 && !cleanEndpoint.includes('/auth/login')) {
+      let errorBody = null;
+      try {
+        errorBody = await response.clone().json();
+      } catch (e) {
+        // Ignored if response is not JSON
+      }
 
-          // Retry the request with the new access token
-          const retryOptions = {
-            ...options,
-            headers: {
-              ...options.headers,
-              Authorization: `Bearer ${newToken}`,
-            },
-          };
-          return this.request(endpoint, retryOptions, true);
-        } catch (refreshErr) {
-          localStorage.removeItem('salon_jwt_token');
-          localStorage.removeItem('salon_access_token');
-          localStorage.removeItem('salon_refresh_token');
-          if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+      const errCode = errorBody?.code || errorBody?.error?.code;
+      const errMsg =
+        errorBody?.message ||
+        errorBody?.error?.message ||
+        (errCode === 'ACCOUNT_DEACTIVATED'
+          ? 'Your account has been deactivated. Please contact your administrator.'
+          : errCode === 'ACCOUNT_SUSPENDED'
+          ? 'Your account has been suspended. Please contact your administrator.'
+          : 'Session expired. Please log in again.');
+
+      // If the account itself is deactivated or suspended, do not attempt to refresh
+      const isDeactivatedOrSuspended =
+        errCode === 'ACCOUNT_DEACTIVATED' ||
+        errCode === 'ACCOUNT_SUSPENDED' ||
+        errCode === 'ACCOUNT_INACTIVE';
+
+      if (isDeactivatedOrSuspended) {
+        localStorage.removeItem('salon_jwt_token');
+        localStorage.removeItem('salon_access_token');
+        localStorage.removeItem('salon_refresh_token');
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('auth_error_message', errMsg);
+          if (window.location.pathname !== '/login') {
             window.location.href = '/login';
           }
-          throw refreshErr;
+        }
+        const error = new Error(errMsg);
+        error.status = 401;
+        error.code = errCode;
+        throw error;
+      }
+
+      // Silent automatic token refresh on expired access token
+      if (!isRetry && !cleanEndpoint.includes('/auth/')) {
+        const storedRefreshToken = localStorage.getItem('salon_refresh_token');
+        if (storedRefreshToken) {
+          try {
+            if (!refreshPromise) {
+              refreshPromise = executeTokenRefresh().finally(() => {
+                refreshPromise = null;
+              });
+            }
+            const newToken = await refreshPromise;
+
+            // Retry the request with the new access token
+            const retryOptions = {
+              ...options,
+              headers: {
+                ...options.headers,
+                Authorization: `Bearer ${newToken}`,
+              },
+            };
+            return this.request(endpoint, retryOptions, true);
+          } catch (refreshErr) {
+            localStorage.removeItem('salon_jwt_token');
+            localStorage.removeItem('salon_access_token');
+            localStorage.removeItem('salon_refresh_token');
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem(
+                'auth_error_message',
+                'Session expired. Please log in again.',
+              );
+              if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+              }
+            }
+            throw refreshErr;
+          }
+        } else {
+          localStorage.removeItem('salon_jwt_token');
+          localStorage.removeItem('salon_access_token');
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem(
+              'auth_error_message',
+              'Session expired. Please log in again.',
+            );
+            if (window.location.pathname !== '/login') {
+              window.location.href = '/login';
+            }
+          }
         }
       }
     }
@@ -136,6 +201,7 @@ export const apiClient = {
       error.status = response.status;
       error.code = body?.code || body?.error?.code;
       error.data = body;
+      error.dependencies = body?.error?.dependencies || body?.dependencies;
       throw error;
     }
 

@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { X, Users, ShieldCheck, Star, Loader2, CheckCircle2 } from 'lucide-react';
+import { Users, Star, CheckCircle2 } from 'lucide-react';
 import { userService } from '../../../services/userService';
+import Modal from '../../../components/shared/Modal';
+import Button from '../../../components/shared/Button';
+import CustomSelector from '../../../components/shared/CustomSelector';
+import SearchInput from '../../../components/shared/SearchInput';
+import Toggle from '../../../components/shared/Toggle';
+import Badge from '../../../components/shared/Badge';
+import ErrorMessage from '../../../components/shared/ErrorMessage';
 
 export const BulkRoleAssignModal = ({
   isOpen,
@@ -22,7 +29,7 @@ export const BulkRoleAssignModal = ({
   const filteredUsers = users.filter((u) => {
     const q = searchQuery.toLowerCase();
     return (
-      u.displayName.toLowerCase().includes(q) ||
+      (u.displayName && u.displayName.toLowerCase().includes(q)) ||
       (u.email && u.email.toLowerCase().includes(q))
     );
   });
@@ -44,7 +51,7 @@ export const BulkRoleAssignModal = ({
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     if (selectedUserIds.length === 0) {
       setErrorMsg('Please select at least one user');
       return;
@@ -73,199 +80,183 @@ export const BulkRoleAssignModal = ({
     }
   };
 
+  const roleOptions = availableRoles.map((role) => ({
+    value: role.id,
+    label: role.name,
+    badge: role.status !== 'active' ? 'Inactive' : null,
+  }));
+
+  const footer = resultSummary ? (
+    <div className="flex justify-end w-full">
+      <Button variant="primary" size="medium" onClick={onClose}>
+        Done
+      </Button>
+    </div>
+  ) : (
+    <div className="flex items-center justify-end gap-3 w-full">
+      <Button
+        variant="secondary"
+        size="medium"
+        onClick={onClose}
+        disabled={submitting}
+      >
+        Cancel
+      </Button>
+      <Button
+        variant="primary"
+        size="medium"
+        onClick={handleSubmit}
+        disabled={submitting || selectedUserIds.length === 0 || !selectedRoleId}
+        loading={submitting}
+      >
+        Assign to {selectedUserIds.length} User(s)
+      </Button>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-[var(--bg-card)] rounded-2xl shadow-2xl border border-[var(--border-color)] overflow-hidden flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-input)]">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-primary-500/10 text-primary-500">
-              <Users size={20} />
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Bulk Role Assignment"
+      size="large"
+      footer={footer}
+    >
+      {resultSummary ? (
+        /* RESULT SUMMARY VIEW */
+        <div className="space-y-4">
+          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 space-y-2 text-xs">
+            <div className="flex items-center gap-2 font-bold text-sm text-emerald-400">
+              <CheckCircle2 size={18} />
+              <span>Bulk Role Assignment Complete</span>
             </div>
-            <div>
-              <h3 className="font-bold text-[var(--text-primary)] text-base">
-                Bulk Role Assignment
-              </h3>
-              <p className="text-xs text-[var(--text-muted)]">
-                Onboard or update roles for multiple users at once
+            <p className="text-[var(--text-secondary)]">
+              Successfully assigned <strong>{resultSummary.roleName}</strong> role to{' '}
+              <span className="font-extrabold text-[var(--text-primary)]">{resultSummary.assignedCount}</span> of{' '}
+              {resultSummary.totalRequested} requested users.
+            </p>
+            {resultSummary.skippedCount > 0 && (
+              <p className="text-amber-400">
+                {resultSummary.skippedCount} users were skipped (already held the role or error).
               </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors cursor-pointer"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* Modal Body */}
-        {resultSummary ? (
-          /* RESULT SUMMARY VIEW */
-          <div className="p-6 space-y-5">
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 space-y-2 text-xs">
-              <div className="flex items-center gap-2 font-bold text-sm text-emerald-400">
-                <CheckCircle2 size={18} />
-                <span>Bulk Role Assignment Complete</span>
-              </div>
-              <p>
-                Successfully assigned <strong>{resultSummary.roleName}</strong> role to{' '}
-                <span className="font-extrabold">{resultSummary.assignedCount}</span> of{' '}
-                {resultSummary.totalRequested} requested users.
-              </p>
-              {resultSummary.skippedCount > 0 && (
-                <p className="text-amber-400">
-                  {resultSummary.skippedCount} users were skipped (already held the role or error).
-                </p>
-              )}
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-5 py-2 text-xs font-bold text-white bg-primary-500 hover:bg-primary-600 rounded-xl shadow-md cursor-pointer"
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* SELECTION FORM VIEW */
-          <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col p-6 space-y-5">
-            {errorMsg && (
-              <div className="p-3 text-xs font-semibold text-rose-500 bg-rose-500/10 border border-rose-500/20 rounded-xl">
-                {errorMsg}
-              </div>
             )}
+          </div>
+        </div>
+      ) : (
+        /* SELECTION FORM VIEW */
+        <div className="space-y-5">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-primary-500/10 text-primary-500 border border-primary-500/20">
+            <Users size={18} className="shrink-0" />
+            <p className="text-xs text-[var(--text-secondary)]">
+              Onboard or update roles for multiple team members simultaneously
+            </p>
+          </div>
 
-            {/* Target Role Selector */}
-            <div className="space-y-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-                1. Select Target Role to Assign
-              </label>
-              <select
-                value={selectedRoleId}
-                onChange={(e) => setSelectedRoleId(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs font-medium bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl focus:border-primary-500 text-[var(--text-primary)]"
-              >
-                <option value="">-- Choose Role --</option>
-                {availableRoles.map((role) => (
-                  <option key={role.id} value={role.id} disabled={role.status !== 'active'}>
-                    {role.name} {role.status !== 'active' ? '(Inactive)' : ''}
-                  </option>
-                ))}
-              </select>
+          {errorMsg && <ErrorMessage message={errorMsg} />}
 
-              {/* Primary Role Toggle */}
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="bulkPrimaryCheck"
-                  checked={isPrimary}
-                  onChange={(e) => setIsPrimary(e.target.checked)}
-                  className="w-4 h-4 rounded text-primary-500 focus:ring-primary-500 border-[var(--border-color)] bg-[var(--bg-input)]"
-                />
-                <label htmlFor="bulkPrimaryCheck" className="text-xs font-semibold text-[var(--text-secondary)] flex items-center gap-1 cursor-pointer">
-                  <Star size={13} className="text-warning-500" />
-                  <span>Set as Primary Role for target users</span>
-                </label>
+          {/* Target Role Selector */}
+          <div className="space-y-3">
+            <CustomSelector
+              label="1. Select Target Role to Assign"
+              options={roleOptions}
+              value={selectedRoleId}
+              onChange={(val) => setSelectedRoleId(val)}
+              placeholder="-- Choose Role --"
+              searchPlaceholder="Search roles..."
+              required
+              isSearchable={true}
+              isClearable={false}
+            />
+
+            {/* Primary Role Toggle */}
+            <div className="flex items-center justify-between p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)]">
+              <div className="flex items-center gap-2">
+                <Star size={14} className="text-warning-500" />
+                <span className="text-xs font-semibold text-[var(--text-secondary)]">
+                  Set as Primary Role for target users
+                </span>
               </div>
+              <Toggle
+                checked={isPrimary}
+                onChange={setIsPrimary}
+                size="md"
+                color="primary"
+                aria-label="Set as Primary Role"
+              />
+            </div>
+          </div>
+
+          {/* User Selection List */}
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                2. Select Users ({selectedUserIds.length} of {users.length} selected)
+              </label>
+              <Button
+                variant="ghost"
+                size="small"
+                onClick={handleToggleSelectAll}
+                className="text-primary-500 font-bold hover:underline"
+              >
+                {selectedUserIds.length === filteredUsers.length ? 'Deselect All' : 'Select All'}
+              </Button>
             </div>
 
-            {/* User Selection List */}
-            <div className="flex-1 flex flex-col min-h-0 space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-                  2. Select Users ({selectedUserIds.length} of {users.length} selected)
-                </label>
-                <button
-                  type="button"
-                  onClick={handleToggleSelectAll}
-                  className="text-xs text-primary-500 font-bold hover:underline cursor-pointer"
-                >
-                  {selectedUserIds.length === filteredUsers.length ? 'Deselect All' : 'Select All'}
-                </button>
-              </div>
+            <SearchInput
+              placeholder="Filter users by name or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onClear={() => setSearchQuery('')}
+            />
 
-              <input
-                type="text"
-                placeholder="Filter users by name or email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl focus:border-primary-500 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
-              />
-
-              <div className="flex-1 overflow-y-auto border border-[var(--border-color)] rounded-xl divide-y divide-[var(--border-color)]">
-                {filteredUsers.length === 0 ? (
-                  <div className="p-4 text-center text-xs text-[var(--text-muted)]">
-                    No users matching search filter.
-                  </div>
-                ) : (
-                  filteredUsers.map((u) => {
-                    const isChecked = selectedUserIds.includes(u.id);
-                    return (
-                      <div
-                        key={u.id}
-                        onClick={() => handleToggleUser(u.id)}
-                        className={`flex items-center justify-between p-3 text-xs cursor-pointer transition-colors ${
-                          isChecked
-                            ? 'bg-primary-500/10 font-semibold'
-                            : 'hover:bg-white/5'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => { }}
-                            className="w-4 h-4 rounded text-primary-500 focus:ring-primary-500 border-[var(--border-color)] bg-[var(--bg-input)]"
-                          />
-                          <div>
-                            <div className="font-bold text-[var(--text-primary)]">
-                              {u.displayName}
-                            </div>
-                            <div className="text-[var(--text-muted)] text-[11px]">
-                              {u.email || 'No email registered'}
-                            </div>
+            <div className="max-h-56 overflow-y-auto border border-[var(--border-color)] rounded-xl divide-y divide-[var(--border-color)] bg-[var(--bg-card)]">
+              {filteredUsers.length === 0 ? (
+                <div className="p-4 text-center text-xs text-[var(--text-muted)]">
+                  No users matching search filter.
+                </div>
+              ) : (
+                filteredUsers.map((u) => {
+                  const isChecked = selectedUserIds.includes(u.id);
+                  return (
+                    <div
+                      key={u.id}
+                      onClick={() => handleToggleUser(u.id)}
+                      className={`flex items-center justify-between p-3 text-xs cursor-pointer transition-colors ${
+                        isChecked
+                          ? 'bg-primary-500/10 font-semibold'
+                          : 'hover:bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {}}
+                          className="w-4 h-4 rounded text-primary-500 focus:ring-primary-500 border-[var(--border-color)] bg-[var(--bg-input)]"
+                        />
+                        <div>
+                          <div className="font-bold text-[var(--text-primary)]">
+                            {u.displayName}
+                          </div>
+                          <div className="text-[var(--text-muted)] text-[11px]">
+                            {u.email || 'No email registered'}
                           </div>
                         </div>
-
-                        {/* Current roles summary */}
-                        <div className="text-[11px] text-[var(--text-muted)]">
-                          {u.activeRolesCount || 0} active role(s)
-                        </div>
                       </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border-color)]">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={submitting}
-                className="px-4 py-2 text-xs font-bold text-[var(--text-secondary)] hover:bg-white/5 rounded-xl transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={submitting || selectedUserIds.length === 0 || !selectedRoleId}
-                className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-primary-500 hover:bg-primary-600 rounded-xl shadow-md shadow-primary-500/20 disabled:opacity-50 transition-all cursor-pointer"
-              >
-                {submitting && <Loader2 size={14} className="animate-spin" />}
-                <span>Assign to {selectedUserIds.length} User(s)</span>
-              </button>
+                      {/* Current roles summary */}
+                      <Badge variant="neutral" size="small">
+                        {u.activeRolesCount || 0} active role(s)
+                      </Badge>
+                    </div>
+                  );
+                })
+              )}
             </div>
-          </form>
-        )}
-      </div>
-    </div>
+          </div>
+        </div>
+      )}
+    </Modal>
   );
 };
 
