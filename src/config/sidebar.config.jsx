@@ -6,6 +6,7 @@ import {
   BookOpen,
   UserCheck,
   Store,
+  Users,
 } from 'lucide-react';
 
 export const SIDEBAR_MODULE_CONFIG = [
@@ -15,6 +16,13 @@ export const SIDEBAR_MODULE_CONFIG = [
     icon: LayoutDashboard,
     allowedRoles: ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER', 'ACCOUNTANT', 'FRONT_DESK', 'SERVICE_STAFF'],
     path: '/dashboard',
+  },
+  {
+    id: 'users',
+    label: 'User Management',
+    icon: Users,
+    allowedRoles: ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER'],
+    path: '/users',
   },
   {
     id: 'organisations',

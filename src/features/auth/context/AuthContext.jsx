@@ -46,6 +46,46 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+  // Proactive session verification on window focus, storage sync, and periodic heartbeat
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'salon_jwt_token' && !e.newValue) {
+        setUser(null);
+        setAccessToken(null);
+      }
+    };
+
+    const verifyActiveSession = async () => {
+      const token = localStorage.getItem('salon_jwt_token');
+      if (token) {
+        try {
+          const profile = await fetchMe(token);
+          if (profile?.status && profile.status !== 'active') {
+            logout();
+            const msg =
+              profile.status === 'deactivated'
+                ? 'Your account has been deactivated. Please contact your administrator.'
+                : 'Your account has been suspended. Please contact your administrator.';
+            sessionStorage.setItem('auth_error_message', msg);
+            window.location.href = '/login';
+          }
+        } catch (err) {
+          // Handled by apiClient 401 interceptor
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('focus', verifyActiveSession);
+    const interval = setInterval(verifyActiveSession, 60000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', verifyActiveSession);
+      clearInterval(interval);
+    };
+  }, []);
+
   const loginUser = async (email, password) => {
     const data = await apiLogin({ email, password });
     if (data?.refreshToken) {

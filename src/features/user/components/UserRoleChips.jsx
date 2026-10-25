@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Star, ShieldAlert, X, ChevronDown, Check } from 'lucide-react';
+import { Star, ShieldAlert, X, ChevronDown } from 'lucide-react';
+import Badge from '../../../components/shared/Badge';
+import Button from '../../../components/shared/Button';
 
 export const UserRoleChips = ({
   roles = [],
@@ -13,17 +15,18 @@ export const UserRoleChips = ({
   if (!roles || roles.length === 0) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full flex items-center gap-1">
+        <Badge variant="warning">
           <ShieldAlert size={13} /> No Active Roles
-        </span>
+        </Badge>
         {!readOnly && onAddRoleClick && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="small"
             onClick={onAddRoleClick}
-            className="text-xs text-primary-500 hover:underline font-bold cursor-pointer"
+            className="text-primary-500 font-bold hover:underline h-7 px-2"
           >
             + Add Role
-          </button>
+          </Button>
         )}
       </div>
     );
@@ -49,12 +52,9 @@ export const UserRoleChips = ({
                 </span>
 
                 {isInactive && (
-                  <span
-                    title="Role is currently inactive"
-                    className="flex items-center gap-0.5 bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1 font-bold"
-                  >
+                  <Badge variant="warning" size="small" className="ml-1 text-white bg-amber-500 border-none">
                     <ShieldAlert size={11} /> Inactive
-                  </span>
+                  </Badge>
                 )}
 
                 {!readOnly && (
@@ -80,12 +80,9 @@ export const UserRoleChips = ({
                 <span>{r.name}</span>
 
                 {isInactive && (
-                  <span
-                    title="Role is currently inactive - review required"
-                    className="flex items-center gap-0.5 text-amber-400 font-bold text-[10px] bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full"
-                  >
+                  <Badge variant="warning" size="small">
                     <ShieldAlert size={11} /> Inactive
-                  </span>
+                  </Badge>
                 )}
 
                 {!readOnly && (
@@ -141,13 +138,14 @@ export const UserRoleChips = ({
 
       {/* + Add Role Pill */}
       {!readOnly && onAddRoleClick && (
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="small"
           onClick={onAddRoleClick}
-          className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border border-dashed border-primary-500 text-primary-500 hover:bg-primary-500/10 transition-all cursor-pointer"
+          className="rounded-full border-dashed h-7 px-3 text-xs"
         >
           + Add Role
-        </button>
+        </Button>
       )}
     </div>
   );
