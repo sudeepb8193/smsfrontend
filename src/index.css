@@ -10,6 +10,11 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  --tw-ring-color: rgba(249, 115, 22, 0.25);
+}
+
+input:focus, textarea:focus, select:focus, button:focus {
+  outline: none !important;
 }
 
 /* Hide scrollbars globally across all browsers while allowing scroll functionality */
@@ -58,6 +63,10 @@ input, textarea, [contenteditable="true"] {
   --color-primary-800: #9A3412;
   --color-primary-900: #7C2D12;
   --color-primary-950: #431407;
+
+  /* RGB equivalents for Tailwind alpha opacity */
+  --color-primary-500-rgb: 249 115 22;
+  --color-primary-600-rgb: 234 88 12;
 
   --color-secondary-50: #F9F9FB;
   --color-secondary-100: #F2F2F5;
