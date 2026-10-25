@@ -9,14 +9,14 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: 'var(--color-primary-500)',
+          DEFAULT: 'rgb(var(--color-primary-500-rgb, 249 115 22) / <alpha-value>)',
           50: 'var(--color-primary-50)',
           100: 'var(--color-primary-100)',
           200: 'var(--color-primary-200)',
           300: 'var(--color-primary-300)',
           400: 'var(--color-primary-400)',
-          500: 'var(--color-primary-500)',
-          600: 'var(--color-primary-600)',
+          500: 'rgb(var(--color-primary-500-rgb, 249 115 22) / <alpha-value>)',
+          600: 'rgb(var(--color-primary-600-rgb, 234 88 12) / <alpha-value>)',
           700: 'var(--color-primary-700)',
           800: 'var(--color-primary-800)',
           900: 'var(--color-primary-900)',
@@ -114,10 +114,13 @@ export default {
           800: '#18181D',
           900: '#0E0E12',
           950: '#08080A',
-        }
+        },
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'var(--font-sans)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        handwriting: ['"Caveat"', 'cursive'],
       },
       borderRadius: {
         'sm': 'var(--radius-sm, 8px)',
