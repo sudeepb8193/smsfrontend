@@ -9,7 +9,7 @@ export const GoogleButton = ({ onClick, disabled = false, text = 'Continue with 
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="w-full py-2.5 sm:py-3 px-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50/80 active:bg-slate-100 text-slate-700 font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer shadow-xs disabled:opacity-60 disabled:cursor-not-allowed select-none"
+      className="w-full py-2.5 sm:py-3 px-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50/90 hover:shadow-md hover:shadow-slate-200/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] text-slate-700 font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer shadow-xs disabled:opacity-60 disabled:cursor-not-allowed select-none"
     >
       <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
         <path
