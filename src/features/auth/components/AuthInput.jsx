@@ -36,9 +36,9 @@ export const AuthInput = ({
         </label>
       )}
 
-      <div className="relative flex items-center">
+      <div className={`relative flex items-center group ${error ? 'animate-shake-subtle' : ''}`}>
         {Icon && (
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center justify-center">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-600 group-focus-within:scale-105 pointer-events-none flex items-center justify-center transition-all duration-200">
             <Icon size={18} strokeWidth={2} />
           </div>
         )}
@@ -56,8 +56,8 @@ export const AuthInput = ({
             Icon ? 'pl-10' : 'pl-3.5'
           } ${isPassword || rightElement ? 'pr-11' : 'pr-3.5'} py-2.5 sm:py-3 ${
             error
-              ? 'border-rose-400 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
-              : 'border-slate-200 hover:border-slate-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20'
+              ? 'border-rose-400 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/15'
+              : 'border-slate-200 hover:border-slate-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20'
           } ${disabled ? 'bg-slate-50 text-slate-400 cursor-not-allowed' : ''}`}
         />
 
@@ -67,7 +67,7 @@ export const AuthInput = ({
             onClick={() => setShowPassword((prev) => !prev)}
             tabIndex={-1}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1 cursor-pointer focus:outline-none"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-purple-600 transition-colors p-1 cursor-pointer focus:outline-none"
           >
             {showPassword ? <EyeOff size={18} strokeWidth={2} /> : <Eye size={18} strokeWidth={2} />}
           </button>

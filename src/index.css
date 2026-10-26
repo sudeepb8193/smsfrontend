@@ -253,3 +253,105 @@ input, textarea, [contenteditable="true"] {
 .animate-slideInRight {
   animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ==========================================================================
+   PREMIUM MOTION & LUXURY SALON ANIMATIONS
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes wave {
+  0% { transform: rotate(0deg); }
+  15% { transform: rotate(14deg); }
+  30% { transform: rotate(-10deg); }
+  45% { transform: rotate(14deg); }
+  60% { transform: rotate(-4deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.animate-wave {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: wave 1.8s ease-in-out infinite;
+}
+
+@keyframes shakeSubtle {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+
+.animate-shake-subtle {
+  animation: shakeSubtle 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes gentleFloat1 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes gentleFloat2 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes gentleFloat3 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes gentleFloat4 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@media (min-width: 1024px) {
+  .animate-float-1 { animation: gentleFloat1 3.8s ease-in-out infinite; }
+  .animate-float-2 { animation: gentleFloat2 4.4s ease-in-out infinite 0.3s; }
+  .animate-float-3 { animation: gentleFloat3 3.6s ease-in-out infinite 0.7s; }
+  .animate-float-4 { animation: gentleFloat4 4.2s ease-in-out infinite 1.1s; }
+}
+
+@keyframes shimmerLavender {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-shimmer-lavender {
+  background-size: 200% auto;
+  animation: shimmerLavender 5s linear infinite;
+}
+
+/* Reduced Motion Override for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .animate-wave,
+  .animate-float-1,
+  .animate-float-2,
+  .animate-float-3,
+  .animate-float-4,
+  .animate-shimmer-lavender {
+    animation: none !important;
+  }
+}
+

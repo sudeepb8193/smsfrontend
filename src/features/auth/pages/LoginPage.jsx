@@ -198,8 +198,11 @@ export const LoginPage = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 sm:py-3.5 px-6 rounded-xl bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-bold text-sm shadow-md shadow-primary-500/25 hover:shadow-lg hover:shadow-primary-500/35 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="group relative w-full h-12 py-3 sm:py-3.5 px-6 rounded-xl bg-gradient-to-r from-orange-500 via-primary-500 to-amber-500 hover:from-orange-600 hover:via-primary-600 hover:to-amber-600 hover:brightness-105 active:scale-[0.98] text-white font-bold text-sm shadow-md shadow-primary-500/25 hover:shadow-lg hover:shadow-purple-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none cursor-pointer overflow-hidden select-none"
           >
+            {/* Top edge subtle glowing reflection beam */}
+            <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
+
             {submitting ? (
               <>
                 <Loader2 size={18} className="animate-spin" />
@@ -208,7 +211,7 @@ export const LoginPage = () => {
             ) : (
               <>
                 <span>Login</span>
-                <ArrowRight size={18} />
+                <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-1.5" />
               </>
             )}
           </button>
