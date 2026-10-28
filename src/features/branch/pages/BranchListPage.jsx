@@ -16,6 +16,7 @@ import {
 import { fetchBranches } from '../api/branchApi';
 import { useBranch } from '../context/BranchContext';
 import { useAuth } from '../../../hooks/useAuth';
+import { usePermission } from '../../../hooks/usePermission';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
 import BranchCard from '../components/BranchCard';
 import BranchStatusBadge from '../components/BranchStatusBadge';
@@ -52,13 +53,18 @@ const SORT_OPTIONS = [
 export const BranchListPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { canCreate, canEdit, canDelete } = usePermission();
   const { currentBranch, setCurrentBranch, refreshBranches } = useBranch();
   const { selectedOrganisation, isSuperAdmin } = useOrganisation();
 
   const userRole = String(
     user?.roleSlug || user?.role || user?.roleName || '',
   ).toLowerCase().replace(/_/g, '-');
-  const isOwner = userRole === 'owner' || userRole === 'super-admin';
+  const isOwner = userRole === 'owner' || userRole === 'super-admin' || isSuperAdmin;
+
+  const canCreateBranch = isOwner || canCreate('branches');
+  const canEditBranch = isOwner || canEdit('branches');
+  const canDeleteBranch = isOwner || canDelete('branches');
 
   const effectiveOrgId = isSuperAdmin ? selectedOrganisation?.id : user?.organizationId;
 
@@ -143,7 +149,7 @@ export const BranchListPage = () => {
           </p>
         </div>
 
-        {isOwner && (
+        {canCreateBranch && (
           <button
             type="button"
             id="add-branch-btn"
@@ -275,7 +281,7 @@ export const BranchListPage = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12">
-            {isOwner ? (
+            {canCreateBranch ? (
               <button
                 type="button"
                 onClick={() => navigate('/branches/create')}
@@ -313,7 +319,7 @@ export const BranchListPage = () => {
               branch={branch}
               onOpenDeleteModal={setDeleteModalBranch}
               onOpenCopyModal={setCopyModalBranch}
-              canManage={isOwner}
+              canManage={canEditBranch || canDeleteBranch}
             />
           ))}
         </div>
@@ -381,7 +387,7 @@ export const BranchListPage = () => {
                           >
                             View
                           </button>
-                          {isOwner && (
+                          {(canEditBranch || isOwner) && (
                             <button
                               type="button"
                               onClick={() => navigate(`/branches/${branch.id}/edit`)}

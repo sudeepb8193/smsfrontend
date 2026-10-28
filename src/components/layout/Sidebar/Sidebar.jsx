@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { SIDEBAR_MODULE_CONFIG } from '../../../config/sidebar.config';
 import { useAuth } from '../../../hooks/useAuth';
+import { hasPermission } from '../../../utils/permissionUtils';
 import Tooltip from '../../shared/Tooltip';
 import {
   ChevronLeft,
@@ -344,6 +345,25 @@ export const Sidebar = ({
     : 'ENTERPRISE';
 
   const filteredModules = SIDEBAR_MODULE_CONFIG.filter((module) => {
+    // Super Admin and Owner have access to their respective dashboard sections
+    if (isSuperAdmin || normUserRole === 'OWNER') {
+      if (module.id === 'organisations' || module.id === 'super-admin-roles') {
+        return isSuperAdmin;
+      }
+      if (module.id === 'my-organisation') {
+        return normUserRole === 'OWNER';
+      }
+      return true;
+    }
+
+    // 1. If module defines requiredPermission, verify user has that permission
+    if (module.requiredPermission) {
+      if (!hasPermission(user, module.requiredPermission)) {
+        return false;
+      }
+    }
+
+    // 2. Role-based fallback
     if (!module.allowedRoles || module.allowedRoles.length === 0) return true;
     if (!userRole) return false;
     return module.allowedRoles.some(

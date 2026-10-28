@@ -29,6 +29,7 @@ import {
 import StatusChangeModal from '../components/StatusChangeModal';
 import DeleteOrganisationModal from '../components/DeleteOrganisationModal';
 import UnderlineTabs from '../../../components/shared/UnderlineTabs';
+import { usePermission } from '../../../hooks/usePermission';
 
 const getLogoUrl = (logoUrl) => {
   if (!logoUrl || logoUrl.includes('key=undefined') || logoUrl.endsWith('undefined')) return '';
@@ -50,6 +51,10 @@ export const OrganisationDetailsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { organisationId } = useParams();
+  const { canEdit, canDelete } = usePermission();
+
+  const canEditOrg = canEdit('organizations');
+  const canDeleteOrg = canDelete('organizations');
 
   const [organisation, setOrganisation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -229,46 +234,52 @@ export const OrganisationDetailsPage = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => navigate(`/super-admin/organisations/${organisationId}/setup`)}
-            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
-          >
-            <Settings2 className="w-4 h-4" />
-            Complete Setup
-          </button>
-          <button
-            onClick={() => navigate(`/super-admin/organisations/${organisationId}/edit`)}
-            className="px-4 py-2 bg-[var(--bg-input)] hover:bg-white/10 text-[var(--text-secondary)] border border-[var(--border-color)] rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
-          >
-            <Edit className="w-4 h-4 text-amber-500" />
-            Edit Organisation
-          </button>
+          {canEditOrg && (
+            <>
+              <button
+                onClick={() => navigate(`/super-admin/organisations/${organisationId}/setup`)}
+                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <Settings2 className="w-4 h-4" />
+                Complete Setup
+              </button>
+              <button
+                onClick={() => navigate(`/super-admin/organisations/${organisationId}/edit`)}
+                className="px-4 py-2 bg-[var(--bg-input)] hover:bg-white/10 text-[var(--text-secondary)] border border-[var(--border-color)] rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <Edit className="w-4 h-4 text-amber-500" />
+                Edit Organisation
+              </button>
 
-          {organisation.status === 'active' ? (
-            <button
-              onClick={() => setStatusModal({ isOpen: true, targetStatus: 'inactive', loading: false })}
-              className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <Power className="w-4 h-4" />
-              Deactivate
-            </button>
-          ) : (
-            <button
-              onClick={() => setStatusModal({ isOpen: true, targetStatus: 'active', loading: false })}
-              className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <Power className="w-4 h-4" />
-              Activate
-            </button>
+              {organisation.status === 'active' ? (
+                <button
+                  onClick={() => setStatusModal({ isOpen: true, targetStatus: 'inactive', loading: false })}
+                  className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Power className="w-4 h-4" />
+                  Deactivate
+                </button>
+              ) : (
+                <button
+                  onClick={() => setStatusModal({ isOpen: true, targetStatus: 'active', loading: false })}
+                  className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Power className="w-4 h-4" />
+                  Activate
+                </button>
+              )}
+            </>
           )}
 
-          <button
-            onClick={() => setDeleteModal({ isOpen: true, loading: false })}
-            className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
-          >
-            <Trash2 className="w-4 h-4" />
-            Delete Organisation
-          </button>
+          {canDeleteOrg && (
+            <button
+              onClick={() => setDeleteModal({ isOpen: true, loading: false })}
+              className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete Organisation
+            </button>
+          )}
         </div>
       </div>
 

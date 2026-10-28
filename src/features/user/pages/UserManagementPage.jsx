@@ -31,6 +31,7 @@ import { toast } from 'sonner';
 import { userService } from '../../../services/userService';
 import { fetchBranches } from '../../branch/api/branchApi';
 import { useAuth } from '../../../hooks/useAuth';
+import { usePermission } from '../../../hooks/usePermission';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
 
 // Shared Components
@@ -56,6 +57,7 @@ import RoleAssignmentHistoryLog from '../components/RoleAssignmentHistoryLog';
 import InviteUserModal from '../components/InviteUserModal';
 import EditUserModal from '../components/EditUserModal';
 import ChangeStatusModal from '../components/ChangeStatusModal';
+import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
 
 // Helper for Initials
 const getInitials = (name) => {
@@ -66,7 +68,8 @@ const getInitials = (name) => {
 };
 
 export const UserManagementPage = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
+  const { canCreate, canEdit, canDelete } = usePermission();
   let selectedOrganisation = null;
   let isSuperAdmin = false;
   try {
@@ -85,8 +88,10 @@ export const UserManagementPage = () => {
   const currentRole = String(user?.role || user?.roleSlug || user?.roleName || '').toLowerCase().replace(/[\s-]+/g, '_');
   const isBranchManager = currentRole === 'branch_manager';
   const isOwner = currentRole === 'owner';
-  const canManageRoles = isSuperAdmin || isOwner;
-  const canDeleteUser = isSuperAdmin || isOwner;
+  const canCreateUser = isSuperAdmin || isOwner || canCreate('users');
+  const canEditUser = isSuperAdmin || isOwner || canEdit('users');
+  const canDeleteUser = isSuperAdmin || isOwner || canDelete('users');
+  const canManageRoles = isSuperAdmin || isOwner || canEdit('roles') || canEdit('users');
 
   const [users, setUsers] = useState([]);
   const [availableRoles, setAvailableRoles] = useState([]);
@@ -292,6 +297,8 @@ export const UserManagementPage = () => {
     try {
       await userService.assignRole(selectedUser.id, { roleId, isPrimary });
       toast.success('Role assigned successfully');
+      notifyPermissionUpdate({ userId: selectedUser.id });
+      await refreshUser();
       await loadData();
     } catch (err) {
       toast.error(err.message || 'Failed to assign role');
@@ -311,6 +318,8 @@ export const UserManagementPage = () => {
     try {
       await userService.removeRole(selectedUser.id, roleId);
       toast.success('Role assignment removed');
+      notifyPermissionUpdate({ userId: selectedUser.id });
+      await refreshUser();
       await loadData();
     } catch (err) {
       toast.error(err.message || 'Failed to remove role');
@@ -511,14 +520,16 @@ export const UserManagementPage = () => {
             </button>
           )}
 
-          <button
-            type="button"
-            onClick={() => setIsInviteModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-primary-500 hover:bg-primary-600 text-white shadow-md shadow-primary-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <UserPlus size={16} />
-            <span>+ Invite User</span>
-          </button>
+          {canCreateUser && (
+            <button
+              type="button"
+              onClick={() => setIsInviteModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-primary-500 hover:bg-primary-600 text-white shadow-md shadow-primary-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <UserPlus size={16} />
+              <span>+ Invite User</span>
+            </button>
+          )}
         </div>
       </div>
 

@@ -6,10 +6,13 @@ import Button from '../../../components/shared/Button';
 import Spinner from '../../../components/shared/Spinner';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { toast } from 'sonner';
+import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
+import { useAuth } from '../../../hooks/useAuth';
 
 export const RolePermissionsPage = ({ isSuperAdminView = false }) => {
   const { roleId } = useParams();
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
 
   const [role, setRole] = useState(null);
   const [matrixTemplate, setMatrixTemplate] = useState([]);
@@ -60,6 +63,10 @@ export const RolePermissionsPage = ({ isSuperAdminView = false }) => {
       if (res.warning) {
         toast.warning(res.warning);
       }
+
+      // Immediately synchronize permissions across client state and other tabs without page reload
+      notifyPermissionUpdate({ roleId });
+      await refreshUser();
 
       setVersionToken(res.versionToken);
       // Reload fresh data

@@ -17,10 +17,16 @@ import DeleteOrganisationModal from '../components/DeleteOrganisationModal';
 import MarketplaceToggleModal from '../components/MarketplaceToggleModal';
 import Button from '../../../components/shared/Button';
 import Pagination from '../../../components/shared/Pagination';
+import { usePermission } from '../../../hooks/usePermission';
 
 export const OrganisationListPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { canCreate, canEdit, canDelete } = usePermission();
+
+  const canCreateOrg = canCreate('organizations');
+  const canEditOrg = canEdit('organizations');
+  const canDeleteOrg = canDelete('organizations');
 
   const [organisations, setOrganisations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -223,13 +229,15 @@ export const OrganisationListPage = () => {
           </p>
         </div>
 
-        <Button
-          icon={Plus}
-          onClick={() => navigate('/super-admin/organisations/create')}
-          className="self-start sm:self-auto"
-        >
-          Create Organisation
-        </Button>
+        {canCreateOrg && (
+          <Button
+            icon={Plus}
+            onClick={() => navigate('/super-admin/organisations/create')}
+            className="self-start sm:self-auto"
+          >
+            Create Organisation
+          </Button>
+        )}
       </div>
 
       {/* Global Central Marketplace Availability Banner */}
@@ -310,6 +318,8 @@ export const OrganisationListPage = () => {
           <OrganisationTable
             organisations={organisations}
             loading={loading}
+            canEdit={canEditOrg}
+            canDelete={canDeleteOrg}
             onStatusChange={handleStatusChangeClick}
             onDeleteClick={handleDeleteClick}
           />
@@ -317,6 +327,8 @@ export const OrganisationListPage = () => {
           <OrganisationGrid
             organisations={organisations}
             loading={loading}
+            canEdit={canEditOrg}
+            canDelete={canDeleteOrg}
             onStatusChange={handleStatusChangeClick}
             onDeleteClick={handleDeleteClick}
           />

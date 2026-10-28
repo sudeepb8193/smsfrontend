@@ -8,6 +8,7 @@ import SearchInput from '../../../components/shared/SearchInput';
 import Toggle from '../../../components/shared/Toggle';
 import Badge from '../../../components/shared/Badge';
 import ErrorMessage from '../../../components/shared/ErrorMessage';
+import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
 
 export const BulkRoleAssignModal = ({
   isOpen,
@@ -71,6 +72,7 @@ export const BulkRoleAssignModal = ({
         isPrimary,
       });
 
+      notifyPermissionUpdate({ userIds: selectedUserIds });
       setResultSummary(res);
       if (onSuccess) onSuccess();
     } catch (err) {

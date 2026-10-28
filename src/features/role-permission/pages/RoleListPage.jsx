@@ -31,6 +31,8 @@ import {
   Pencil,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
+import { useAuth } from '../../../hooks/useAuth';
 
 const STANDARD_ACTIONS = [
   { key: 'view', label: 'View' },
@@ -44,6 +46,7 @@ const STANDARD_ACTIONS = [
 
 export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null }) => {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
 
   // Roles state
   const [roles, setRoles] = useState([]);
@@ -441,6 +444,10 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
       setVersionToken(res.versionToken);
       setHasUnsavedChanges(false);
 
+      // Immediately propagate updated permissions across state and tabs without page reload
+      notifyPermissionUpdate({ roleId: selectedRoleId });
+      await refreshUser();
+
       // Refresh roles to update permission counters
       const apiFn = isSuperAdminView ? rolePermissionApi.getSuperAdminRoles : rolePermissionApi.getRoles;
       const rolesRes = await apiFn({ limit: 100, organizationId: selectedOrgId || undefined });
@@ -524,6 +531,8 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
       setDeletingRole(true);
       await rolePermissionApi.deleteRole(deleteConfirmRole.id);
       toast.success(`Role "${deleteConfirmRole.name}" deleted successfully`);
+      notifyPermissionUpdate({ roleId: deleteConfirmRole.id });
+      await refreshUser();
       setDeleteConfirmRole(null);
 
       // Refresh roles

@@ -9,26 +9,39 @@ import BranchEditPage from '../features/branch/pages/BranchEditPage';
 // Route definitions are consumed by AppRoutes
 export const BranchRoutes = (
   <>
-    <Route path="/branches" element={<BranchListPage />} />
     <Route
       element={
         <RoleGuard
-          allowedRoles={['OWNER', 'Owner', 'SUPER_ADMIN', 'Super Admin', 'BRANCH_MANAGER', 'Branch Manager']}
+          requiredPermission="branches.view"
+          allowedRoles={['OWNER', 'SUPER_ADMIN', 'BRANCH_MANAGER', 'ACCOUNTANT', 'FRONT_DESK']}
         />
       }
     >
-      <Route path="/branches/:branchId/edit" element={<BranchEditPage />} />
+      <Route path="/branches" element={<BranchListPage />} />
+      <Route path="/branches/:branchId" element={<BranchDetailsPage />} />
     </Route>
+
     <Route
       element={
         <RoleGuard
-          allowedRoles={['OWNER', 'Owner', 'SUPER_ADMIN', 'Super Admin']}
+          requiredPermission="branches.create"
+          allowedRoles={['OWNER', 'SUPER_ADMIN']}
         />
       }
     >
       <Route path="/branches/create" element={<BranchCreatePage />} />
     </Route>
-    <Route path="/branches/:branchId" element={<BranchDetailsPage />} />
+
+    <Route
+      element={
+        <RoleGuard
+          requiredPermission="branches.edit"
+          allowedRoles={['OWNER', 'SUPER_ADMIN', 'BRANCH_MANAGER']}
+        />
+      }
+    >
+      <Route path="/branches/:branchId/edit" element={<BranchEditPage />} />
+    </Route>
   </>
 );
 

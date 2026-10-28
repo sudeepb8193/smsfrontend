@@ -29,18 +29,22 @@ import BranchStatusBadge from '../components/BranchStatusBadge';
 import BranchTypeBadge from '../components/BranchTypeBadge';
 import BranchDeleteModal from '../components/BranchDeleteModal';
 import CopySettingsModal from '../components/CopySettingsModal';
+import { usePermission } from '../../../hooks/usePermission';
 import { toast } from 'sonner';
 
 export const BranchDetailsPage = () => {
   const { branchId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { canEdit, canDelete } = usePermission();
   const { currentBranch, setCurrentBranch, refreshBranches } = useBranch();
 
   const userRole = String(
     user?.roleSlug || user?.role || user?.roleName || '',
   ).toLowerCase().replace(/_/g, '-');
   const isOwner = userRole === 'owner' || userRole === 'super-admin';
+  const canEditBranch = isOwner || canEdit('branches', branchId);
+  const canDeleteBranch = isOwner || canDelete('branches', branchId);
 
   const [branch, setBranch] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -144,7 +148,7 @@ export const BranchDetailsPage = () => {
             </button>
           )}
 
-          {isOwner && (
+          {canEditBranch && (
             <>
               <button
                 type="button"
@@ -163,16 +167,18 @@ export const BranchDetailsPage = () => {
                 <Edit size={14} />
                 <span>Edit Profile</span>
               </button>
-
-              <button
-                type="button"
-                onClick={() => setIsDeleteModalOpen(true)}
-                className="p-2 text-xs font-semibold rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white border border-rose-500/20 transition-colors"
-                title="Delete or Close Branch"
-              >
-                <Trash2 size={16} />
-              </button>
             </>
+          )}
+
+          {canDeleteBranch && (
+            <button
+              type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="p-2 text-xs font-semibold rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white border border-rose-500/20 transition-colors"
+              title="Delete or Close Branch"
+            >
+              <Trash2 size={16} />
+            </button>
           )}
         </div>
       </div>

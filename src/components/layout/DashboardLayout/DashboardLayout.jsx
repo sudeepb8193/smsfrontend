@@ -8,7 +8,8 @@ export const DashboardLayout = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
+  const lastRefreshRef = React.useRef(Date.now());
 
   useEffect(() => {
     const handleResize = () => {
@@ -22,7 +23,12 @@ export const DashboardLayout = () => {
 
   useEffect(() => {
     setIsMobileOpen(false);
-  }, [location.pathname]);
+    // Keep permissions freshly synced on page navigation without reload
+    if (Date.now() - lastRefreshRef.current > 15000) {
+      lastRefreshRef.current = Date.now();
+      refreshUser();
+    }
+  }, [location.pathname, refreshUser]);
 
   const handleToggleSidebar = () => {
     if (window.innerWidth < 1024) {
