@@ -26,6 +26,12 @@ export const OrganisationFilters = ({
     { label: 'Custom Plan', value: 'Custom' },
   ];
 
+  const modeOptions = [
+    { label: 'All Modes', value: 'all' },
+    { label: 'Individual Website', value: 'INDIVIDUAL_WEBSITE' },
+    { label: 'Central Marketplace', value: 'CENTRAL_MARKETPLACE' },
+  ];
+
   return (
     <div className="p-3.5 sm:p-4 border-b border-[var(--border-color)] bg-[var(--bg-card)] transition-colors">
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
@@ -43,8 +49,19 @@ export const OrganisationFilters = ({
 
         {/* Filter Custom Selectors & View Toggle */}
         <div className="flex flex-wrap items-center gap-3">
+          {/* Operating Mode Custom Selector */}
+          <div className="min-w-[170px]">
+            <CustomSelector
+              options={modeOptions}
+              value={filters.operatingMode || 'all'}
+              onChange={(val) => onChange('operatingMode', val)}
+              placeholder="All Modes"
+              isSearchable={false}
+            />
+          </div>
+
           {/* Status Custom Selector */}
-          <div className="min-w-[160px]">
+          <div className="min-w-[150px]">
             <CustomSelector
               options={statusOptions}
               value={filters.status}
@@ -55,7 +72,7 @@ export const OrganisationFilters = ({
           </div>
 
           {/* Plan Custom Selector */}
-          <div className="min-w-[160px]">
+          <div className="min-w-[150px]">
             <CustomSelector
               options={planOptions}
               value={filters.plan}

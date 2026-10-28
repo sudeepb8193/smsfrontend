@@ -9,6 +9,12 @@ import {
   X,
   Upload,
   Loader2,
+  Globe,
+  Store,
+  Check,
+  CheckCircle2,
+  Sparkles,
+  ShieldAlert,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { uploadImageFile } from '../api/organisationApi';
@@ -16,6 +22,7 @@ import Input from '../../../components/shared/Input';
 import CustomSelector from '../../../components/shared/CustomSelector';
 import DatePicker from '../../../components/shared/DatePicker';
 import Button from '../../../components/shared/Button';
+import Modal from '../../../components/shared/Modal';
 
 export const OrganisationForm = ({
   initialValues = null,
@@ -30,6 +37,7 @@ export const OrganisationForm = ({
     name: '',
     code: '',
     businessType: 'salon',
+    operatingMode: 'INDIVIDUAL_WEBSITE',
     logoUrl: '',
     description: '',
     email: '',
@@ -68,6 +76,8 @@ export const OrganisationForm = ({
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoUploadError, setLogoUploadError] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
+  const [showModeConfirmModal, setShowModeConfirmModal] = useState(false);
+  const [pendingSubmitPayload, setPendingSubmitPayload] = useState(null);
 
   const businessTypeOptions = [
     { label: 'Salon', value: 'salon' },
@@ -176,6 +186,7 @@ export const OrganisationForm = ({
         maxBranches: sub?.maxBranches || 1,
         maxUsers: sub?.maxUsers || 5,
         status: initialValues.status || 'active',
+        operatingMode: initialValues.operatingMode || 'INDIVIDUAL_WEBSITE',
       });
     }
   }, [initialValues]);
@@ -194,6 +205,10 @@ export const OrganisationForm = ({
     if (!formData.code.trim()) newErrors.code = 'Organisation Code is required';
     if (!formData.businessType) newErrors.businessType = 'Business Type is required';
     
+    if (!formData.operatingMode) {
+      newErrors.operatingMode = 'Please select an Operating Mode for this organisation';
+    }
+
     if (!formData.email.trim()) {
       newErrors.email = 'Organisation Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
@@ -236,12 +251,31 @@ export const OrganisationForm = ({
 
     const payload = {
       ...cleanedData,
+      operatingMode: formData.operatingMode,
       maxBranches: Number(formData.maxBranches) || 1,
       maxUsers: Number(formData.maxUsers) || 5,
       ownerPassword: formData.ownerPassword || 'Owner@123',
     };
 
+    if (
+      isEditMode &&
+      initialValues?.operatingMode &&
+      formData.operatingMode !== initialValues.operatingMode
+    ) {
+      setPendingSubmitPayload(payload);
+      setShowModeConfirmModal(true);
+      return;
+    }
+
     onSubmit(payload);
+  };
+
+  const handleConfirmModeChange = () => {
+    setShowModeConfirmModal(false);
+    if (pendingSubmitPayload) {
+      onSubmit(pendingSubmitPayload);
+      setPendingSubmitPayload(null);
+    }
   };
 
   return (
@@ -252,6 +286,202 @@ export const OrganisationForm = ({
           <span>{serverError}</span>
         </div>
       )}
+
+      {/* SECTION: OPERATING MODE SELECTION */}
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm text-[var(--text-primary)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-4 pb-3 border-b border-[var(--border-color)]">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-primary-500/10 text-primary-500 border border-primary-500/20">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                Organisation Operating Mode
+                <span className="text-xs text-rose-500">*</span>
+              </h3>
+              <p className="text-[11px] text-[var(--text-muted)]">
+                Select how this organisation will operate and accept customer bookings
+              </p>
+            </div>
+          </div>
+          {isEditMode && initialValues?.operatingMode && (
+            <span className="self-start sm:self-auto text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[var(--bg-input)] border border-[var(--border-color)] text-[var(--text-secondary)]">
+              Current: {initialValues.operatingMode === 'CENTRAL_MARKETPLACE' ? 'Central Salon Marketplace' : 'Individual Salon Website'}
+            </span>
+          )}
+        </div>
+
+        {errors.operatingMode && (
+          <div className="mb-3.5 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errors.operatingMode}</span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Card A: Individual Salon Website */}
+          <div
+            id="operating-mode-individual"
+            onClick={() => handleChange('operatingMode', 'INDIVIDUAL_WEBSITE')}
+            className={`relative rounded-2xl border-2 p-4 sm:p-5 cursor-pointer transition-all duration-200 flex flex-col justify-between ${
+              formData.operatingMode === 'INDIVIDUAL_WEBSITE'
+                ? 'border-primary-500 bg-primary-500/5 shadow-md shadow-primary-500/10'
+                : 'border-[var(--border-color)] bg-[var(--bg-card)] hover:border-primary-500/40 hover:bg-white/[0.02]'
+            }`}
+          >
+            <div>
+              <div className="flex items-start justify-between gap-3 mb-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                      formData.operatingMode === 'INDIVIDUAL_WEBSITE'
+                        ? 'bg-primary-500 text-white shadow-sm'
+                        : 'bg-[var(--bg-input)] text-[var(--text-secondary)] border border-[var(--border-color)]'
+                    }`}
+                  >
+                    <Globe className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-[var(--text-primary)]">
+                      Individual Salon Website
+                    </h4>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                      Independent Direct
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
+                    formData.operatingMode === 'INDIVIDUAL_WEBSITE'
+                      ? 'border-primary-500 bg-primary-500 text-white'
+                      : 'border-[var(--border-color)] bg-[var(--bg-input)]'
+                  }`}
+                >
+                  {formData.operatingMode === 'INDIVIDUAL_WEBSITE' && (
+                    <Check className="w-3 h-3 stroke-[3]" />
+                  )}
+                </div>
+              </div>
+
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-3.5">
+                Operate an independent salon business with its own booking website and management dashboard.
+              </p>
+
+              <div className="space-y-1.5 pt-2 border-t border-[var(--border-color)] text-xs text-[var(--text-secondary)]">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Own salon booking website.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Own branding and domain configuration.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Own branches and services.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Own appointments and customers.</span>
+                </div>
+                <div className="flex items-center gap-2 text-[var(--text-muted)]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-muted)] ml-1 mr-1 shrink-0" />
+                  <span>No central marketplace listing.</span>
+                </div>
+              </div>
+            </div>
+
+            {formData.operatingMode === 'INDIVIDUAL_WEBSITE' && (
+              <div className="mt-4 pt-2.5 border-t border-primary-500/20 flex items-center justify-between text-[11px] font-bold text-primary-500">
+                <span>Selected Operating Mode</span>
+                <span className="px-2 py-0.5 rounded-md bg-primary-500/10">Active Selection</span>
+              </div>
+            )}
+          </div>
+
+          {/* Card B: Central Marketplace */}
+          <div
+            id="operating-mode-marketplace"
+            onClick={() => handleChange('operatingMode', 'CENTRAL_MARKETPLACE')}
+            className={`relative rounded-2xl border-2 p-4 sm:p-5 cursor-pointer transition-all duration-200 flex flex-col justify-between ${
+              formData.operatingMode === 'CENTRAL_MARKETPLACE'
+                ? 'border-primary-500 bg-primary-500/5 shadow-md shadow-primary-500/10'
+                : 'border-[var(--border-color)] bg-[var(--bg-card)] hover:border-primary-500/40 hover:bg-white/[0.02]'
+            }`}
+          >
+            <div>
+              <div className="flex items-start justify-between gap-3 mb-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                      formData.operatingMode === 'CENTRAL_MARKETPLACE'
+                        ? 'bg-primary-500 text-white shadow-sm'
+                        : 'bg-[var(--bg-input)] text-[var(--text-secondary)] border border-[var(--border-color)]'
+                    }`}
+                  >
+                    <Store className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-[var(--text-primary)]">
+                      Central Salon Marketplace
+                    </h4>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                      Discovery Network
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
+                    formData.operatingMode === 'CENTRAL_MARKETPLACE'
+                      ? 'border-primary-500 bg-primary-500 text-white'
+                      : 'border-[var(--border-color)] bg-[var(--bg-input)]'
+                  }`}
+                >
+                  {formData.operatingMode === 'CENTRAL_MARKETPLACE' && (
+                    <Check className="w-3 h-3 stroke-[3]" />
+                  )}
+                </div>
+              </div>
+
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-3.5">
+                Allow customers to discover and book this salon through the central marketplace.
+              </p>
+
+              <div className="space-y-1.5 pt-2 border-t border-[var(--border-color)] text-xs text-[var(--text-secondary)]">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Salon management dashboard.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Organisation-specific branches and services.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Marketplace salon listing.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Marketplace discovery and booking.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Organisation-specific appointment management.</span>
+                </div>
+              </div>
+            </div>
+
+            {formData.operatingMode === 'CENTRAL_MARKETPLACE' && (
+              <div className="mt-4 pt-2.5 border-t border-primary-500/20 flex items-center justify-between text-[11px] font-bold text-primary-500">
+                <span>Selected Operating Mode</span>
+                <span className="px-2 py-0.5 rounded-md bg-primary-500/10">Active Selection</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* SECTION 1: ORGANISATION INFORMATION */}
       <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm text-[var(--text-primary)]">
@@ -654,6 +884,91 @@ export const OrganisationForm = ({
           {isEditMode ? 'Update Organisation' : 'Create Organisation'}
         </Button>
       </div>
+
+      {/* CONFIRMATION MODAL FOR OPERATING MODE CHANGE */}
+      {showModeConfirmModal && (
+        <Modal
+          isOpen={showModeConfirmModal}
+          onClose={() => {
+            setShowModeConfirmModal(false);
+            setPendingSubmitPayload(null);
+          }}
+          title="Confirm Operating Mode Transition"
+          size="medium"
+          footer={
+            <div className="flex items-center justify-end gap-3 w-full">
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setShowModeConfirmModal(false);
+                  setPendingSubmitPayload(null);
+                }}
+              >
+                Keep Current Mode
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleConfirmModeChange}
+                loading={loading}
+              >
+                Confirm & Apply Mode Change
+              </Button>
+            </div>
+          }
+        >
+          <div className="space-y-4 py-2">
+            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs flex items-start gap-3">
+              <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
+              <div>
+                <p className="font-bold text-sm text-[var(--text-primary)] mb-1">
+                  Changing Organisation Operating Mode
+                </p>
+                <p className="text-[var(--text-secondary)] leading-relaxed">
+                  You are switching this organisation from{' '}
+                  <span className="font-bold text-amber-500">
+                    {initialValues?.operatingMode === 'CENTRAL_MARKETPLACE'
+                      ? 'Central Marketplace'
+                      : 'Individual Salon Website'}
+                  </span>{' '}
+                  to{' '}
+                  <span className="font-bold text-primary-500">
+                    {formData.operatingMode === 'CENTRAL_MARKETPLACE'
+                      ? 'Central Marketplace'
+                      : 'Individual Salon Website'}
+                  </span>.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2 text-xs text-[var(--text-secondary)] bg-[var(--bg-input)] p-3.5 rounded-xl border border-[var(--border-color)]">
+              <p className="font-bold text-[var(--text-primary)] mb-2">Transition Guarantees & Impact:</p>
+              <div className="flex items-center gap-2 text-emerald-500">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>Existing appointments, customer records, and branches are completely preserved.</span>
+              </div>
+              <div className="flex items-center gap-2 text-emerald-500">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>Direct bookings on the individual salon website remain fully functional.</span>
+              </div>
+              {formData.operatingMode === 'INDIVIDUAL_WEBSITE' ? (
+                <div className="flex items-center gap-2 text-amber-500">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>The salon will be excluded from the central marketplace discovery network.</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-primary-500">
+                  <Sparkles className="w-4 h-4 shrink-0" />
+                  <span>The salon will become eligible for marketplace listing and customer discovery once approved.</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-[11px] text-[var(--text-muted)] italic">
+              This action will be permanently recorded in the system audit logs.
+            </p>
+          </div>
+        </Modal>
+      )}
     </form>
   );
 };

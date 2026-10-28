@@ -10,6 +10,8 @@ import {
   Calendar,
   Layers,
   ShieldAlert,
+  Globe,
+  Store,
 } from 'lucide-react';
 
 const getLogoUrl = (logoUrl) => {
@@ -78,6 +80,23 @@ export const OrganisationTable = ({
     }
   };
 
+  const getOperatingModeBadge = (mode) => {
+    if (mode === 'CENTRAL_MARKETPLACE') {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-500/10 text-teal-400 border border-teal-500/20 whitespace-nowrap">
+          <Store className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+          Central Marketplace
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20 whitespace-nowrap">
+        <Globe className="w-3.5 h-3.5 text-violet-400 shrink-0" />
+        Individual Website
+      </span>
+    );
+  };
+
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A';
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -127,6 +146,7 @@ export const OrganisationTable = ({
             <th className="py-3.5 px-4 min-w-[200px]">Email & Phone</th>
             <th className="py-3.5 px-4 min-w-[100px] text-center">Branches</th>
             <th className="py-3.5 px-4 min-w-[130px]">Subscription</th>
+            <th className="py-3.5 px-4 min-w-[170px]">Operating Mode</th>
             <th className="py-3.5 px-4 min-w-[120px]">Status</th>
             <th className="py-3.5 px-4 min-w-[130px] whitespace-nowrap">Created Date</th>
             <th className="py-3.5 px-4 min-w-[110px] text-right">Actions</th>
@@ -214,6 +234,11 @@ export const OrganisationTable = ({
                     <span className="inline-block font-semibold text-xs px-2.5 py-1 rounded-md bg-[var(--bg-input)] text-[var(--text-secondary)] border border-[var(--border-color)]">
                       {org.subscription?.planName || 'Basic Plan'}
                     </span>
+                  </td>
+
+                  {/* Operating Mode */}
+                  <td className="py-3.5 px-4">
+                    {getOperatingModeBadge(org.operatingMode)}
                   </td>
 
                   {/* Status */}

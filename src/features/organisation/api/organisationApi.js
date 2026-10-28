@@ -10,6 +10,7 @@ export function fetchOrganisations(params = {}) {
   if (params.search) query.append('search', params.search);
   if (params.status && params.status !== 'all') query.append('status', params.status);
   if (params.plan && params.plan !== 'all') query.append('plan', params.plan);
+  if (params.operatingMode && params.operatingMode !== 'all') query.append('operatingMode', params.operatingMode);
   if (params.page) query.append('page', params.page);
   if (params.limit) query.append('limit', params.limit);
   if (params.sortBy) query.append('sortBy', params.sortBy);
@@ -18,6 +19,19 @@ export function fetchOrganisations(params = {}) {
   const queryString = query.toString() ? `?${query.toString()}` : '';
   return request(`/super-admin/organisations${queryString}`, {
     method: 'GET',
+  });
+}
+
+export function fetchMarketplaceSetting() {
+  return request('/super-admin/platform-settings/marketplace', {
+    method: 'GET',
+  });
+}
+
+export function updateMarketplaceSetting(enabled, reason = '') {
+  return request('/super-admin/platform-settings/marketplace', {
+    method: 'PATCH',
+    body: JSON.stringify({ enabled, reason }),
   });
 }
 

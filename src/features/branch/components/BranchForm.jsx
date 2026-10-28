@@ -270,9 +270,9 @@ export const BranchForm = ({
       branchType,
       coverImageUrl: coverImageUrl || null,
       status: targetStatus || status,
-      launchedAt: launchedAt || null,
-      ...(isSuperAdmin && targetOrgId ? { organizationId: targetOrgId } : {}),
-      ...(copySettingsFromBranchId ? { copySettingsFromBranchId } : {}),
+      launchedAt: launchedAt && launchedAt.trim() ? launchedAt.trim() : null,
+      ...(!isEditMode && isSuperAdmin && targetOrgId ? { organizationId: targetOrgId } : {}),
+      ...(!isEditMode && copySettingsFromBranchId ? { copySettingsFromBranchId } : {}),
 
       // Address
       ...(addressLine1.trim()

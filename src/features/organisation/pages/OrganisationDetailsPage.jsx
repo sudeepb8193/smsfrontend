@@ -15,6 +15,7 @@ import {
   Mail,
   Phone,
   Globe,
+  Store,
   MapPin,
   Loader2,
   AlertTriangle,
@@ -206,6 +207,18 @@ export const OrganisationDetailsPage = () => {
                 >
                   ● {organisation.status}
                 </span>
+
+                {organisation.operatingMode === 'CENTRAL_MARKETPLACE' ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                    <Store className="w-3.5 h-3.5" />
+                    Central Marketplace
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                    <Globe className="w-3.5 h-3.5" />
+                    Individual Website
+                  </span>
+                )}
               </div>
               <p className="text-xs text-[var(--text-muted)] capitalize mt-0.5">
                 {organisation.businessType?.replace('_', ' ')}
@@ -353,6 +366,35 @@ export const OrganisationDetailsPage = () => {
                         year: 'numeric',
                       })}
                     </span>
+                  </div>
+
+                  <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl md:col-span-2">
+                    <span className="text-xs text-[var(--text-muted)] block mb-1">Operating Mode & Discovery Channel</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        {organisation.operatingMode === 'CENTRAL_MARKETPLACE' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                            <Store className="w-4 h-4 text-teal-400 shrink-0" />
+                            Central Salon Marketplace
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                            <Globe className="w-4 h-4 text-violet-400 shrink-0" />
+                            Individual Salon Website
+                          </span>
+                        )}
+                        <span className="text-xs text-[var(--text-muted)]">
+                          {organisation.operatingMode === 'CENTRAL_MARKETPLACE'
+                            ? 'Salon appears in central marketplace discovery when published'
+                            : 'Salon operates direct independent website & booking portal'}
+                        </span>
+                      </div>
+                      {organisation.operatingMode === 'CENTRAL_MARKETPLACE' && (
+                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-secondary)] capitalize">
+                          Listing: {organisation.marketplaceListingStatus || 'draft'}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl flex items-center gap-3">
