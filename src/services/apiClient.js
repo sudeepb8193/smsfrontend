@@ -190,17 +190,23 @@ export const apiClient = {
     const body = await response.json().catch(() => null);
 
     if (!response.ok) {
-      const errorMsg =
-        body?.error?.message ||
-        body?.message ||
-        body?.errors ||
-        'An unexpected server error occurred';
+      const details = body?.error?.details || body?.details;
+      const detailsMsg = Array.isArray(details)
+        ? details.join(', ')
+        : typeof details === 'string'
+        ? details
+        : null;
+      const baseMsg = body?.error?.message || body?.message || body?.errors;
+      const errorMsg = detailsMsg
+        ? `${baseMsg ? `${baseMsg}: ` : ''}${detailsMsg}`
+        : baseMsg || 'An unexpected server error occurred';
       const error = new Error(
         typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
       );
       error.status = response.status;
       error.code = body?.code || body?.error?.code;
       error.data = body;
+      error.details = details;
       error.dependencies = body?.error?.dependencies || body?.dependencies;
       throw error;
     }

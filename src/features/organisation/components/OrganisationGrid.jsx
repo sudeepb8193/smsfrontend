@@ -13,6 +13,8 @@ import {
   ShieldCheck,
   Ban,
   Trash2,
+  Globe,
+  Store,
 } from 'lucide-react';
 
 export const OrganisationGrid = ({
@@ -144,10 +146,21 @@ export const OrganisationGrid = ({
                     <h3 className="font-bold text-[var(--text-primary)] text-sm line-clamp-1 group-hover:text-primary-500 transition-colors">
                       {org.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-0.5">
+                    <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
                       <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 bg-[var(--bg-input)] text-[var(--text-secondary)] rounded border border-[var(--border-color)]">
                         {org.code || 'N/A'}
                       </span>
+                      {org.operatingMode === 'CENTRAL_MARKETPLACE' ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                          <Store className="w-3 h-3" />
+                          Marketplace
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                          <Globe className="w-3 h-3" />
+                          Website
+                        </span>
+                      )}
                       <span className="text-[11px] text-[var(--text-muted)] capitalize">
                         • {org.businessType?.replace('_', ' ')}
                       </span>

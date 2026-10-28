@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Plus, Building2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Building2, Store, Sparkles, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   fetchOrganisations,
   updateOrganisationStatus,
   deleteOrganisation,
+  fetchMarketplaceSetting,
+  updateMarketplaceSetting,
 } from '../api/organisationApi';
 import OrganisationFilters from '../components/OrganisationFilters';
 import OrganisationTable from '../components/OrganisationTable';
 import OrganisationGrid from '../components/OrganisationGrid';
 import StatusChangeModal from '../components/StatusChangeModal';
 import DeleteOrganisationModal from '../components/DeleteOrganisationModal';
+import MarketplaceToggleModal from '../components/MarketplaceToggleModal';
 import Button from '../../../components/shared/Button';
 import Pagination from '../../../components/shared/Pagination';
 
@@ -28,6 +31,7 @@ export const OrganisationListPage = () => {
     search: '',
     status: 'all',
     plan: 'all',
+    operatingMode: 'all',
     page: 1,
     limit: 10,
   });
@@ -45,6 +49,15 @@ export const OrganisationListPage = () => {
     loading: false,
   });
 
+  // Central Marketplace Setting state
+  const [marketplaceEnabled, setMarketplaceEnabled] = useState(false);
+  const [marketplaceLoading, setMarketplaceLoading] = useState(true);
+  const [marketplaceModal, setMarketplaceModal] = useState({
+    isOpen: false,
+    targetEnabled: false,
+    loading: false,
+  });
+
   useEffect(() => {
     if (location.state?.message) {
       toast.success(location.state.message);
@@ -59,6 +72,21 @@ export const OrganisationListPage = () => {
       toast.success(message);
     }
   };
+
+  // Load Marketplace Setting
+  const loadMarketplaceSetting = useCallback(async () => {
+    try {
+      setMarketplaceLoading(true);
+      const res = await fetchMarketplaceSetting();
+      if (res && res.data) {
+        setMarketplaceEnabled(Boolean(res.data.marketplaceEnabled));
+      }
+    } catch (err) {
+      console.error('Failed to load marketplace setting:', err);
+    } finally {
+      setMarketplaceLoading(false);
+    }
+  }, []);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -82,6 +110,10 @@ export const OrganisationListPage = () => {
     loadData();
   }, [loadData]);
 
+  useEffect(() => {
+    loadMarketplaceSetting();
+  }, [loadMarketplaceSetting]);
+
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
   };
@@ -91,6 +123,7 @@ export const OrganisationListPage = () => {
       search: '',
       status: 'all',
       plan: 'all',
+      operatingMode: 'all',
       page: 1,
       limit: 10,
     });
@@ -148,6 +181,34 @@ export const OrganisationListPage = () => {
     }
   };
 
+  // Marketplace Toggle Handlers
+  const handleMarketplaceToggleClick = () => {
+    setMarketplaceModal({
+      isOpen: true,
+      targetEnabled: !marketplaceEnabled,
+      loading: false,
+    });
+  };
+
+  const handleConfirmMarketplaceToggle = async (targetEnabled, reason) => {
+    setMarketplaceModal((prev) => ({ ...prev, loading: true }));
+    try {
+      const res = await updateMarketplaceSetting(targetEnabled, reason);
+      setMarketplaceEnabled(targetEnabled);
+      showToast(
+        res.message ||
+          `Central Marketplace has been ${
+            targetEnabled ? 'enabled' : 'disabled'
+          } successfully.`,
+      );
+      setMarketplaceModal({ isOpen: false, targetEnabled: false, loading: false });
+    } catch (err) {
+      console.error('Failed to update marketplace setting:', err);
+      showToast(err.message || 'Failed to update marketplace setting', 'error');
+      setMarketplaceModal((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
   return (
     <div className="space-y-4 pb-12">
       {/* Header */}
@@ -158,7 +219,7 @@ export const OrganisationListPage = () => {
             Organisations
           </h1>
           <p className="text-sm text-[var(--text-muted)]">
-            Manage all registered salon organisations, owner accounts, and active subscriptions
+            Manage all registered salon organisations, owner accounts, operating modes, and active subscriptions
           </p>
         </div>
 
@@ -169,6 +230,70 @@ export const OrganisationListPage = () => {
         >
           Create Organisation
         </Button>
+      </div>
+
+      {/* Global Central Marketplace Availability Banner */}
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-5 shadow-sm transition-colors">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div
+              className={`p-3 rounded-2xl border shrink-0 transition-colors ${
+                marketplaceEnabled
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+              }`}
+            >
+              <Store className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h2 className="text-base font-semibold text-[var(--text-primary)]">
+                  Central Marketplace Availability
+                </h2>
+                {marketplaceLoading ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-500/10 text-[var(--text-muted)]">
+                    <RefreshCw className="w-3 h-3 animate-spin" /> Checking...
+                  </span>
+                ) : marketplaceEnabled ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Marketplace Active (Discoverable)
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                    Marketplace Disabled
+                  </span>
+                )}
+              </div>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-3xl">
+                When active, organisations configured with <span className="text-[var(--text-primary)] font-medium">Central Marketplace</span> mode and published status are discoverable to public consumers on the marketplace portal.
+                Direct website bookings on individual salon domains remain available regardless of this setting.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
+            <button
+              type="button"
+              onClick={handleMarketplaceToggleClick}
+              disabled={marketplaceLoading}
+              aria-label="Toggle Central Marketplace Availability"
+              className={`relative inline-flex h-7 w-13 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+                marketplaceEnabled ? 'bg-emerald-500' : 'bg-neutral-600'
+              } ${marketplaceLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                  marketplaceEnabled ? 'translate-x-6' : 'translate-x-0'
+                }`}
+              />
+            </button>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] w-14">
+              {marketplaceEnabled ? 'Active' : 'Disabled'}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Unified Card Container (Filters + View Toggle + Table/Grid) */}
@@ -229,8 +354,18 @@ export const OrganisationListPage = () => {
         organisation={deleteModal.organisation}
         loading={deleteModal.loading}
       />
+
+      {/* Marketplace Toggle Modal */}
+      <MarketplaceToggleModal
+        isOpen={marketplaceModal.isOpen}
+        onClose={() => setMarketplaceModal({ isOpen: false, targetEnabled: false, loading: false })}
+        onConfirm={handleConfirmMarketplaceToggle}
+        targetEnabled={marketplaceModal.targetEnabled}
+        loading={marketplaceModal.loading}
+      />
     </div>
   );
 };
 
 export default OrganisationListPage;
+
