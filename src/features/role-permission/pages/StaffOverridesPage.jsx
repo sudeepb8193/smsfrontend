@@ -13,8 +13,11 @@ import {
   Search,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
+import { useAuth } from '../../../hooks/useAuth';
 
 export const StaffOverridesPage = () => {
+  const { refreshUser } = useAuth();
   const [staffIdInput, setStaffIdInput] = useState('');
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [overridesData, setOverridesData] = useState(null);
@@ -76,6 +79,8 @@ export const StaffOverridesPage = () => {
       await rolePermissionApi.createStaffOverride(selectedStaff.id, payload);
       toast.success('Permission exception created successfully');
       setModalOpen(false);
+      notifyPermissionUpdate({ staffId: selectedStaff.id });
+      await refreshUser();
       loadStaffOverrides(selectedStaff.id);
     } catch (err) {
       toast.error(err.message || 'Failed to create override');
@@ -91,6 +96,8 @@ export const StaffOverridesPage = () => {
       await rolePermissionApi.deleteStaffOverride(selectedStaff.id, deleteOverrideTarget.id);
       toast.success('Permission override removed');
       setDeleteOverrideTarget(null);
+      notifyPermissionUpdate({ staffId: selectedStaff.id });
+      await refreshUser();
       loadStaffOverrides(selectedStaff.id);
     } catch (err) {
       toast.error(err.message || 'Failed to remove override');

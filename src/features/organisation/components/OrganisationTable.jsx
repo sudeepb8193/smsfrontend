@@ -33,6 +33,8 @@ const getLogoUrl = (logoUrl) => {
 export const OrganisationTable = ({
   organisations = [],
   loading = false,
+  canEdit = true,
+  canDelete = true,
   onStatusChange,
   onDeleteClick,
 }) => {
@@ -299,66 +301,76 @@ export const OrganisationTable = ({
                             View Organisation
                           </button>
 
-                          <button
-                            onClick={() => {
-                              setOpenActionId(null);
-                              navigate(`/super-admin/organisations/${org.id}/edit`);
-                            }}
-                            className="w-full flex items-center gap-2 px-3.5 py-2 text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-                          >
-                            <Edit className="w-4 h-4 text-amber-500" />
-                            Edit Details
-                          </button>
-
-                          <div className="my-1 border-t border-[var(--border-color)]" />
-
-                          {org.status === 'active' ? (
+                          {canEdit && (
                             <button
                               onClick={() => {
                                 setOpenActionId(null);
-                                onStatusChange(org, 'inactive');
+                                navigate(`/super-admin/organisations/${org.id}/edit`);
                               }}
-                              className="w-full flex items-center gap-2 px-3.5 py-2 text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer"
+                              className="w-full flex items-center gap-2 px-3.5 py-2 text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                             >
-                              <Power className="w-4 h-4" />
-                              Deactivate
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => {
-                                setOpenActionId(null);
-                                onStatusChange(org, 'active');
-                              }}
-                              className="w-full flex items-center gap-2 px-3.5 py-2 text-emerald-500 hover:bg-emerald-500/10 transition-colors cursor-pointer"
-                            >
-                              <Power className="w-4 h-4" />
-                              Activate
+                              <Edit className="w-4 h-4 text-amber-500" />
+                              Edit Details
                             </button>
                           )}
 
-                          <button
-                            onClick={() => {
-                              setOpenActionId(null);
-                              onStatusChange(org, 'suspended');
-                            }}
-                            className="w-full flex items-center gap-2 px-3.5 py-2 text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer"
-                          >
-                            <ShieldAlert className="w-4 h-4" />
-                            Suspend
-                          </button>
+                          {canEdit && (
+                            <>
+                              <div className="my-1 border-t border-[var(--border-color)]" />
 
-                          <div className="my-1 border-t border-[var(--border-color)]" />
+                              {org.status === 'active' ? (
+                                <button
+                                  onClick={() => {
+                                    setOpenActionId(null);
+                                    onStatusChange(org, 'inactive');
+                                  }}
+                                  className="w-full flex items-center gap-2 px-3.5 py-2 text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer"
+                                >
+                                  <Power className="w-4 h-4" />
+                                  Deactivate
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => {
+                                    setOpenActionId(null);
+                                    onStatusChange(org, 'active');
+                                  }}
+                                  className="w-full flex items-center gap-2 px-3.5 py-2 text-emerald-500 hover:bg-emerald-500/10 transition-colors cursor-pointer"
+                                >
+                                  <Power className="w-4 h-4" />
+                                  Activate
+                                </button>
+                              )}
 
-                          <button
-                            onClick={() => {
-                              setOpenActionId(null);
-                              onDeleteClick(org);
-                            }}
-                            className="w-full flex items-center gap-2 px-3.5 py-2 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            Delete Organisation
-                          </button>
+                              <button
+                                onClick={() => {
+                                  setOpenActionId(null);
+                                  onStatusChange(org, 'suspended');
+                                }}
+                                className="w-full flex items-center gap-2 px-3.5 py-2 text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer"
+                              >
+                                <ShieldAlert className="w-4 h-4" />
+                                Suspend
+                              </button>
+                            </>
+                          )}
+
+                          {canDelete && (
+                            <>
+                              <div className="my-1 border-t border-[var(--border-color)]" />
+
+                              <button
+                                onClick={() => {
+                                  setOpenActionId(null);
+                                  onDeleteClick(org);
+                                }}
+                                className="w-full flex items-center gap-2 px-3.5 py-2 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                Delete Organisation
+                              </button>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>

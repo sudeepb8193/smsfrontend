@@ -53,6 +53,9 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setAccessToken(null);
       }
+      if (e.key === 'sms_permissions_last_updated') {
+        refreshUser();
+      }
     };
 
     const verifyActiveSession = async () => {
@@ -68,6 +71,10 @@ export const AuthProvider = ({ children }) => {
                 : 'Your account has been suspended. Please contact your administrator.';
             sessionStorage.setItem('auth_error_message', msg);
             window.location.href = '/login';
+            return;
+          }
+          if (profile) {
+            setUser(profile);
           }
         } catch (err) {
           // Handled by apiClient 401 interceptor
@@ -75,14 +82,39 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
+    const handlePermissionsUpdated = () => {
+      refreshUser();
+    };
+
+    // 1. Same-tab real-time event listener
+    window.addEventListener('sms:permissions-updated', handlePermissionsUpdated);
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('focus', verifyActiveSession);
-    const interval = setInterval(verifyActiveSession, 60000);
+    const interval = setInterval(verifyActiveSession, 30000);
+
+    // 2. Cross-tab BroadcastChannel listener
+    let channel;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      try {
+        channel = new BroadcastChannel('sms_permissions_sync');
+        channel.onmessage = (msg) => {
+          if (msg.data?.type === 'PERMISSIONS_UPDATED') {
+            refreshUser();
+          }
+        };
+      } catch (err) {
+        console.warn('BroadcastChannel error:', err);
+      }
+    }
 
     return () => {
+      window.removeEventListener('sms:permissions-updated', handlePermissionsUpdated);
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('focus', verifyActiveSession);
       clearInterval(interval);
+      if (channel) {
+        channel.close();
+      }
     };
   }, []);
 
@@ -112,6 +144,22 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const refreshUser = async () => {
+    const token = localStorage.getItem('salon_jwt_token');
+    if (token) {
+      try {
+        const profile = await fetchMe(token);
+        if (profile) {
+          setUser(profile);
+          return profile;
+        }
+      } catch (err) {
+        console.error('Failed to refresh user profile:', err);
+      }
+    }
+    return null;
+  };
+
   const logout = () => {
     localStorage.removeItem('salon_refresh_token');
     localStorage.removeItem('salon_jwt_token');
@@ -126,6 +174,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!accessToken && !!user,
     loginUser,
     registerUser,
+    refreshUser,
     logout,
   };
 

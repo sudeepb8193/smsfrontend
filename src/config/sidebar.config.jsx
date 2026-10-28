@@ -22,6 +22,7 @@ export const SIDEBAR_MODULE_CONFIG = [
     label: 'User Management',
     icon: Users,
     allowedRoles: ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER'],
+    requiredPermission: 'users.view',
     path: '/users',
   },
   {
@@ -29,6 +30,7 @@ export const SIDEBAR_MODULE_CONFIG = [
     label: 'Organisations & Setup',
     icon: Building2,
     allowedRoles: ['SUPER_ADMIN'],
+    requiredPermission: 'organizations.view',
     path: '/super-admin/organisations',
   },
   {
@@ -36,6 +38,7 @@ export const SIDEBAR_MODULE_CONFIG = [
     label: 'Roles & Access Control',
     icon: ShieldCheck,
     allowedRoles: ['SUPER_ADMIN'],
+    requiredPermission: 'roles.view',
     path: '/super-admin/roles',
     subtasks: [
       { id: 'sa-role-catalog', label: 'Role Catalog & Scopes', path: '/super-admin/roles' },
@@ -48,6 +51,7 @@ export const SIDEBAR_MODULE_CONFIG = [
     label: 'My Organization',
     icon: Building2,
     allowedRoles: ['OWNER'],
+    requiredPermission: 'organizations.view',
     path: '/owner/organisation/setup',
   },
   {
@@ -55,6 +59,7 @@ export const SIDEBAR_MODULE_CONFIG = [
     label: 'Branch Management',
     icon: Store,
     allowedRoles: ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER', 'ACCOUNTANT', 'FRONT_DESK'],
+    requiredPermission: 'branches.view',
     path: '/branches',
   },
 ];

@@ -20,6 +20,8 @@ import {
 export const OrganisationGrid = ({
   organisations = [],
   loading = false,
+  canEdit = true,
+  canDelete = true,
   onStatusChange,
   onDeleteClick,
 }) => {
@@ -194,57 +196,67 @@ export const OrganisationGrid = ({
                         View Details
                       </button>
 
-                      <button
-                        onClick={() => {
-                          setOpenActionId(null);
-                          navigate(`/super-admin/organisations/${org.id}/edit`);
-                        }}
-                        className="w-full flex items-center gap-2 px-3.5 py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors cursor-pointer"
-                      >
-                        <Edit className="w-4 h-4 text-amber-500" />
-                        Edit Organisation
-                      </button>
-
-                      <div className="my-1 border-t border-[var(--border-color)]" />
-
-                      {org.status !== 'active' && (
+                      {canEdit && (
                         <button
                           onClick={() => {
                             setOpenActionId(null);
-                            onStatusChange && onStatusChange(org, 'active');
+                            navigate(`/super-admin/organisations/${org.id}/edit`);
                           }}
-                          className="w-full flex items-center gap-2 px-3.5 py-2 text-emerald-500 hover:bg-emerald-500/10 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2 px-3.5 py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors cursor-pointer"
                         >
-                          <ShieldCheck className="w-4 h-4" />
-                          Activate Organisation
+                          <Edit className="w-4 h-4 text-amber-500" />
+                          Edit Organisation
                         </button>
                       )}
 
-                      {org.status !== 'suspended' && (
-                        <button
-                          onClick={() => {
-                            setOpenActionId(null);
-                            onStatusChange && onStatusChange(org, 'suspended');
-                          }}
-                          className="w-full flex items-center gap-2 px-3.5 py-2 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                        >
-                          <Ban className="w-4 h-4" />
-                          Suspend Organisation
-                        </button>
+                      {canEdit && (
+                        <>
+                          <div className="my-1 border-t border-[var(--border-color)]" />
+
+                          {org.status !== 'active' && (
+                            <button
+                              onClick={() => {
+                                setOpenActionId(null);
+                                onStatusChange && onStatusChange(org, 'active');
+                              }}
+                              className="w-full flex items-center gap-2 px-3.5 py-2 text-emerald-500 hover:bg-emerald-500/10 transition-colors cursor-pointer"
+                            >
+                              <ShieldCheck className="w-4 h-4" />
+                              Activate Organisation
+                            </button>
+                          )}
+
+                          {org.status !== 'suspended' && (
+                            <button
+                              onClick={() => {
+                                setOpenActionId(null);
+                                onStatusChange && onStatusChange(org, 'suspended');
+                              }}
+                              className="w-full flex items-center gap-2 px-3.5 py-2 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                            >
+                              <Ban className="w-4 h-4" />
+                              Suspend Organisation
+                            </button>
+                          )}
+                        </>
                       )}
 
-                      <div className="my-1 border-t border-[var(--border-color)]" />
+                      {canDelete && (
+                        <>
+                          <div className="my-1 border-t border-[var(--border-color)]" />
 
-                      <button
-                        onClick={() => {
-                          setOpenActionId(null);
-                          onDeleteClick && onDeleteClick(org);
-                        }}
-                        className="w-full flex items-center gap-2 px-3.5 py-2 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Delete Organisation
-                      </button>
+                          <button
+                            onClick={() => {
+                              setOpenActionId(null);
+                              onDeleteClick && onDeleteClick(org);
+                            }}
+                            className="w-full flex items-center gap-2 px-3.5 py-2 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete Organisation
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

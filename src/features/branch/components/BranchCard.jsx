@@ -14,6 +14,7 @@ import {
 import BranchStatusBadge from './BranchStatusBadge';
 import BranchTypeBadge from './BranchTypeBadge';
 import { useBranch } from '../context/BranchContext';
+import { usePermission } from '../../../hooks/usePermission';
 
 export const BranchCard = ({
   branch,
@@ -23,8 +24,12 @@ export const BranchCard = ({
 }) => {
   const navigate = useNavigate();
   const { currentBranch, setCurrentBranch } = useBranch();
+  const { canEdit, canDelete, isOwner } = usePermission();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  const canEditItem = isOwner || canEdit('branches', branch.id);
+  const canDeleteItem = isOwner || canDelete('branches', branch.id);
 
   const isCurrentActive = currentBranch?.id === branch.id;
 
@@ -63,7 +68,7 @@ export const BranchCard = ({
         navigate(`/branches/${branch.id}`);
       },
     },
-    ...(canManage
+    ...(canEditItem
       ? [
           {
             label: 'Edit Profile',
@@ -81,6 +86,10 @@ export const BranchCard = ({
               onOpenCopyModal?.(branch);
             },
           },
+        ]
+      : []),
+    ...(canDeleteItem
+      ? [
           {
             label: 'Delete or Close Branch',
             icon: Trash2,
