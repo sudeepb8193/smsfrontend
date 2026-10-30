@@ -18,14 +18,9 @@ import DatePicker from '../../../components/shared/DatePicker';
 import CustomSelector from '../../../components/shared/CustomSelector';
 import TimePicker from '../../../components/shared/TimePicker';
 import Toggle from '../../../components/shared/Toggle';
+import MediaUpload from '../../../components/shared/MediaUpload';
+import CharCount from '../../../components/shared/CharCount';
 import { toast } from 'sonner';
-
-const TABS = [
-  { id: 'profile', label: '1 Profile & Identity', icon: Building2 },
-  { id: 'address', label: '2 Address & Location', icon: MapPin },
-  { id: 'contact', label: '3 Contact & Phone', icon: Phone },
-  { id: 'hours', label: '4 Business Hours', icon: Clock },
-];
 
 const BRANCH_TYPES = [
   { id: 'flagship', label: 'Flagship' },
@@ -43,6 +38,22 @@ const WEEKDAYS = [
   { day: 0, label: 'Sunday' },
 ];
 
+/** Reusable section card header matching OrganisationForm style */
+const SectionHeader = ({ icon: Icon, title, description, iconColor = 'text-primary-500', iconBg = 'bg-primary-500/10', iconBorder = 'border-primary-500/20', action }) => (
+  <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-[var(--border-color)]">
+    <div className="flex items-center gap-2.5">
+      <div className={`p-1.5 rounded-lg ${iconBg} ${iconColor} border ${iconBorder}`}>
+        <Icon className="w-4 h-4" />
+      </div>
+      <div>
+        <h3 className="text-sm font-bold text-[var(--text-primary)]">{title}</h3>
+        <p className="text-[11px] text-[var(--text-muted)]">{description}</p>
+      </div>
+    </div>
+    {action}
+  </div>
+);
+
 export const BranchForm = ({
   initialValues = {},
   onSubmit,
@@ -54,14 +65,12 @@ export const BranchForm = ({
   const { organisations, selectedOrganisation, isSuperAdmin } = useOrganisation();
   const fileInputRef = useRef(null);
 
-  const [activeTab, setActiveTab] = useState('profile');
-
   // Organization Scope (Super Admin only)
   const [targetOrgId, setTargetOrgId] = useState(
     initialValues.organizationId || selectedOrganisation?.id || '',
   );
 
-  // Tab 1: Profile State
+  // Section 1: Profile State
   const [name, setName] = useState(initialValues.name || '');
   const [code, setCode] = useState(initialValues.code || '');
   const [branchType, setBranchType] = useState(initialValues.branchType || 'standard');
@@ -74,41 +83,25 @@ export const BranchForm = ({
     initialValues.copySettingsFromBranchId || '',
   );
 
-  // Tab 2: Address State
-  const [addressLine1, setAddressLine1] = useState(
-    initialValues.branchAddress?.addressLine1 || '',
-  );
-  const [addressLine2, setAddressLine2] = useState(
-    initialValues.branchAddress?.addressLine2 || '',
-  );
-  const [landmark, setLandmark] = useState(
-    initialValues.branchAddress?.landmark || '',
-  );
+  // Section 2: Address State
+  const [addressLine1, setAddressLine1] = useState(initialValues.branchAddress?.addressLine1 || '');
+  const [addressLine2, setAddressLine2] = useState(initialValues.branchAddress?.addressLine2 || '');
+  const [landmark, setLandmark] = useState(initialValues.branchAddress?.landmark || '');
   const [city, setCity] = useState(initialValues.branchAddress?.city || '');
   const [state, setState] = useState(initialValues.branchAddress?.state || '');
-  const [postalCode, setPostalCode] = useState(
-    initialValues.branchAddress?.postalCode || '',
-  );
-  const [countryCode, setCountryCode] = useState(
-    initialValues.branchAddress?.countryCode || 'IN',
-  );
-  const [mapsUrl, setMapsUrl] = useState(
-    initialValues.branchAddress?.mapsUrl || '',
-  );
+  const [postalCode, setPostalCode] = useState(initialValues.branchAddress?.postalCode || '');
+  const [countryCode, setCountryCode] = useState(initialValues.branchAddress?.countryCode || 'IN');
+  const [mapsUrl, setMapsUrl] = useState(initialValues.branchAddress?.mapsUrl || '');
 
-  // Tab 3: Contact State
+  // Section 3: Contact State
   const [phoneCountryCode, setPhoneCountryCode] = useState(
     initialValues.branchContact?.phoneCountryCode || '+91',
   );
-  const [phoneNumber, setPhoneNumber] = useState(
-    initialValues.branchContact?.phoneNumber || '',
-  );
-  const [whatsappNumber, setWhatsappNumber] = useState(
-    initialValues.branchContact?.whatsappNumber || '',
-  );
+  const [phoneNumber, setPhoneNumber] = useState(initialValues.branchContact?.phoneNumber || '');
+  const [whatsappNumber, setWhatsappNumber] = useState(initialValues.branchContact?.whatsappNumber || '');
   const [email, setEmail] = useState(initialValues.branchContact?.email || '');
 
-  // Tab 4: Business Hours State
+  // Section 4: Business Hours State
   const [businessHours, setBusinessHours] = useState(() => {
     if (initialValues.businessHours && initialValues.businessHours.length > 0) {
       const map = new Map(initialValues.businessHours.map((h) => [h.dayOfWeek, h]));
@@ -260,7 +253,6 @@ export const BranchForm = ({
   const handleSubmit = (targetStatus) => {
     if (!validate()) {
       toast.error('Please fix validation errors before proceeding');
-      setActiveTab('profile');
       return;
     }
 
@@ -314,60 +306,37 @@ export const BranchForm = ({
     onSubmit(payload, targetStatus === 'draft');
   };
 
-  const currentTabIndex = TABS.findIndex((t) => t.id === activeTab);
-
   return (
-    <div className="space-y-6">
-      {/* Sleek Horizontal Tab Bar */}
-      <div className="border-b border-[var(--border-color)] pb-3">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-          {TABS.map((tab, idx) => {
-            const isCurrent = activeTab === tab.id;
-            const isDone = idx < currentTabIndex;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col gap-1.5 text-left transition select-none cursor-pointer ${
-                  isCurrent ? 'opacity-100' : 'opacity-70 hover:opacity-100'
-                }`}
-              >
-                <div
-                  className={`h-[3px] rounded-full transition-all duration-300 ${
-                    isCurrent || isDone ? 'bg-primary-500' : 'bg-[var(--border-color)]'
-                  }`}
-                />
-                <span
-                  className={`text-xs tracking-tight truncate ${
-                    isCurrent
-                      ? 'font-bold text-[var(--text-primary)]'
-                      : isDone
-                      ? 'font-medium text-[var(--text-secondary)]'
-                      : 'text-[var(--text-muted)]'
-                  }`}
-                >
-                  {tab.label}
-                </span>
-              </button>
-            );
-          })}
+    <div className="space-y-4">
+
+      {/* Page Title */}
+      <div className="mb-1 flex items-center justify-between gap-3">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
+            {isEditMode ? 'Edit branch details' : 'Create new branch'}
+          </h2>
+          <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
+            Fill in all sections below to configure this branch location.
+          </p>
         </div>
+        {isEditMode && (initialValues?.code || code) && (
+          <span className="text-xs font-mono font-bold text-primary-500 bg-primary-500/10 px-2.5 py-1 rounded-md shrink-0">
+            {code || initialValues.code}
+          </span>
+        )}
       </div>
 
-      {/* TAB 1: PROFILE & IDENTITY */}
-      {activeTab === 'profile' && (
-        <div className="space-y-5 animate-in fade-in duration-200">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-              {isEditMode ? 'Branch profile & identity' : 'Establish new branch'}
-            </h2>
-            <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
-              Configure foundational identity, unique code, operational tier and multi-tenant partition.
-            </p>
-          </div>
+      {/* ─── SECTION 1: PROFILE & IDENTITY ─── */}
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm">
+        <SectionHeader
+          icon={Building2}
+          title="Profile & Identity"
+          description="Branch name, unique code, operational tier and cover image"
+        />
 
-          {/* Super Admin Organization Picker via shared CustomSelector */}
+        <div className="space-y-4">
+
+          {/* Super Admin Organization Picker */}
           {isSuperAdmin && (
             <div className="p-3.5 rounded-2xl bg-primary-500/5 border border-primary-500/20">
               <CustomSelector
@@ -393,133 +362,96 @@ export const BranchForm = ({
             </div>
           )}
 
-          {/* Branch Name */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-              Branch name <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                if (errors.name) setErrors((prev) => ({ ...prev, name: null }));
-              }}
-              placeholder="e.g. Indiranagar Flagship Salon & Spa"
-              className={`w-full h-11 px-3.5 rounded-xl border text-sm text-[var(--text-primary)] bg-[var(--bg-input)] placeholder:text-[var(--text-muted)] focus:outline-none transition ${
-                errors.name ? 'border-rose-500' : 'border-[var(--border-color)] focus:border-primary-500'
-              }`}
-            />
-            {errors.name && <p className="text-xs text-rose-500">{errors.name}</p>}
-          </div>
-
-          {/* Branch Code */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                Branch code <span className="text-rose-500">*</span>
-              </label>
-              {codeChecking ? (
-                <span className="text-xs text-[var(--text-muted)] flex items-center gap-1">
-                  <Loader2 size={12} className="animate-spin text-primary-500" />
-                  Checking...
-                </span>
-              ) : codeAvailable === true ? (
-                <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
-                  <Check size={13} /> Available
-                </span>
-              ) : null}
-            </div>
-            <input
-              type="text"
-              value={code}
-              onChange={(e) => {
-                setCode(e.target.value.toUpperCase());
-                if (errors.code) setErrors((prev) => ({ ...prev, code: null }));
-              }}
-              placeholder="e.g. BLR-01"
-              maxLength={20}
-              className={`w-full h-11 px-3.5 font-mono uppercase rounded-xl border text-sm text-[var(--text-primary)] bg-[var(--bg-input)] placeholder:text-[var(--text-muted)] focus:outline-none transition ${
-                errors.code || codeAvailable === false
-                  ? 'border-rose-500'
-                  : codeAvailable === true
-                  ? 'border-emerald-500/60 focus:border-emerald-500'
-                  : 'border-[var(--border-color)] focus:border-primary-500'
-              }`}
-            />
-            {codeAvailable === false && (
-              <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-400 flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5">
-                  <AlertCircle size={14} className="shrink-0 text-rose-500" />
-                  <span>Branch code "{code}" is already taken.</span>
-                </span>
-                {suggestedCode && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCode(suggestedCode);
-                      setCodeAvailable(true);
-                      setSuggestedCode(null);
-                      setCodeError(null);
-                    }}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary-500 text-white font-mono text-xs font-bold hover:bg-primary-600 transition cursor-pointer"
-                  >
-                    <Sparkles size={12} /> Use {suggestedCode}
-                  </button>
-                )}
+          {/* Branch Name + Code grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Branch Name */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                  Branch name <span className="text-rose-500">*</span>
+                </label>
+                <CharCount current={name} max={150} />
               </div>
-            )}
-            {errors.code && codeAvailable !== false && (
-              <p className="text-xs text-rose-500">{errors.code}</p>
-            )}
-          </div>
-
-          {/* Cover Photo Upload */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-              Cover photo
-            </label>
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-[var(--border-color)] hover:border-primary-500 rounded-2xl p-4 sm:p-5 flex items-center gap-4 bg-[var(--bg-input)] cursor-pointer transition"
-            >
-              <div className="w-14 h-14 rounded-xl bg-primary-500/10 text-primary-500 border border-primary-500/20 flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden">
-                {coverImageUrl ? (
-                  <img src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
-                ) : (
-                  <Building2 size={24} className="opacity-70" />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm font-medium text-[var(--text-primary)]">
-                  {uploadingImage
-                    ? 'Uploading photo...'
-                    : <>Drag cover photo here or <span className="underline font-semibold text-primary-500">browse</span></>}
-                </p>
-                <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                  PNG, JPG or WebP · up to 5 MB
-                </p>
-              </div>
-              {coverImageUrl && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCoverImageUrl('');
-                  }}
-                  className="p-1.5 rounded-lg hover:bg-rose-500/10 text-[var(--text-muted)] hover:text-rose-500 transition cursor-pointer"
-                  title="Remove photo"
-                >
-                  <X size={16} />
-                </button>
-              )}
               <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageFileChange}
+                type="text"
+                value={name}
+                maxLength={150}
+                onChange={(e) => {
+                  const val = e.target.value.slice(0, 150);
+                  setName(val);
+                  if (errors.name) setErrors((prev) => ({ ...prev, name: null }));
+                }}
+                placeholder="e.g. Indiranagar Flagship Salon & Spa"
+                className={`w-full h-11 px-3.5 rounded-xl border text-sm text-[var(--text-primary)] bg-[var(--bg-input)] placeholder:text-[var(--text-muted)] focus:outline-none transition ${
+                  errors.name ? 'border-rose-500' : 'border-[var(--border-color)] focus:border-primary-500'
+                }`}
               />
+              {errors.name && <p className="text-xs text-rose-500">{errors.name}</p>}
+            </div>
+
+            {/* Branch Code */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                    Branch code <span className="text-rose-500">*</span>
+                  </label>
+                  {codeChecking ? (
+                    <span className="text-xs text-[var(--text-muted)] flex items-center gap-1">
+                      <Loader2 size={12} className="animate-spin text-primary-500" />
+                      Checking...
+                    </span>
+                  ) : codeAvailable === true ? (
+                    <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                      <Check size={13} /> Available
+                    </span>
+                  ) : null}
+                </div>
+                <CharCount current={code} max={20} />
+              </div>
+              <input
+                type="text"
+                value={code}
+                maxLength={20}
+                onChange={(e) => {
+                  const val = e.target.value.toUpperCase().slice(0, 20);
+                  setCode(val);
+                  if (errors.code) setErrors((prev) => ({ ...prev, code: null }));
+                }}
+                placeholder="e.g. BLR-01"
+                className={`w-full h-11 px-3.5 font-mono uppercase rounded-xl border text-sm text-[var(--text-primary)] bg-[var(--bg-input)] placeholder:text-[var(--text-muted)] focus:outline-none transition ${
+                  errors.code || codeAvailable === false
+                    ? 'border-rose-500'
+                    : codeAvailable === true
+                    ? 'border-emerald-500/60 focus:border-emerald-500'
+                    : 'border-[var(--border-color)] focus:border-primary-500'
+                }`}
+              />
+              {codeAvailable === false && (
+                <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-400 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5">
+                    <AlertCircle size={14} className="shrink-0 text-rose-500" />
+                    <span>Branch code "{code}" is already taken.</span>
+                  </span>
+                  {suggestedCode && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCode(suggestedCode);
+                        setCodeAvailable(true);
+                        setSuggestedCode(null);
+                        setCodeError(null);
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary-500 text-white font-mono text-xs font-bold hover:bg-primary-600 transition cursor-pointer"
+                    >
+                      <Sparkles size={12} /> Use {suggestedCode}
+                    </button>
+                  )}
+                </div>
+              )}
+              {errors.code && codeAvailable !== false && (
+                <p className="text-xs text-rose-500">{errors.code}</p>
+              )}
             </div>
           </div>
 
@@ -542,14 +474,25 @@ export const BranchForm = ({
                         : 'border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-secondary)] hover:border-primary-500/40 hover:text-[var(--text-primary)]'
                     }`}
                   >
-                    <span>{bt.label}</span>
+                    {bt.label}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Launch Date using shared DatePicker & Inherit Settings using CustomSelector */}
+          {/* Cover Photo Upload */}
+          <MediaUpload
+            label="Cover photo"
+            value={coverImageUrl}
+            onChange={(url) => setCoverImageUrl(url)}
+            folder="branches"
+            helperText="PNG, JPG or WebP · up to 5 MB"
+            aspectRatio="wide"
+            placeholderIcon={Building2}
+          />
+
+          {/* Launch Date + Inherit Settings */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-end">
             <div>
               <DatePicker
@@ -580,28 +523,33 @@ export const BranchForm = ({
             )}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* TAB 2: ADDRESS & LOCATION */}
-      {activeTab === 'address' && (
-        <div className="space-y-5 animate-in fade-in duration-200">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-              Branch address & location
-            </h2>
-            <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
-              Physical salon location printed on customer receipts and booking confirmations.
-            </p>
-          </div>
+      {/* ─── SECTION 2: ADDRESS & LOCATION ─── */}
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm">
+        <SectionHeader
+          icon={MapPin}
+          title="Address & Location"
+          description="Physical salon location printed on customer receipts and booking confirmations"
+          iconColor="text-violet-500"
+          iconBg="bg-violet-500/10"
+          iconBorder="border-violet-500/20"
+        />
 
+        <div className="space-y-3.5">
+          {/* Address Line 1 */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-              Address Line 1 (Street / Building)
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                Address Line 1 (Street / Building)
+              </label>
+              <CharCount current={addressLine1} max={150} />
+            </div>
             <input
               type="text"
               value={addressLine1}
-              onChange={(e) => setAddressLine1(e.target.value)}
+              maxLength={150}
+              onChange={(e) => setAddressLine1(e.target.value.slice(0, 150))}
               placeholder="e.g. 100 Feet Road, HAL 2nd Stage"
               className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
             />
@@ -609,26 +557,34 @@ export const BranchForm = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                Address Line 2 (Suite / Floor)
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                  Address Line 2 (Suite / Floor)
+                </label>
+                <CharCount current={addressLine2} max={150} />
+              </div>
               <input
                 type="text"
                 value={addressLine2}
-                onChange={(e) => setAddressLine2(e.target.value)}
+                maxLength={150}
+                onChange={(e) => setAddressLine2(e.target.value.slice(0, 150))}
                 placeholder="e.g. 2nd Floor, Suite 402"
                 className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                Landmark
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                  Landmark
+                </label>
+                <CharCount current={landmark} max={100} />
+              </div>
               <input
                 type="text"
                 value={landmark}
-                onChange={(e) => setLandmark(e.target.value)}
+                maxLength={100}
+                onChange={(e) => setLandmark(e.target.value.slice(0, 100))}
                 placeholder="e.g. Opposite Sony Center"
                 className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
               />
@@ -637,26 +593,32 @@ export const BranchForm = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                City
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)]">City</label>
+                <CharCount current={city} max={50} />
+              </div>
               <input
                 type="text"
                 value={city}
-                onChange={(e) => setCity(e.target.value)}
+                maxLength={50}
+                onChange={(e) => setCity(e.target.value.slice(0, 50))}
                 placeholder="e.g. Bengaluru"
                 className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                State / Province
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                  State / Province
+                </label>
+                <CharCount current={state} max={50} />
+              </div>
               <input
                 type="text"
                 value={state}
-                onChange={(e) => setState(e.target.value)}
+                maxLength={50}
+                onChange={(e) => setState(e.target.value.slice(0, 50))}
                 placeholder="e.g. Karnataka"
                 className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
               />
@@ -665,13 +627,17 @@ export const BranchForm = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                Postal / PIN Code
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                  Postal / PIN Code
+                </label>
+                <CharCount current={postalCode} max={10} />
+              </div>
               <input
                 type="text"
                 value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
+                maxLength={10}
+                onChange={(e) => setPostalCode(e.target.value.slice(0, 10))}
                 placeholder="e.g. 560038"
                 className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
               />
@@ -684,7 +650,7 @@ export const BranchForm = ({
               <input
                 type="text"
                 value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value.toUpperCase())}
+                onChange={(e) => setCountryCode(e.target.value.toUpperCase().slice(0, 2))}
                 placeholder="IN"
                 maxLength={2}
                 className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 font-mono uppercase transition"
@@ -692,94 +658,119 @@ export const BranchForm = ({
             </div>
           </div>
 
+          {/* Google Maps URL */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-              Google Maps URL (optional)
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                Google Maps URL (optional)
+              </label>
+              <CharCount current={mapsUrl} max={500} />
+            </div>
             <input
               type="url"
               value={mapsUrl}
-              onChange={(e) => setMapsUrl(e.target.value)}
+              maxLength={500}
+              onChange={(e) => setMapsUrl(e.target.value.slice(0, 500))}
               placeholder="https://maps.google.com/..."
               className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
             />
           </div>
         </div>
-      )}
+      </div>
 
-      {/* TAB 3: CONTACT & PHONE */}
-      {activeTab === 'contact' && (
-        <div className="space-y-5 animate-in fade-in duration-200">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-              Branch contact & communication
-            </h2>
-            <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
-              Customer phone line, booking assistance number, and public contact email.
-            </p>
-          </div>
+      {/* ─── SECTION 3: CONTACT & PHONE ─── */}
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm">
+        <SectionHeader
+          icon={Phone}
+          title="Contact & Communication"
+          description="Customer phone line, booking assistance number, and public contact email"
+          iconColor="text-emerald-500"
+          iconBg="bg-emerald-500/10"
+          iconBorder="border-emerald-500/20"
+        />
 
+        <div className="space-y-3.5">
+          {/* Phone Country Code + Phone Number */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                Country Code
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                  Country Code
+                </label>
+                <CharCount current={phoneCountryCode} max={5} />
+              </div>
               <input
                 type="text"
                 value={phoneCountryCode}
-                onChange={(e) => setPhoneCountryCode(e.target.value)}
+                maxLength={5}
+                onChange={(e) => setPhoneCountryCode(e.target.value.slice(0, 5))}
                 placeholder="+91"
                 className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
               />
             </div>
 
             <div className="sm:col-span-2 space-y-1.5">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                Phone Number
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                  Phone Number
+                </label>
+                <CharCount current={phoneNumber} max={15} />
+              </div>
               <input
                 type="tel"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                maxLength={15}
+                onChange={(e) => setPhoneNumber(e.target.value.slice(0, 15))}
                 placeholder="e.g. 98765 43210"
                 className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
               />
             </div>
           </div>
 
+          {/* WhatsApp */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-[var(--text-secondary)]">
                 WhatsApp Booking Line
               </label>
-              {phoneNumber && (
-                <button
-                  type="button"
-                  onClick={() => setWhatsappNumber(phoneNumber)}
-                  className="text-[11px] text-primary-500 hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <Copy size={11} /> Same as phone
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {phoneNumber && (
+                  <button
+                    type="button"
+                    onClick={() => setWhatsappNumber(phoneNumber.slice(0, 15))}
+                    className="text-[11px] text-primary-500 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <Copy size={11} /> Same as phone
+                  </button>
+                )}
+                <CharCount current={whatsappNumber} max={15} />
+              </div>
             </div>
             <input
               type="tel"
               value={whatsappNumber}
-              onChange={(e) => setWhatsappNumber(e.target.value)}
+              maxLength={15}
+              onChange={(e) => setWhatsappNumber(e.target.value.slice(0, 15))}
               placeholder="e.g. 98765 43210"
               className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] text-sm text-[var(--text-primary)] bg-[var(--bg-input)] focus:outline-none focus:border-primary-500 transition"
             />
           </div>
 
+          {/* Email */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-              Branch Public Email
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+                Branch Public Email
+              </label>
+              <CharCount current={email} max={100} />
+            </div>
             <input
               type="email"
               value={email}
+              maxLength={100}
               onChange={(e) => {
-                setEmail(e.target.value);
+                const val = e.target.value.slice(0, 100);
+                setEmail(val);
                 if (errors.email) setErrors((prev) => ({ ...prev, email: null }));
               }}
               placeholder="e.g. indiranagar@glowbeauty.in"
@@ -790,20 +781,18 @@ export const BranchForm = ({
             {errors.email && <p className="text-xs text-rose-500">{errors.email}</p>}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* TAB 4: BUSINESS HOURS */}
-      {activeTab === 'hours' && (
-        <div className="space-y-5 animate-in fade-in duration-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-                Weekly business hours
-              </h2>
-              <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">
-                Set active operational slots for public bookings and stylist shifts.
-              </p>
-            </div>
+      {/* ─── SECTION 4: BUSINESS HOURS ─── */}
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 sm:p-5 shadow-sm">
+        <SectionHeader
+          icon={Clock}
+          title="Weekly Business Hours"
+          description="Set active operational slots for public bookings and stylist shifts"
+          iconColor="text-amber-500"
+          iconBg="bg-amber-500/10"
+          iconBorder="border-amber-500/20"
+          action={
             <button
               type="button"
               onClick={copyMondayHoursToAll}
@@ -811,85 +800,85 @@ export const BranchForm = ({
             >
               <Copy size={13} /> Copy Monday to weekdays
             </button>
-          </div>
+          }
+        />
 
-          <div className="border border-[var(--border-color)] rounded-2xl divide-y divide-[var(--border-color)] overflow-hidden bg-[var(--bg-input)]/30">
-            {businessHours.map((hour, index) => (
-              <div
-                key={hour.dayOfWeek}
-                className={`p-3.5 flex flex-wrap items-center justify-between gap-3 ${
-                  hour.isOpen ? 'bg-[var(--bg-card)]' : 'bg-[var(--bg-input)]/20 opacity-70'
-                }`}
-              >
-                {/* Day label and shared Toggle component */}
-                <div className="flex items-center gap-3 min-w-[140px]">
-                  <Toggle
-                    checked={hour.isOpen}
-                    onChange={(checked) =>
-                      setBusinessHours((prev) =>
-                        prev.map((item, i) =>
-                          i === index ? { ...item, isOpen: checked } : item,
-                        ),
-                      )
-                    }
-                    size="sm"
-                    showText={false}
-                  />
-                  <span className="text-xs font-semibold text-[var(--text-primary)]">
-                    {hour.label}
-                  </span>
-                </div>
-
-                {/* Shared TimePicker Components */}
-                {hour.isOpen ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-32">
-                      <TimePicker
-                        value={hour.openTime}
-                        onChange={(timeVal) =>
-                          setBusinessHours((prev) =>
-                            prev.map((item, i) =>
-                              i === index ? { ...item, openTime: timeVal } : item,
-                            ),
-                          )
-                        }
-                        timeFormat="24h"
-                        step={30}
-                        placeholder="Open time"
-                      />
-                    </div>
-
-                    <span className="text-xs text-[var(--text-muted)]">to</span>
-
-                    <div className="w-32">
-                      <TimePicker
-                        value={hour.closeTime}
-                        onChange={(timeVal) =>
-                          setBusinessHours((prev) =>
-                            prev.map((item, i) =>
-                              i === index ? { ...item, closeTime: timeVal } : item,
-                            ),
-                          )
-                        }
-                        timeFormat="24h"
-                        step={30}
-                        placeholder="Close time"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <span className="text-xs font-medium text-[var(--text-muted)] italic pr-4">
-                    Closed
-                  </span>
-                )}
+        <div className="border border-[var(--border-color)] rounded-2xl divide-y divide-[var(--border-color)] overflow-hidden bg-[var(--bg-input)]/30">
+          {businessHours.map((hour, index) => (
+            <div
+              key={hour.dayOfWeek}
+              className={`p-3.5 flex flex-wrap items-center justify-between gap-3 ${
+                hour.isOpen ? 'bg-[var(--bg-card)]' : 'bg-[var(--bg-input)]/20 opacity-70'
+              }`}
+            >
+              {/* Day label and Toggle */}
+              <div className="flex items-center gap-3 min-w-[140px]">
+                <Toggle
+                  checked={hour.isOpen}
+                  onChange={(checked) =>
+                    setBusinessHours((prev) =>
+                      prev.map((item, i) =>
+                        i === index ? { ...item, isOpen: checked } : item,
+                      ),
+                    )
+                  }
+                  size="sm"
+                  showText={false}
+                />
+                <span className="text-xs font-semibold text-[var(--text-primary)]">
+                  {hour.label}
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* Persistent Footer Actions */}
-      <div className="pt-5 flex items-center justify-between border-t border-[var(--border-color)]">
+              {/* TimePicker pair */}
+              {hour.isOpen ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-32">
+                    <TimePicker
+                      value={hour.openTime}
+                      onChange={(timeVal) =>
+                        setBusinessHours((prev) =>
+                          prev.map((item, i) =>
+                            i === index ? { ...item, openTime: timeVal } : item,
+                          ),
+                        )
+                      }
+                      timeFormat="24h"
+                      step={30}
+                      placeholder="Open time"
+                    />
+                  </div>
+
+                  <span className="text-xs text-[var(--text-muted)]">to</span>
+
+                  <div className="w-32">
+                    <TimePicker
+                      value={hour.closeTime}
+                      onChange={(timeVal) =>
+                        setBusinessHours((prev) =>
+                          prev.map((item, i) =>
+                            i === index ? { ...item, closeTime: timeVal } : item,
+                          ),
+                        )
+                      }
+                      timeFormat="24h"
+                      step={30}
+                      placeholder="Close time"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <span className="text-xs font-medium text-[var(--text-muted)] italic pr-4">
+                  Closed
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── FOOTER ACTIONS ─── */}
+      <div className="pt-2 flex items-center justify-between border-t border-[var(--border-color)]">
         <button
           type="button"
           onClick={onCancel}
@@ -910,34 +899,18 @@ export const BranchForm = ({
             </button>
           )}
 
-          {currentTabIndex < TABS.length - 1 ? (
-            <button
-              type="button"
-              onClick={() => {
-                if (validate()) {
-                  setActiveTab(TABS[currentTabIndex + 1].id);
-                } else {
-                  toast.error('Please complete required fields before proceeding');
-                }
-              }}
-              className="px-6 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs sm:text-sm font-semibold transition shadow-sm cursor-pointer"
-            >
-              Next step →
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled={isSubmitting}
-              onClick={() => handleSubmit(isEditMode ? status : 'active')}
-              className="px-6 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs sm:text-sm font-semibold transition shadow-sm disabled:opacity-50 cursor-pointer"
-            >
-              {isSubmitting
-                ? 'Saving...'
-                : isEditMode
-                ? 'Save all changes'
-                : 'Create branch location'}
-            </button>
-          )}
+          <button
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => handleSubmit(isEditMode ? status : 'active')}
+            className="px-6 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs sm:text-sm font-semibold transition shadow-sm disabled:opacity-50 cursor-pointer"
+          >
+            {isSubmitting
+              ? 'Saving...'
+              : isEditMode
+              ? 'Save all changes'
+              : 'Create branch location'}
+          </button>
         </div>
       </div>
     </div>

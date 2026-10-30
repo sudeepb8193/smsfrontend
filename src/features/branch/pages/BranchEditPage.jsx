@@ -76,33 +76,14 @@ export const BranchEditPage = () => {
   }
 
   return (
-    <div className="w-full max-w-[760px] mx-auto py-2 sm:py-4">
-      {/* Top Navigation Bar */}
-      <div className="flex items-center justify-between mb-5">
-        <button
-          type="button"
-          onClick={() => navigate(`/branches/${branchId}`)}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-        >
-          <ArrowLeft size={15} />
-          <span>Back to branch details</span>
-        </button>
-
-        <span className="text-xs font-mono font-bold text-primary-500 bg-primary-500/10 px-2.5 py-1 rounded-md">
-          {branch.code}
-        </span>
-      </div>
-
-      {/* Main Card Container */}
-      <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-color)] p-6 sm:p-8 shadow-sm">
-        <BranchForm
-          initialValues={branch}
-          onSubmit={handleUpdate}
-          isSubmitting={isSubmitting}
-          isEditMode={true}
-          onCancel={() => navigate(`/branches/${branchId}`)}
-        />
-      </div>
+    <div className="space-y-4 pb-6">
+      <BranchForm
+        initialValues={branch}
+        onSubmit={handleUpdate}
+        isSubmitting={isSubmitting}
+        isEditMode={true}
+        onCancel={() => navigate(`/branches/${branchId}`)}
+      />
     </div>
   );
 };

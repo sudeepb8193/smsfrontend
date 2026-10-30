@@ -334,15 +334,9 @@ export const Sidebar = ({
   const normUserRole = String(userRole).toUpperCase().replace(/[\s_-]+/g, '_');
   const isSuperAdmin = normUserRole === 'SUPER_ADMIN' || normUserRole === 'SUPERADMIN';
 
-  const displayLogoUrl = !isSuperAdmin
-    ? user?.organization?.logoUrl || user?.organizationLogo || user?.logoUrl
-    : null;
-  const displayName = !isSuperAdmin
-    ? user?.organization?.name || user?.organizationName || 'SalonFlow Pro'
-    : 'SalonFlow Pro';
-  const displayType = !isSuperAdmin
-    ? user?.organization?.businessType || user?.organizationType || 'ENTERPRISE'
-    : 'ENTERPRISE';
+  const displayLogoUrl = null;
+  const displayName = 'SalonFlow Pro';
+
 
   const filteredModules = SIDEBAR_MODULE_CONFIG.filter((module) => {
     // Super Admin and Owner have access to their respective dashboard sections
@@ -390,7 +384,7 @@ export const Sidebar = ({
       >
         {/* Brand Header (Matches Navbar h-16 / 64px Height Exactly) */}
         <div className="h-16 px-5 border-b border-white/10 flex items-center justify-between overflow-hidden shrink-0">
-          <Tooltip content={`${displayName} (${displayType})`} position="right">
+          <Tooltip content={displayName} position="right">
             <div className="flex items-center gap-3 overflow-hidden cursor-pointer">
               <div className="w-9 h-9 min-w-[36px] rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center shadow-md overflow-hidden">
                 {displayLogoUrl ? (
@@ -409,7 +403,7 @@ export const Sidebar = ({
                     {displayName}
                   </h1>
                   <span className="text-[10px] text-primary-400 font-bold tracking-widest block uppercase truncate">
-                    {displayType}
+                    ENTERPRISE
                   </span>
                 </div>
               )}

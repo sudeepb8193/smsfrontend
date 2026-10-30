@@ -23,6 +23,7 @@ import CustomSelector from '../../../components/shared/CustomSelector';
 import DatePicker from '../../../components/shared/DatePicker';
 import Button from '../../../components/shared/Button';
 import Modal from '../../../components/shared/Modal';
+import MediaUpload from '../../../components/shared/MediaUpload';
 
 export const OrganisationForm = ({
   initialValues = null,
@@ -506,7 +507,9 @@ export const OrganisationForm = ({
             required
             type="text"
             value={formData.name}
-            onChange={(e) => handleChange('name', e.target.value)}
+            maxLength={150}
+            showCharCount
+            onChange={(e) => handleChange('name', e.target.value.slice(0, 150))}
             placeholder="e.g. Glamour Salon & Spa"
             error={errors.name}
           />
@@ -518,7 +521,9 @@ export const OrganisationForm = ({
             type="text"
             disabled={isEditMode}
             value={formData.code}
-            onChange={(e) => handleChange('code', e.target.value.toUpperCase())}
+            maxLength={20}
+            showCharCount
+            onChange={(e) => handleChange('code', e.target.value.toUpperCase().slice(0, 20))}
             placeholder="e.g. GLAM01"
             error={errors.code}
           />
@@ -542,7 +547,9 @@ export const OrganisationForm = ({
             required
             type="email"
             value={formData.email}
-            onChange={(e) => handleChange('email', e.target.value)}
+            maxLength={100}
+            showCharCount
+            onChange={(e) => handleChange('email', e.target.value.slice(0, 100))}
             placeholder="info@glamoursalon.com"
             error={errors.email}
           />
@@ -553,7 +560,9 @@ export const OrganisationForm = ({
             required
             type="text"
             value={formData.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
+            maxLength={15}
+            showCharCount
+            onChange={(e) => handleChange('phone', e.target.value.slice(0, 15))}
             placeholder="+91 98765 43210"
             error={errors.phone}
           />
@@ -563,91 +572,27 @@ export const OrganisationForm = ({
             label="Website URL"
             type="url"
             value={formData.website}
-            onChange={(e) => handleChange('website', e.target.value)}
+            maxLength={255}
+            showCharCount
+            onChange={(e) => handleChange('website', e.target.value.slice(0, 255))}
             placeholder="https://www.glamoursalon.com"
           />
 
           {/* Logo Upload Section */}
           <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
-              Organisation Logo
-            </label>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl">
-              {/* Logo Preview Thumbnail */}
-              {logoPreview || formData.logoUrl ? (
-                <div className="relative w-14 h-14 rounded-xl border border-[var(--border-color)] overflow-hidden bg-[var(--bg-input)] shrink-0 group">
-                  <img
-                    src={logoPreview || formData.logoUrl}
-                    alt="Logo Preview"
-                    className="w-full h-full object-cover"
-                    onError={() => {
-                      setLogoPreview(null);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLogoPreview(null);
-                      handleChange('logoUrl', '');
-                    }}
-                    className="absolute inset-0 bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Remove Logo"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="w-14 h-14 rounded-xl bg-[var(--bg-card)] border border-dashed border-[var(--border-color)] text-[var(--text-muted)] flex items-center justify-center shrink-0">
-                  <Building2 className="w-6 h-6" />
-                </div>
-              )}
-
-              {/* Upload Action & URL Input */}
-              <div className="flex-1 space-y-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <label className="px-3.5 py-1.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5">
-                    {uploadingLogo ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        Uploading to B2...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-3.5 h-3.5" />
-                        Upload Logo
-                      </>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/gif"
-                      className="hidden"
-                      disabled={uploadingLogo}
-                      onChange={handleLogoFileUpload}
-                    />
-                  </label>
-
-                  {(logoPreview || formData.logoUrl) && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setLogoPreview(null);
-                        handleChange('logoUrl', '');
-                      }}
-                      className="px-2.5 py-1.5 text-xs text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors font-medium"
-                    >
-                      Remove Logo
-                    </button>
-                  )}
-                </div>
-
-                <p className="text-[11px] text-[var(--text-muted)]">
-                  Upload JPG, PNG, WebP or GIF up to 5 MB directly to cloud storage.
-                </p>
-                {logoUploadError && (
-                  <p className="text-xs text-rose-500 font-medium">{logoUploadError}</p>
-                )}
-              </div>
-            </div>
+            <MediaUpload
+              label="Organisation Logo"
+              value={formData.logoUrl}
+              onChange={(url) => {
+                setLogoPreview(url);
+                handleChange('logoUrl', url);
+              }}
+              folder="organizations"
+              aspectRatio="square"
+              placeholderIcon={Building2}
+              helperText="Upload JPG, PNG, WebP or GIF up to 5 MB"
+              error={logoUploadError}
+            />
           </div>
 
           {/* Address Line 1 */}
@@ -656,7 +601,9 @@ export const OrganisationForm = ({
               label="Address"
               type="text"
               value={formData.addressLine1}
-              onChange={(e) => handleChange('addressLine1', e.target.value)}
+              maxLength={150}
+              showCharCount
+              onChange={(e) => handleChange('addressLine1', e.target.value.slice(0, 150))}
               placeholder="Street Address / Suite No."
             />
           </div>
@@ -666,7 +613,9 @@ export const OrganisationForm = ({
             label="City"
             type="text"
             value={formData.city}
-            onChange={(e) => handleChange('city', e.target.value)}
+            maxLength={50}
+            showCharCount
+            onChange={(e) => handleChange('city', e.target.value.slice(0, 50))}
             placeholder="e.g. Mumbai"
           />
 
@@ -674,7 +623,9 @@ export const OrganisationForm = ({
             label="State"
             type="text"
             value={formData.state}
-            onChange={(e) => handleChange('state', e.target.value)}
+            maxLength={50}
+            showCharCount
+            onChange={(e) => handleChange('state', e.target.value.slice(0, 50))}
             placeholder="e.g. Maharashtra"
           />
 
@@ -682,7 +633,9 @@ export const OrganisationForm = ({
             label="Country"
             type="text"
             value={formData.country}
-            onChange={(e) => handleChange('country', e.target.value)}
+            maxLength={50}
+            showCharCount
+            onChange={(e) => handleChange('country', e.target.value.slice(0, 50))}
             placeholder="India"
           />
 
@@ -690,7 +643,9 @@ export const OrganisationForm = ({
             label="Pincode"
             type="text"
             value={formData.pincode}
-            onChange={(e) => handleChange('pincode', e.target.value)}
+            maxLength={10}
+            showCharCount
+            onChange={(e) => handleChange('pincode', e.target.value.slice(0, 10))}
             placeholder="400001"
           />
         </div>
@@ -717,7 +672,9 @@ export const OrganisationForm = ({
             label="GST Number"
             type="text"
             value={formData.gstNumber}
-            onChange={(e) => handleChange('gstNumber', e.target.value)}
+            maxLength={15}
+            showCharCount
+            onChange={(e) => handleChange('gstNumber', e.target.value.toUpperCase().slice(0, 15))}
             placeholder="27AAAAA0000A1Z5"
           />
 
@@ -766,7 +723,9 @@ export const OrganisationForm = ({
               required
               type="text"
               value={formData.ownerName}
-              onChange={(e) => handleChange('ownerName', e.target.value)}
+              maxLength={100}
+              showCharCount
+              onChange={(e) => handleChange('ownerName', e.target.value.slice(0, 100))}
               placeholder="John Doe"
               error={errors.ownerName}
             />
@@ -776,7 +735,9 @@ export const OrganisationForm = ({
               required
               type="email"
               value={formData.ownerEmail}
-              onChange={(e) => handleChange('ownerEmail', e.target.value)}
+              maxLength={100}
+              showCharCount
+              onChange={(e) => handleChange('ownerEmail', e.target.value.slice(0, 100))}
               placeholder="owner@glamoursalon.com"
               error={errors.ownerEmail}
             />
@@ -785,7 +746,9 @@ export const OrganisationForm = ({
               label="Owner Phone"
               type="text"
               value={formData.ownerPhone}
-              onChange={(e) => handleChange('ownerPhone', e.target.value)}
+              maxLength={15}
+              showCharCount
+              onChange={(e) => handleChange('ownerPhone', e.target.value.slice(0, 15))}
               placeholder="+91 98765 43210"
             />
           </div>
