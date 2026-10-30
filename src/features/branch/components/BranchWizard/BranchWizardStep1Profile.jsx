@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { checkBranchCode, uploadBranchCoverImage } from '../../api/branchApi';
 import { useBranch } from '../../context/BranchContext';
+import MediaUpload from '../../../../components/shared/MediaUpload';
 import { toast } from 'sonner';
 
 const BRANCH_TYPES = [
@@ -255,53 +256,15 @@ export const BranchWizardStep1Profile = ({
       </div>
 
       {/* Cover Image Upload (Matching /owner/organisation/setup logo pattern) */}
-      <div className="space-y-1.5">
-        <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-          Cover photo
-        </label>
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-[var(--border-color)] hover:border-primary-500 rounded-2xl p-4 sm:p-5 flex items-center gap-4 bg-[var(--bg-input)] cursor-pointer transition"
-        >
-          <div className="w-14 h-14 rounded-xl bg-primary-500/10 text-primary-500 border border-primary-500/20 flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden">
-            {coverImageUrl ? (
-              <img src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
-            ) : (
-              <Building2 size={24} className="opacity-70" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs sm:text-sm font-medium text-[var(--text-primary)]">
-              {uploadingImage
-                ? 'Uploading photo...'
-                : <>Drag cover photo here or <span className="underline font-semibold text-primary-500">browse</span></>}
-            </p>
-            <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-              PNG, JPG or WebP · up to 5 MB
-            </p>
-          </div>
-          {coverImageUrl && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setCoverImageUrl('');
-              }}
-              className="p-1.5 rounded-lg hover:bg-rose-500/10 text-[var(--text-muted)] hover:text-rose-500 transition cursor-pointer"
-              title="Remove photo"
-            >
-              <X size={16} />
-            </button>
-          )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImageFileChange}
-          />
-        </div>
-      </div>
+      <MediaUpload
+        label="Cover photo"
+        value={coverImageUrl}
+        onChange={(url) => setCoverImageUrl(url)}
+        folder="branches"
+        helperText="PNG, JPG or WebP · up to 5 MB"
+        aspectRatio="wide"
+        placeholderIcon={Building2}
+      />
 
       {/* Branch Type Selection */}
       <div className="space-y-1.5">

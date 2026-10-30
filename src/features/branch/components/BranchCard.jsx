@@ -107,6 +107,8 @@ export const BranchCard = ({
     <div
       id={`branch-card-${branch.id}`}
       className={`group relative rounded-2xl border transition-all duration-200 flex flex-col bg-[var(--bg-card)] ${
+        menuOpen ? 'z-30' : 'z-0'
+      } ${
         isCurrentActive
           ? 'border-primary-500/50 shadow-lg shadow-primary-500/10 ring-1 ring-primary-500/30'
           : 'border-[var(--border-color)] hover:border-primary-500/30 hover:shadow-md'
@@ -133,7 +135,7 @@ export const BranchCard = ({
         </div>
 
         {/* Top Header Overlay: Badges on left, 3-dots action menu on right */}
-        <div className="absolute top-3 inset-x-3 flex items-start justify-between gap-2 z-10">
+        <div className={`absolute top-3 inset-x-3 flex items-start justify-between gap-2 ${menuOpen ? 'z-30' : 'z-10'}`}>
           <div className="flex flex-wrap items-center gap-1.5 min-w-0 pr-1">
             <BranchStatusBadge status={branch.status} />
             <BranchTypeBadge type={branch.branchType} />
@@ -157,7 +159,7 @@ export const BranchCard = ({
             {menuOpen && (
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="absolute right-0 top-full mt-1.5 w-48 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-2xl py-1.5 z-30 animate-in fade-in zoom-in-95 duration-100"
+                className="absolute right-0 top-full mt-1.5 w-48 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-2xl py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100"
               >
                 {menuItems.map((item, idx) => {
                   const Icon = item.icon;
@@ -192,7 +194,7 @@ export const BranchCard = ({
 
         {/* Active Badge if currently selected in switcher */}
         {isCurrentActive && (
-          <div className="absolute bottom-3 right-3 bg-primary-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 z-10">
+          <div className="absolute bottom-3 right-3 bg-primary-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 z-[2]">
             <CheckCircle2 size={13} />
             <span>Active Context</span>
           </div>

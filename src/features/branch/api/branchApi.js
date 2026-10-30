@@ -1,4 +1,5 @@
 import apiClient from '../../../services/apiClient';
+import { uploadMedia } from '../../../services/mediaService';
 
 function request(path, options = {}) {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
@@ -88,12 +89,5 @@ export function copyBranchSettings(targetBranchId, payload) {
  * 9. Upload branch cover image via storage endpoint
  */
 export async function uploadBranchCoverImage(file) {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('folder', 'branches');
-
-  return request('/storage/upload', {
-    method: 'POST',
-    body: formData,
-  });
+  return uploadMedia(file, 'branches');
 }

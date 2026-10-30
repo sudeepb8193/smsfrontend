@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Building2,
@@ -12,6 +12,11 @@ import {
   RefreshCw,
   MapPin,
   CheckCircle2,
+  MoreVertical,
+  Eye,
+  Edit,
+  Copy,
+  Trash2,
 } from 'lucide-react';
 import { fetchBranches } from '../api/branchApi';
 import { useBranch } from '../context/BranchContext';
@@ -78,7 +83,7 @@ export const BranchListPage = () => {
 
   // Pagination & Data State
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(12);
+  const [limit, setLimit] = useState(10);
   const [branchesData, setBranchesData] = useState([]);
   const [meta, setMeta] = useState({ total: 0, totalPages: 1 });
   const [loading, setLoading] = useState(true);
@@ -87,6 +92,19 @@ export const BranchListPage = () => {
   // Modals State
   const [deleteModalBranch, setDeleteModalBranch] = useState(null);
   const [copyModalBranch, setCopyModalBranch] = useState(null);
+  const [activeMenuBranchId, setActiveMenuBranchId] = useState(null);
+  const tableMenuRef = useRef(null);
+
+  useEffect(() => {
+    if (!activeMenuBranchId) return;
+    const handleOutsideClick = (e) => {
+      if (tableMenuRef.current && !tableMenuRef.current.contains(e.target)) {
+        setActiveMenuBranchId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [activeMenuBranchId]);
 
   const loadData = useCallback(async () => {
     if (isSuperAdmin && !effectiveOrgId) {
@@ -110,13 +128,23 @@ export const BranchListPage = () => {
         sortOrder,
       });
 
-      const list = res?.data || res || [];
+      const list = Array.isArray(res?.data)
+        ? res.data
+        : Array.isArray(res?.items)
+        ? res.items
+        : Array.isArray(res)
+        ? res
+        : [];
       setBranchesData(list);
-      if (res?.meta) {
-        setMeta(res.meta);
-      } else {
-        setMeta({ total: list.length, totalPages: 1 });
-      }
+
+      const total = res?.meta?.total ?? res?.total ?? list.length;
+      const totalPages = res?.meta?.totalPages ?? (limit > 0 ? Math.ceil(total / limit) : 1);
+      setMeta({
+        total,
+        totalPages: totalPages || 1,
+        page: res?.meta?.page ?? page,
+        limit: res?.meta?.limit ?? limit,
+      });
     } catch (err) {
       console.error('Failed to load branches:', err);
       setError(err?.message || 'Failed to fetch salon branches');
@@ -312,7 +340,7 @@ export const BranchListPage = () => {
         )
       ) : viewMode === 'grid' ? (
         /* GRID VIEW (Only real branches) */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {branchesData.map((branch) => (
             <BranchCard
               key={branch.id}
@@ -325,8 +353,8 @@ export const BranchListPage = () => {
         </div>
       ) : (
         /* TABLE VIEW */
-        <div className="overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)]">
-          <div className="overflow-x-auto">
+        <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)]">
+          <div className="overflow-x-auto min-h-[320px]">
             <table className="w-full text-left text-xs">
               <thead className="bg-[var(--bg-input)] text-[var(--text-secondary)] uppercase tracking-wider text-[11px] font-semibold border-b border-[var(--border-color)]">
                 <tr>
@@ -340,14 +368,63 @@ export const BranchListPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-color)] text-[var(--text-primary)]">
-                {branchesData.map((branch) => {
+                {branchesData.map((branch, index) => {
                   const isCurrentActive = currentBranch?.id === branch.id;
+                  const canEditItem = isOwner || canEditBranch || canEdit('branches', branch.id);
+                  const canDeleteItem = isOwner || canDeleteBranch || canDelete('branches', branch.id);
+                  const isMenuOpen = activeMenuBranchId === branch.id;
+                  const isNearBottom = index >= branchesData.length - 2 && branchesData.length > 2;
+
+                  const menuItems = [
+                    {
+                      label: 'View Details',
+                      icon: Eye,
+                      onClick: () => {
+                        setActiveMenuBranchId(null);
+                        navigate(`/branches/${branch.id}`);
+                      },
+                    },
+                    ...(canEditItem
+                      ? [
+                          {
+                            label: 'Edit Profile',
+                            icon: Edit,
+                            onClick: () => {
+                              setActiveMenuBranchId(null);
+                              navigate(`/branches/${branch.id}/edit`);
+                            },
+                          },
+                          {
+                            label: 'Copy Settings From...',
+                            icon: Copy,
+                            onClick: () => {
+                              setActiveMenuBranchId(null);
+                              setCopyModalBranch(branch);
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(canDeleteItem
+                      ? [
+                          {
+                            label: 'Delete or Close Branch',
+                            icon: Trash2,
+                            danger: true,
+                            onClick: () => {
+                              setActiveMenuBranchId(null);
+                              setDeleteModalBranch(branch);
+                            },
+                          },
+                        ]
+                      : []),
+                  ];
+
                   return (
                     <tr
                       key={branch.id}
                       className={`hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${
                         isCurrentActive ? 'bg-primary-500/5' : ''
-                      }`}
+                      } ${isMenuOpen ? 'relative z-30' : ''}`}
                     >
                       <td className="px-4 py-3 font-mono font-bold text-primary-500">
                         {branch.code}
@@ -379,22 +456,61 @@ export const BranchListPage = () => {
                         {branch._count?.staff || 0} staff
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
+                        <div
+                          className="relative inline-block text-left"
+                          ref={isMenuOpen ? tableMenuRef : null}
+                        >
                           <button
                             type="button"
-                            onClick={() => navigate(`/branches/${branch.id}`)}
-                            className="px-2.5 py-1 text-xs rounded-lg bg-[var(--bg-input)] hover:bg-primary-500 hover:text-white transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveMenuBranchId(isMenuOpen ? null : branch.id);
+                            }}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+                              isMenuOpen
+                                ? 'bg-primary-500/15 text-primary-500 ring-2 ring-primary-500/30'
+                                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/10'
+                            }`}
+                            aria-label={`Branch actions for ${branch.name}`}
+                            aria-expanded={isMenuOpen}
                           >
-                            View
+                            <MoreVertical size={16} />
                           </button>
-                          {(canEditBranch || isOwner) && (
-                            <button
-                              type="button"
-                              onClick={() => navigate(`/branches/${branch.id}/edit`)}
-                              className="px-2.5 py-1 text-xs rounded-lg bg-[var(--bg-input)] hover:bg-[var(--bg-card-hover)] transition-colors"
+
+                          {isMenuOpen && (
+                            <div
+                              onClick={(e) => e.stopPropagation()}
+                              className={`absolute right-0 ${
+                                isNearBottom ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
+                              } w-48 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-2xl py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100 text-left`}
                             >
-                              Edit
-                            </button>
+                              {menuItems.map((item, idx) => {
+                                const Icon = item.icon;
+                                return (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      item.onClick();
+                                    }}
+                                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-left transition-colors cursor-pointer ${
+                                      item.danger
+                                        ? 'text-rose-500 hover:bg-rose-500/10'
+                                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'
+                                    }`}
+                                  >
+                                    {Icon && (
+                                      <Icon
+                                        size={14}
+                                        className={item.danger ? 'text-rose-500' : 'text-primary-500'}
+                                      />
+                                    )}
+                                    <span>{item.label}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
                           )}
                         </div>
                       </td>
@@ -408,13 +524,18 @@ export const BranchListPage = () => {
       )}
 
       {/* Pagination */}
-      {meta.total > limit && (
+      {meta.total > 0 && !loading && (
         <Pagination
           currentPage={page}
-          totalPages={meta.totalPages}
+          totalPages={meta.totalPages || 1}
           totalItems={meta.total}
-          itemsPerPage={limit}
-          onPageChange={setPage}
+          pageSize={limit}
+          onPageChange={(newPage) => setPage(newPage)}
+          onPageSizeChange={(newSize) => {
+            setLimit(newSize);
+            setPage(1);
+          }}
+          pageSizeOptions={[10, 25, 50, 100]}
         />
       )}
 
