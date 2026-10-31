@@ -3,7 +3,8 @@ import { LayoutGrid, List } from 'lucide-react';
 import Tooltip from './Tooltip';
 
 export const ViewToggle = ({
-  view = 'list',
+  view,
+  value,
   onChange,
   options = [
     { id: 'list', label: 'List', icon: List, title: 'List View' },
@@ -11,10 +12,32 @@ export const ViewToggle = ({
   ],
   className = '',
 }) => {
-  const activeIndex = Math.max(
-    0,
-    options.findIndex((opt) => opt.id === view)
-  );
+  // Support either `value` or `view` prop
+  const currentView = value !== undefined ? value : (view !== undefined ? view : options[0]?.id);
+
+  // Match current active option index (with tolerance for 'list' <-> 'table' aliases)
+  const resolveActiveIndex = () => {
+    let idx = options.findIndex((opt) => opt.id === currentView);
+    if (idx !== -1) return idx;
+
+    if (currentView === 'list' || currentView === 'table') {
+      idx = options.findIndex((opt) => opt.id === 'list' || opt.id === 'table');
+      if (idx !== -1) return idx;
+    }
+
+    return 0;
+  };
+
+  const activeIndex = resolveActiveIndex();
+
+  const isOptionActive = (optId) => {
+    if (optId === currentView) return true;
+    if ((optId === 'list' || optId === 'table') && (currentView === 'list' || currentView === 'table')) {
+      const hasExact = options.some((o) => o.id === currentView);
+      if (!hasExact) return true;
+    }
+    return false;
+  };
 
   const getIcon = (opt) => {
     if (opt.icon) return opt.icon;
@@ -29,7 +52,7 @@ export const ViewToggle = ({
     >
       {/* Sliding Active Primary Background Pill */}
       <div
-        className="absolute top-0.5 bottom-0.5 w-9 bg-primary-600 rounded-lg shadow-sm shadow-primary-600/30 transition-all duration-300 ease-out pointer-events-none"
+        className="absolute top-0.5 bottom-0.5 left-0.5 w-9 bg-primary-500 rounded-lg shadow-sm shadow-primary-500/30 transition-all duration-300 ease-out pointer-events-none"
         style={{
           transform: `translateX(${activeIndex * 2.25}rem)`,
         }}
@@ -38,7 +61,7 @@ export const ViewToggle = ({
       {/* Toggle Options (Icon Only) */}
       {options.map((opt) => {
         const Icon = getIcon(opt);
-        const isActive = opt.id === view;
+        const isActive = isOptionActive(opt.id);
         const itemTitle = opt.title || `${opt.label || opt.id} View`;
 
         return (

@@ -1,91 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { rolePermissionApi } from '../api/rolePermissionApi';
+import React from 'react';
 import RolePermissionMatrix from '../components/RolePermissionMatrix';
 import Button from '../../../components/shared/Button';
 import Spinner from '../../../components/shared/Spinner';
-import { ArrowLeft, Shield } from 'lucide-react';
-import { toast } from 'sonner';
-import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
-import { useAuth } from '../../../hooks/useAuth';
+import { ArrowLeft } from 'lucide-react';
+import { useRolePermissions } from '../hooks/useRolePermission';
 
 export const RolePermissionsPage = ({ isSuperAdminView = false }) => {
-  const { roleId } = useParams();
-  const navigate = useNavigate();
-  const { refreshUser } = useAuth();
-
-  const [role, setRole] = useState(null);
-  const [matrixTemplate, setMatrixTemplate] = useState([]);
-  const [initialAssignments, setInitialAssignments] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [versionToken, setVersionToken] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [concurrencyConflict, setConcurrencyConflict] = useState(null);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      setConcurrencyConflict(null);
-
-      const [roleData, permData, templateData, branchData] = await Promise.all([
-        rolePermissionApi.getRole(roleId),
-        rolePermissionApi.getRolePermissions(roleId),
-        rolePermissionApi.getMatrixTemplate(),
-        rolePermissionApi.getBranches(),
-      ]);
-
-      setRole(roleData);
-      setInitialAssignments(permData.assignments || []);
-      setVersionToken(permData.versionToken || permData.updatedAt || '');
-      setMatrixTemplate(templateData || []);
-      setBranches(branchData || []);
-    } catch (err) {
-      toast.error(err.message || 'Failed to load role permission matrix');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (roleId) {
-      loadData();
-    }
-  }, [roleId]);
-
-  const handleSave = async (payload) => {
-    try {
-      setSaving(true);
-      setConcurrencyConflict(null);
-
-      const res = await rolePermissionApi.updateRolePermissions(roleId, payload);
-      toast.success('Permissions and branch scopes saved successfully');
-      if (res.warning) {
-        toast.warning(res.warning);
-      }
-
-      // Immediately synchronize permissions across client state and other tabs without page reload
-      notifyPermissionUpdate({ roleId });
-      await refreshUser();
-
-      setVersionToken(res.versionToken);
-      // Reload fresh data
-      await loadData();
-    } catch (err) {
-      if (err.status === 409 || err.data?.code === 'CONCURRENCY_CONFLICT') {
-        setConcurrencyConflict({
-          message: err.data?.message || 'Role permissions have been modified by another administrator.',
-        });
-        toast.error('Concurrency Conflict: Please review the updated role state before saving.');
-      } else {
-        toast.error(err.message || 'Failed to save permissions');
-      }
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const basePath = isSuperAdminView ? '/super-admin/roles' : '/owner/roles';
+  const {
+    role,
+    matrixTemplate,
+    initialAssignments,
+    branches,
+    versionToken,
+    loading,
+    saving,
+    concurrencyConflict,
+    loadData,
+    handleSave,
+    handleBack,
+  } = useRolePermissions({ isSuperAdminView });
 
   if (loading && !role) {
     return (
@@ -104,7 +37,7 @@ export const RolePermissionsPage = ({ isSuperAdminView = false }) => {
           variant="secondary"
           size="small"
           icon={ArrowLeft}
-          onClick={() => navigate(basePath)}
+          onClick={handleBack}
         >
           Back to Roles
         </Button>

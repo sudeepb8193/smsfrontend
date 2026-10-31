@@ -13,11 +13,13 @@ import {
 import { useBranch } from '../context/BranchContext';
 import { useAuth } from '../../../hooks/useAuth';
 import BranchStatusBadge from './BranchStatusBadge';
+import { usePermission } from '../../../hooks/usePermission';
 import { toast } from 'sonner';
 
 export const BranchSwitcher = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { canCreate, isSuperAdmin } = usePermission();
   const { branches, currentBranch, setCurrentBranch, loading } = useBranch();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +31,7 @@ export const BranchSwitcher = () => {
     user?.roleSlug || user?.role || user?.roleName || '',
   ).toLowerCase().replace(/_/g, '-');
   const isOwner = userRole === 'owner' || userRole === 'super-admin';
+  const canCreateBranch = isSuperAdmin || canCreate('branches');
 
   // Close when clicking outside
   useEffect(() => {
@@ -211,7 +214,7 @@ export const BranchSwitcher = () => {
               <span>Manage All</span>
             </button>
 
-            {isOwner && (
+            {canCreateBranch && (
               <button
                 type="button"
                 onClick={() => {

@@ -340,7 +340,7 @@ export const Sidebar = ({
 
   const filteredModules = SIDEBAR_MODULE_CONFIG.filter((module) => {
     // Super Admin and Owner have access to their respective dashboard sections
-    if (isSuperAdmin || normUserRole === 'OWNER') {
+    if (isSuperAdmin) {
       if (module.id === 'organisations' || module.id === 'super-admin-roles') {
         return isSuperAdmin;
       }

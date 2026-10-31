@@ -1,56 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Building2, ArrowLeft, Loader2 } from 'lucide-react';
-import {
-  fetchOrganisationDetails,
-  updateOrganisation,
-} from '../api/organisationApi';
+import React from 'react';
+import { Building2, Loader2 } from 'lucide-react';
 import OrganisationForm from '../components/OrganisationForm';
+import { useOrganisationEdit } from '../hooks/useOrganisation';
 
 export const EditOrganisationPage = () => {
-  const navigate = useNavigate();
-  const { organisationId } = useParams();
-
-  const [organisation, setOrganisation] = useState(null);
-  const [fetchLoading, setFetchLoading] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState(null);
-
-  useEffect(() => {
-    const loadDetails = async () => {
-      setFetchLoading(true);
-      try {
-        const data = await fetchOrganisationDetails(organisationId);
-        setOrganisation(data);
-      } catch (err) {
-        console.error('Failed to load organisation details:', err);
-        setServerError('Failed to load organisation data');
-      } finally {
-        setFetchLoading(false);
-      }
-    };
-
-    if (organisationId) {
-      loadDetails();
-    }
-  }, [organisationId]);
-
-  const handleSubmit = async (payload) => {
-    setLoading(true);
-    setServerError(null);
-
-    try {
-      await updateOrganisation(organisationId, payload);
-      navigate(`/super-admin/organisations/${organisationId}`, {
-        state: { message: 'Organisation updated successfully.' },
-      });
-    } catch (err) {
-      console.error('Failed to update organisation:', err);
-      setServerError(err.message || 'Failed to update organisation');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    organisation,
+    fetchLoading,
+    loading,
+    serverError,
+    handleSubmit,
+  } = useOrganisationEdit();
 
   if (fetchLoading) {
     return (

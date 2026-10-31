@@ -1,30 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { BadgeCheck, LoaderCircle, MailCheck } from 'lucide-react';
-import { verifyOrganisationContactEmail } from '../../organisation/api/organisationApi';
+import { useContactEmailVerification } from '../hooks/useAuth';
 
 export default function ContactEmailVerificationPage() {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token') || '';
-  const [result, setResult] = useState(() => ({
-    status: token ? 'loading' : 'error',
-    message: token ? '' : 'This verification link is missing its token.',
-  }));
-
-  useEffect(() => {
-    if (!token) return undefined;
-    let active = true;
-    verifyOrganisationContactEmail(token)
-      .then((response) => {
-        if (active) setResult({ status: 'success', message: response.message });
-      })
-      .catch((error) => {
-        if (active) setResult({ status: 'error', message: error.message });
-      });
-    return () => {
-      active = false;
-    };
-  }, [token]);
+  const { result } = useContactEmailVerification();
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[var(--bg-app)] px-4">

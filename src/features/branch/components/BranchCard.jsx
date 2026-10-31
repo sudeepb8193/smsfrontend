@@ -24,12 +24,12 @@ export const BranchCard = ({
 }) => {
   const navigate = useNavigate();
   const { currentBranch, setCurrentBranch } = useBranch();
-  const { canEdit, canDelete, isOwner } = usePermission();
+  const { canEdit, canDelete, isSuperAdmin } = usePermission();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  const canEditItem = isOwner || canEdit('branches', branch.id);
-  const canDeleteItem = isOwner || canDelete('branches', branch.id);
+  const canEditItem = isSuperAdmin || canEdit('branches', branch.id);
+  const canDeleteItem = isSuperAdmin || canDelete('branches', branch.id);
 
   const isCurrentActive = currentBranch?.id === branch.id;
 

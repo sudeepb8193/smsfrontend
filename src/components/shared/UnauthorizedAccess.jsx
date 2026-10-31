@@ -1,9 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldAlert, ArrowLeft, Home, Lock, HelpCircle } from 'lucide-react';
+import { ShieldAlert, ArrowLeft, Home, HelpCircle } from 'lucide-react';
 import Card from './Card';
 import Button from './Button';
-import Badge from './Badge';
 
 export const UnauthorizedAccess = ({
   title = 'Access Restricted',
@@ -28,43 +27,9 @@ export const UnauthorizedAccess = ({
         {title}
       </h2>
 
-      <p className="text-sm text-[var(--text-muted)] max-w-md mb-5 leading-relaxed">
+      <p className="text-sm text-[var(--text-muted)] max-w-md mb-6 leading-relaxed">
         {message}
       </p>
-
-      {(requiredPermission || requiredRole || resourceName) && (
-        <div className="w-full max-w-md bg-[var(--bg-input)] border border-[var(--border-color)] rounded-xl p-3.5 mb-6 text-left space-y-2">
-          <div className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
-            <Lock size={12} className="text-danger-500" />
-            Security Diagnostic Context
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
-            {requiredPermission && (
-              <div>
-                <span className="text-[var(--text-muted)] block text-[10px]">Required Permission:</span>
-                <Badge variant="danger" size="small" className="font-mono mt-0.5">
-                  {requiredPermission}
-                </Badge>
-              </div>
-            )}
-            {requiredRole && (
-              <div>
-                <span className="text-[var(--text-muted)] block text-[10px]">Required Role:</span>
-                <Badge variant="warning" size="small" className="mt-0.5">
-                  {requiredRole}
-                </Badge>
-              </div>
-            )}
-            {resourceName && (
-              <div className="col-span-full">
-                <span className="text-[var(--text-muted)] block text-[10px]">Target Resource:</span>
-                <span className="font-medium text-[var(--text-primary)]">{resourceName}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       <div className="flex flex-wrap items-center justify-center gap-3">
         {showBackButton && (

@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import {
   Building2,
   Plus,
@@ -18,11 +17,6 @@ import {
   Copy,
   Trash2,
 } from 'lucide-react';
-import { fetchBranches } from '../api/branchApi';
-import { useBranch } from '../context/BranchContext';
-import { useAuth } from '../../../hooks/useAuth';
-import { usePermission } from '../../../hooks/usePermission';
-import { useOrganisation } from '../../organisation/context/OrganisationContext';
 import BranchCard from '../components/BranchCard';
 import BranchStatusBadge from '../components/BranchStatusBadge';
 import BranchTypeBadge from '../components/BranchTypeBadge';
@@ -32,6 +26,8 @@ import Pagination from '../../../components/shared/Pagination';
 import SearchInput from '../../../components/shared/SearchInput';
 import CustomSelector from '../../../components/shared/CustomSelector';
 import ViewToggle from '../../../components/shared/ViewToggle';
+import UnauthorizedAccess from '../../../components/shared/UnauthorizedAccess';
+import { useBranchList } from '../hooks/useBranch';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All Statuses' },
@@ -56,111 +52,69 @@ const SORT_OPTIONS = [
 ];
 
 export const BranchListPage = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { canCreate, canEdit, canDelete } = usePermission();
-  const { currentBranch, setCurrentBranch, refreshBranches } = useBranch();
-  const { selectedOrganisation, isSuperAdmin } = useOrganisation();
+  const {
+    // Data & Async
+    branchesData,
+    meta,
+    loading,
+    error,
+    handleRefresh,
 
-  const userRole = String(
-    user?.roleSlug || user?.role || user?.roleName || '',
-  ).toLowerCase().replace(/_/g, '-');
-  const isOwner = userRole === 'owner' || userRole === 'super-admin' || isSuperAdmin;
+    // Filters & Pagination
+    search,
+    statusFilter,
+    typeFilter,
+    sortBy,
+    sortOrder,
+    viewMode,
+    page,
+    limit,
+    setViewMode,
+    setPage,
+    setLimit,
+    handleSearchChange,
+    handleStatusFilterChange,
+    handleTypeFilterChange,
+    handleSortChange,
+    handleResetFilters,
 
-  const canCreateBranch = isOwner || canCreate('branches');
-  const canEditBranch = isOwner || canEdit('branches');
-  const canDeleteBranch = isOwner || canDelete('branches');
+    // Permissions & Context
+    isOwner,
+    canViewBranch,
+    canCreateBranch,
+    canEditBranch,
+    canDeleteBranch,
+    canEdit,
+    canDelete,
+    currentBranch,
+    isSuperAdmin,
+    effectiveOrgId,
 
-  const effectiveOrgId = isSuperAdmin ? selectedOrganisation?.id : user?.organizationId;
+    // Modals & Menu
+    deleteModalBranch,
+    setDeleteModalBranch,
+    copyModalBranch,
+    setCopyModalBranch,
+    activeMenuBranchId,
+    setActiveMenuBranchId,
+    tableMenuRef,
 
-  // Filters State
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [sortOrder, setSortOrder] = useState('desc');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
+    // Navigation
+    handleCreateBranchNavigate,
+    handleBranchDetailsNavigate,
+    handleBranchEditNavigate,
+  } = useBranchList();
 
-  // Pagination & Data State
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [branchesData, setBranchesData] = useState([]);
-  const [meta, setMeta] = useState({ total: 0, totalPages: 1 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Modals State
-  const [deleteModalBranch, setDeleteModalBranch] = useState(null);
-  const [copyModalBranch, setCopyModalBranch] = useState(null);
-  const [activeMenuBranchId, setActiveMenuBranchId] = useState(null);
-  const tableMenuRef = useRef(null);
-
-  useEffect(() => {
-    if (!activeMenuBranchId) return;
-    const handleOutsideClick = (e) => {
-      if (tableMenuRef.current && !tableMenuRef.current.contains(e.target)) {
-        setActiveMenuBranchId(null);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, [activeMenuBranchId]);
-
-  const loadData = useCallback(async () => {
-    if (isSuperAdmin && !effectiveOrgId) {
-      setBranchesData([]);
-      setMeta({ total: 0, totalPages: 1 });
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchBranches({
-        organizationId: effectiveOrgId,
-        search,
-        status: statusFilter,
-        branchType: typeFilter,
-        page,
-        limit,
-        sortBy,
-        sortOrder,
-      });
-
-      const list = Array.isArray(res?.data)
-        ? res.data
-        : Array.isArray(res?.items)
-        ? res.items
-        : Array.isArray(res)
-        ? res
-        : [];
-      setBranchesData(list);
-
-      const total = res?.meta?.total ?? res?.total ?? list.length;
-      const totalPages = res?.meta?.totalPages ?? (limit > 0 ? Math.ceil(total / limit) : 1);
-      setMeta({
-        total,
-        totalPages: totalPages || 1,
-        page: res?.meta?.page ?? page,
-        limit: res?.meta?.limit ?? limit,
-      });
-    } catch (err) {
-      console.error('Failed to load branches:', err);
-      setError(err?.message || 'Failed to fetch salon branches');
-    } finally {
-      setLoading(false);
-    }
-  }, [effectiveOrgId, isSuperAdmin, search, statusFilter, typeFilter, page, limit, sortBy, sortOrder]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  const handleRefresh = async () => {
-    await loadData();
-    await refreshBranches();
-  };
+  if (!canViewBranch) {
+    return (
+      <UnauthorizedAccess
+        title="Access Restricted"
+        message="You do not have the necessary permissions required to view or access salon branches in this organization."
+        requiredPermission="branches.view"
+        resourceName="Branch Management"
+      />
+    );
+  }
 
   return (
     <div className="space-y-4 pb-6">
@@ -181,7 +135,7 @@ export const BranchListPage = () => {
           <button
             type="button"
             id="add-branch-btn"
-            onClick={() => navigate('/branches/create')}
+            onClick={handleCreateBranchNavigate}
             className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-primary-500 hover:bg-primary-600 text-white shadow-md shadow-primary-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus size={16} />
@@ -197,144 +151,172 @@ export const BranchListPage = () => {
           <div className="flex-1 min-w-[240px]">
             <SearchInput
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              onClear={() => {
-                setSearch('');
-                setPage(1);
-              }}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onClear={() => handleSearchChange('')}
               placeholder="Search branches by name or code (e.g. BLR-01)..."
             />
           </div>
 
-          {/* Quick Filters and View Modes */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          {/* Quick Filter Selectors */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
             {/* Status Filter */}
-            <div className="w-40 sm:w-44">
+            <div className="w-36">
               <CustomSelector
-                value={statusFilter}
-                onChange={(val) => {
-                  setStatusFilter(val || 'all');
-                  setPage(1);
-                }}
                 options={STATUS_OPTIONS}
+                value={statusFilter}
+                onChange={handleStatusFilterChange}
+                placeholder="Status"
                 isSearchable={false}
                 isClearable={false}
-                placeholder="Filter Status"
               />
             </div>
 
-            {/* Branch Type Filter */}
-            <div className="w-36 sm:w-40">
+            {/* Type Filter */}
+            <div className="w-36">
               <CustomSelector
-                value={typeFilter}
-                onChange={(val) => {
-                  setTypeFilter(val || 'all');
-                  setPage(1);
-                }}
                 options={TYPE_OPTIONS}
+                value={typeFilter}
+                onChange={handleTypeFilterChange}
+                placeholder="Type"
                 isSearchable={false}
                 isClearable={false}
-                placeholder="Filter Type"
               />
             </div>
 
-            {/* Sort Dropdown */}
-            <div className="w-40 sm:w-44">
+            {/* Sort Selector */}
+            <div className="w-44">
               <CustomSelector
-                value={`${sortBy}:${sortOrder}`}
-                onChange={(val) => {
-                  if (val) {
-                    const [sb, so] = val.split(':');
-                    setSortBy(sb);
-                    setSortOrder(so);
-                    setPage(1);
-                  }
-                }}
                 options={SORT_OPTIONS}
+                value={`${sortBy}:${sortOrder}`}
+                onChange={handleSortChange}
+                placeholder="Sort by"
                 isSearchable={false}
                 isClearable={false}
-                placeholder="Sort by"
               />
             </div>
 
-            {/* View Mode Toggle */}
+            {/* Refresh Button */}
+            <button
+              type="button"
+              onClick={handleRefresh}
+              className="p-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] hover:bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer"
+              title="Refresh branches list"
+            >
+              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+            </button>
+          </div>
+        </div>
+
+        {/* Bottom Filter Info / Active Filters Summary */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[var(--border-color)] text-xs text-[var(--text-muted)]">
+          <div className="flex items-center gap-2">
+            <span>
+              Showing <strong className="text-[var(--text-primary)]">{branchesData.length}</strong> of{' '}
+              <strong className="text-[var(--text-primary)]">{meta.total}</strong> locations
+            </span>
+
+            {(statusFilter !== 'all' || typeFilter !== 'all' || search) && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="text-primary-500 hover:underline font-semibold ml-2"
+              >
+                Clear all filters
+              </button>
+            )}
+          </div>
+
+          {/* View Toggle */}
+          <div className="ml-auto">
             <ViewToggle
               view={viewMode}
+              value={viewMode}
               onChange={setViewMode}
               options={[
                 { id: 'grid', label: 'Grid', icon: LayoutGrid, title: 'Grid View' },
                 { id: 'table', label: 'Table', icon: List, title: 'Table View' },
               ]}
             />
-
-            {/* Refresh */}
-            <button
-              type="button"
-              onClick={handleRefresh}
-              className="h-10 px-3 text-xs rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] hover:bg-[var(--bg-card-hover)] text-[var(--text-secondary)] transition-colors flex items-center justify-center cursor-pointer shadow-sm"
-              title="Refresh Branches"
-            >
-              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
-            </button>
           </div>
         </div>
       </div>
 
+      {/* Super Admin Organization Hint */}
+      {isSuperAdmin && !effectiveOrgId && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs flex items-center gap-2">
+          <Building2 size={16} className="shrink-0" />
+          <span>
+            Please select an organization in the top navigation bar to view its specific branch locations.
+          </span>
+        </div>
+      )}
+
       {/* Main Content Area */}
       {loading ? (
-        <div className="flex min-h-[300px] flex-col items-center justify-center text-[var(--text-muted)]">
-          <Loader2 className="mb-2 h-8 w-8 animate-spin text-primary-500" />
-          <p className="text-xs font-semibold">Loading salon branches...</p>
+        <div className="py-20 flex flex-col items-center justify-center text-[var(--text-muted)]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-500 mb-2" />
+          <p className="text-xs font-semibold">Loading branch network...</p>
         </div>
       ) : error ? (
-        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center text-rose-500 text-sm">
-          {error}
-        </div>
+        String(error).toLowerCase().includes('permission') ||
+        String(error).toLowerCase().includes('forbidden') ||
+        String(error).toLowerCase().includes('403') ? (
+          <UnauthorizedAccess
+            title="Access Restricted"
+            message={error}
+            requiredPermission="branches.view"
+            resourceName="Branch Management"
+            onRetry={handleRefresh}
+          />
+        ) : (
+          <div className="p-8 text-center rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-500">
+            <p className="font-semibold text-sm">{error}</p>
+            <button
+              type="button"
+              onClick={handleRefresh}
+              className="mt-3 px-4 py-2 rounded-xl bg-primary-500 text-white text-xs font-semibold hover:bg-primary-600 transition"
+            >
+              Retry
+            </button>
+          </div>
+        )
       ) : branchesData.length === 0 ? (
-        /* Empty State */
+        /* EMPTY STATE */
         search || statusFilter !== 'all' || typeFilter !== 'all' ? (
-          <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-12 text-center max-w-lg mx-auto">
-            <div className="w-16 h-16 rounded-2xl bg-primary-500/15 text-primary-500 flex items-center justify-center mx-auto mb-4">
-              <Building2 size={32} />
-            </div>
-            <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">
-              No matching branches found
-            </h3>
-            <p className="text-xs text-[var(--text-secondary)] mb-6">
-              Try adjusting your search keywords or filter settings.
+          <div className="p-12 text-center rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)]">
+            <Filter className="w-10 h-10 text-[var(--text-muted)] mx-auto mb-2 opacity-50" />
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">No matching branches found</h3>
+            <p className="text-xs text-[var(--text-muted)] mt-1 max-w-sm mx-auto">
+              No branch matches your active filter criteria. Try clearing search keywords or resetting filters.
             </p>
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="mt-4 px-4 py-2 rounded-xl bg-[var(--bg-input)] hover:bg-white/5 border border-[var(--border-color)] text-xs font-semibold transition"
+            >
+              Reset Filters
+            </button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12">
+          <div className="p-12 text-center rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)]">
+            <Building2 className="w-12 h-12 text-primary-500/40 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-[var(--text-primary)]">No branches created yet</h3>
+            <p className="text-xs text-[var(--text-muted)] mt-1 max-w-md mx-auto">
+              Your organization doesn't have any operational salon branches set up. Add your first flagship or standard salon location to begin.
+            </p>
             {canCreateBranch ? (
               <button
                 type="button"
-                onClick={() => navigate('/branches/create')}
-                className="group border-2 border-dashed border-[var(--border-color)] hover:border-primary-500/50 rounded-2xl p-10 max-w-md w-full flex flex-col items-center justify-center text-center bg-[var(--bg-card)]/50 hover:bg-primary-500/5 transition-all cursor-pointer shadow-sm"
+                onClick={handleCreateBranchNavigate}
+                className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold shadow-md shadow-primary-500/20 transition hover:scale-105 active:scale-95"
               >
-                <div className="w-14 h-14 rounded-2xl bg-primary-500/10 text-primary-500 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-sm">
-                  <Plus size={28} />
-                </div>
-                <h4 className="text-base font-bold text-[var(--text-primary)] group-hover:text-primary-500 transition-colors">
-                  Add New Location
-                </h4>
-                <p className="text-xs text-[var(--text-muted)] mt-1.5 max-w-[260px]">
-                  Create a new salon suite, express kiosk, or flagship studio.
-                </p>
+                <Plus size={16} />
+                <span>Create First Branch</span>
               </button>
             ) : (
-              <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-12 text-center max-w-lg mx-auto">
-                <Building2 size={32} className="mx-auto mb-3 text-[var(--text-muted)]" />
-                <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">
-                  No branches added yet
-                </h3>
-                <p className="text-xs text-[var(--text-secondary)]">
-                  Contact an administrator or owner to create a salon branch.
-                </p>
-              </div>
+              <p className="text-xs text-amber-500 mt-3">
+                Contact an administrator or owner to create a salon branch.
+              </p>
             )}
           </div>
         )
@@ -370,8 +352,8 @@ export const BranchListPage = () => {
               <tbody className="divide-y divide-[var(--border-color)] text-[var(--text-primary)]">
                 {branchesData.map((branch, index) => {
                   const isCurrentActive = currentBranch?.id === branch.id;
-                  const canEditItem = isOwner || canEditBranch || canEdit('branches', branch.id);
-                  const canDeleteItem = isOwner || canDeleteBranch || canDelete('branches', branch.id);
+                  const canEditItem = isSuperAdmin || canEditBranch || canEdit('branches', branch.id);
+                  const canDeleteItem = isSuperAdmin || canDeleteBranch || canDelete('branches', branch.id);
                   const isMenuOpen = activeMenuBranchId === branch.id;
                   const isNearBottom = index >= branchesData.length - 2 && branchesData.length > 2;
 
@@ -381,7 +363,7 @@ export const BranchListPage = () => {
                       icon: Eye,
                       onClick: () => {
                         setActiveMenuBranchId(null);
-                        navigate(`/branches/${branch.id}`);
+                        handleBranchDetailsNavigate(branch.id);
                       },
                     },
                     ...(canEditItem
@@ -391,7 +373,7 @@ export const BranchListPage = () => {
                             icon: Edit,
                             onClick: () => {
                               setActiveMenuBranchId(null);
-                              navigate(`/branches/${branch.id}/edit`);
+                              handleBranchEditNavigate(branch.id);
                             },
                           },
                           {
@@ -432,7 +414,7 @@ export const BranchListPage = () => {
                       <td className="px-4 py-3 font-semibold">
                         <button
                           type="button"
-                          onClick={() => navigate(`/branches/${branch.id}`)}
+                          onClick={() => handleBranchDetailsNavigate(branch.id)}
                           className="hover:text-primary-500 transition-colors text-left"
                         >
                           {branch.name}
@@ -535,7 +517,7 @@ export const BranchListPage = () => {
             setLimit(newSize);
             setPage(1);
           }}
-          pageSizeOptions={[10, 25, 50, 100]}
+          pageSizeOptions={[6, 9, 12, 18, 24]}
         />
       )}
 

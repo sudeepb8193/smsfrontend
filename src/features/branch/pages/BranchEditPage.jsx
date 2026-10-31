@@ -1,53 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
 import { ArrowLeft, Loader2, Building2 } from 'lucide-react';
 import BranchForm from '../components/BranchForm';
-import { fetchBranchDetails, updateBranch } from '../api/branchApi';
-import { useBranch } from '../context/BranchContext';
-import { toast } from 'sonner';
+import UnauthorizedAccess from '../../../components/shared/UnauthorizedAccess';
+import { useBranchEdit } from '../hooks/useBranch';
 
 export const BranchEditPage = () => {
-  const { branchId } = useParams();
-  const navigate = useNavigate();
-  const { refreshBranches } = useBranch();
+  const {
+    branch,
+    loading,
+    isSubmitting,
+    error,
+    canEditBranch,
+    handleUpdate,
+    handleCancel,
+    handleBackToBranches,
+  } = useBranchEdit();
 
-  const [branch, setBranch] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetchBranchDetails(branchId);
-        setBranch(res?.data || res);
-      } catch (err) {
-        console.error('Failed to load branch for editing:', err);
-        setError(err?.message || 'Branch not found or inaccessible');
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [branchId]);
-
-  const handleUpdate = async (payload) => {
-    try {
-      setIsSubmitting(true);
-      const res = await updateBranch(branchId, payload);
-      const updated = res?.data || res;
-      toast.success(`Branch "${updated.name}" updated successfully.`);
-      await refreshBranches();
-      navigate(`/branches/${branchId}`);
-    } catch (err) {
-      console.error('Branch update error:', err);
-      toast.error(err?.message || 'Failed to update branch profile');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  if (!canEditBranch) {
+    return (
+      <UnauthorizedAccess
+        title="Access Restricted"
+        message="You do not have permission to edit salon branches in this organization."
+        requiredPermission="branches.edit"
+        resourceName="Edit Branch"
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -59,6 +37,22 @@ export const BranchEditPage = () => {
   }
 
   if (error || !branch) {
+    const isPermissionError = error && (
+      String(error).toLowerCase().includes('permission') ||
+      String(error).toLowerCase().includes('forbidden') ||
+      String(error).toLowerCase().includes('403')
+    );
+
+    if (isPermissionError) {
+      return (
+        <UnauthorizedAccess
+          title="Access Restricted"
+          message={error}
+          requiredPermission="branches.edit"
+          resourceName="Edit Branch"
+        />
+      );
+    }
     return (
       <div className="mx-auto max-w-[760px] rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] p-8 text-center my-6">
         <Building2 className="mx-auto mb-3 h-10 w-10 text-rose-500" />
@@ -66,7 +60,7 @@ export const BranchEditPage = () => {
         <p className="mt-1 text-xs text-[var(--text-muted)]">{error}</p>
         <button
           type="button"
-          onClick={() => navigate('/branches')}
+          onClick={handleBackToBranches}
           className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-primary-500 hover:bg-primary-600 px-4 py-2 text-xs font-semibold text-white transition-colors cursor-pointer"
         >
           <ArrowLeft size={14} /> Back to branches
@@ -82,7 +76,7 @@ export const BranchEditPage = () => {
         onSubmit={handleUpdate}
         isSubmitting={isSubmitting}
         isEditMode={true}
-        onCancel={() => navigate(`/branches/${branchId}`)}
+        onCancel={handleCancel}
       />
     </div>
   );

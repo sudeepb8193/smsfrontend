@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { rolePermissionApi } from '../api/rolePermissionApi';
+import React from 'react';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
 import CustomSelector from '../../../components/shared/CustomSelector';
@@ -11,7 +10,7 @@ import {
   Layers,
   Search,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { usePermissionCatalog } from '../hooks/useRolePermission';
 
 const ACTION_COLORS = {
   view: 'primary',
@@ -24,105 +23,22 @@ const ACTION_COLORS = {
 };
 
 export const PermissionCatalogPage = () => {
-  const [permissions, setPermissions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [moduleFilter, setModuleFilter] = useState('');
-  const [actionFilter, setActionFilter] = useState('');
-  const [expandedModules, setExpandedModules] = useState({});
-
-  useEffect(() => {
-    const fetchCatalog = async () => {
-      try {
-        setLoading(true);
-        const data = await rolePermissionApi.getPermissions({
-          includeLegacy: true,
-        });
-        setPermissions(data || []);
-
-        // Auto-expand all modules initially
-        const autoExpanded = {};
-        (data || []).forEach((p) => {
-          autoExpanded[p.moduleCode] = true;
-        });
-        setExpandedModules(autoExpanded);
-      } catch (err) {
-        toast.error(err.message || 'Failed to load permissions catalog');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCatalog();
-  }, []);
-
-  // Filter permissions
-  const filtered = useMemo(() => {
-    return permissions.filter((p) => {
-      if (moduleFilter && p.moduleCode !== moduleFilter) return false;
-      if (actionFilter && p.action !== actionFilter) return false;
-      if (search) {
-        const term = search.toLowerCase();
-        return (
-          p.permissionKey.toLowerCase().includes(term) ||
-          p.label.toLowerCase().includes(term) ||
-          (p.description && p.description.toLowerCase().includes(term)) ||
-          p.moduleLabel.toLowerCase().includes(term)
-        );
-      }
-      return true;
-    });
-  }, [permissions, search, moduleFilter, actionFilter]);
-
-  // Group by module
-  const grouped = useMemo(() => {
-    const map = new Map();
-    filtered.forEach((p) => {
-      if (!map.has(p.moduleCode)) {
-        map.set(p.moduleCode, {
-          moduleCode: p.moduleCode,
-          moduleLabel: p.moduleLabel,
-          items: [],
-        });
-      }
-      map.get(p.moduleCode).items.push(p);
-    });
-    return Array.from(map.values());
-  }, [filtered]);
-
-  // Unique module options for filter dropdown
-  const moduleOptions = useMemo(() => {
-    const mods = new Map();
-    permissions.forEach((p) => {
-      mods.set(p.moduleCode, p.moduleLabel);
-    });
-    return [
-      { value: '', label: 'All Modules' },
-      ...Array.from(mods.entries()).map(([code, label]) => ({
-        value: code,
-        label: `${label} (${code})`,
-      })),
-    ];
-  }, [permissions]);
-
-  const toggleExpand = (modCode) => {
-    setExpandedModules((prev) => ({
-      ...prev,
-      [modCode]: !prev[modCode],
-    }));
-  };
-
-  const expandAll = () => {
-    const next = {};
-    grouped.forEach((g) => {
-      next[g.moduleCode] = true;
-    });
-    setExpandedModules(next);
-  };
-
-  const collapseAll = () => {
-    setExpandedModules({});
-  };
+  const {
+    loading,
+    search,
+    setSearch,
+    moduleFilter,
+    setModuleFilter,
+    actionFilter,
+    setActionFilter,
+    expandedModules,
+    filtered,
+    grouped,
+    moduleOptions,
+    toggleExpand,
+    expandAll,
+    collapseAll,
+  } = usePermissionCatalog();
 
   return (
     <div className="space-y-4">
