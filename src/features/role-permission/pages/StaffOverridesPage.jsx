@@ -1,110 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { rolePermissionApi } from '../api/rolePermissionApi';
+import React from 'react';
 import StaffOverrideModal from '../components/StaffOverrideModal';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
 import Input from '../../../components/shared/Input';
 import ConfirmDialog from '../../../components/shared/ConfirmDialog';
-import Spinner from '../../../components/shared/Spinner';
 import {
   UserCheck,
   Plus,
   Trash2,
   Search,
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
-import { useAuth } from '../../../hooks/useAuth';
+import { useStaffOverrides } from '../hooks/useRolePermission';
 
 export const StaffOverridesPage = () => {
-  const { refreshUser } = useAuth();
-  const [staffIdInput, setStaffIdInput] = useState('');
-  const [selectedStaff, setSelectedStaff] = useState(null);
-  const [overridesData, setOverridesData] = useState(null);
-  const [permissionsCatalog, setPermissionsCatalog] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [deleteOverrideTarget, setDeleteOverrideTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
-
-  // Load catalog and branches on mount
-  useEffect(() => {
-    const initData = async () => {
-      try {
-        const [perms, brs] = await Promise.all([
-          rolePermissionApi.getPermissions(),
-          rolePermissionApi.getBranches(),
-        ]);
-        setPermissionsCatalog(perms || []);
-        setBranches(brs || []);
-      } catch (err) {
-        console.error('Failed to prefetch metadata', err);
-      }
-    };
-    initData();
-  }, []);
-
-  const loadStaffOverrides = async (id) => {
-    if (!id?.trim()) return;
-    try {
-      setLoading(true);
-      const [overridesRes, effRes] = await Promise.all([
-        rolePermissionApi.getStaffOverrides(id.trim()),
-        rolePermissionApi.getStaffEffectivePermissions(id.trim()),
-      ]);
-
-      setOverridesData({
-        ...overridesRes,
-        effectivePermissions: effRes.effectivePermissions || [],
-      });
-      setSelectedStaff({
-        id: overridesRes.staffId,
-        fullName: overridesRes.fullName,
-        employeeCode: overridesRes.employeeCode,
-        homeBranch: overridesRes.homeBranch,
-      });
-    } catch (err) {
-      toast.error(err.message || 'Staff member not found');
-      setOverridesData(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateOverride = async (payload) => {
-    try {
-      setSubmitting(true);
-      await rolePermissionApi.createStaffOverride(selectedStaff.id, payload);
-      toast.success('Permission exception created successfully');
-      setModalOpen(false);
-      notifyPermissionUpdate({ staffId: selectedStaff.id });
-      await refreshUser();
-      loadStaffOverrides(selectedStaff.id);
-    } catch (err) {
-      toast.error(err.message || 'Failed to create override');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleDeleteOverride = async () => {
-    if (!deleteOverrideTarget) return;
-    try {
-      setDeleting(true);
-      await rolePermissionApi.deleteStaffOverride(selectedStaff.id, deleteOverrideTarget.id);
-      toast.success('Permission override removed');
-      setDeleteOverrideTarget(null);
-      notifyPermissionUpdate({ staffId: selectedStaff.id });
-      await refreshUser();
-      loadStaffOverrides(selectedStaff.id);
-    } catch (err) {
-      toast.error(err.message || 'Failed to remove override');
-    } finally {
-      setDeleting(false);
-    }
-  };
+  const {
+    staffIdInput,
+    setStaffIdInput,
+    selectedStaff,
+    overridesData,
+    permissionsCatalog,
+    branches,
+    loading,
+    modalOpen,
+    setModalOpen,
+    submitting,
+    deleteOverrideTarget,
+    setDeleteOverrideTarget,
+    deleting,
+    loadStaffOverrides,
+    handleCreateOverride,
+    handleDeleteOverride,
+  } = useStaffOverrides();
 
   return (
     <div className="space-y-4">

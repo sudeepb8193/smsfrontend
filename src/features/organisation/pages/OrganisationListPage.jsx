@@ -1,14 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Plus, Building2, Store, Sparkles, AlertCircle, RefreshCw } from 'lucide-react';
-import { toast } from 'sonner';
-import {
-  fetchOrganisations,
-  updateOrganisationStatus,
-  deleteOrganisation,
-  fetchMarketplaceSetting,
-  updateMarketplaceSetting,
-} from '../api/organisationApi';
+import React from 'react';
+import { Plus, Building2, Store, RefreshCw } from 'lucide-react';
 import OrganisationFilters from '../components/OrganisationFilters';
 import OrganisationTable from '../components/OrganisationTable';
 import OrganisationGrid from '../components/OrganisationGrid';
@@ -17,203 +8,39 @@ import DeleteOrganisationModal from '../components/DeleteOrganisationModal';
 import MarketplaceToggleModal from '../components/MarketplaceToggleModal';
 import Button from '../../../components/shared/Button';
 import Pagination from '../../../components/shared/Pagination';
-import { usePermission } from '../../../hooks/usePermission';
+import { useOrganisationList } from '../hooks/useOrganisation';
 
 export const OrganisationListPage = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { canCreate, canEdit, canDelete } = usePermission();
-
-  const canCreateOrg = canCreate('organizations');
-  const canEditOrg = canEdit('organizations');
-  const canDeleteOrg = canDelete('organizations');
-
-  const [organisations, setOrganisations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('list');
-  const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0, totalPages: 1 });
-
-  const [filters, setFilters] = useState({
-    search: '',
-    status: 'all',
-    plan: 'all',
-    operatingMode: 'all',
-    page: 1,
-    limit: 10,
-  });
-
-  const [statusModal, setStatusModal] = useState({
-    isOpen: false,
-    organisation: null,
-    targetStatus: null,
-    loading: false,
-  });
-
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    organisation: null,
-    loading: false,
-  });
-
-  // Central Marketplace Setting state
-  const [marketplaceEnabled, setMarketplaceEnabled] = useState(false);
-  const [marketplaceLoading, setMarketplaceLoading] = useState(true);
-  const [marketplaceModal, setMarketplaceModal] = useState({
-    isOpen: false,
-    targetEnabled: false,
-    loading: false,
-  });
-
-  useEffect(() => {
-    if (location.state?.message) {
-      toast.success(location.state.message);
-      window.history.replaceState({}, document.title);
-    }
-  }, [location.state]);
-
-  const showToast = (message, type = 'success') => {
-    if (type === 'error') {
-      toast.error(message);
-    } else {
-      toast.success(message);
-    }
-  };
-
-  // Load Marketplace Setting
-  const loadMarketplaceSetting = useCallback(async () => {
-    try {
-      setMarketplaceLoading(true);
-      const res = await fetchMarketplaceSetting();
-      if (res && res.data) {
-        setMarketplaceEnabled(Boolean(res.data.marketplaceEnabled));
-      }
-    } catch (err) {
-      console.error('Failed to load marketplace setting:', err);
-    } finally {
-      setMarketplaceLoading(false);
-    }
-  }, []);
-
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetchOrganisations(filters);
-      if (res && res.data) {
-        setOrganisations(res.data);
-        setMeta(res.meta || { page: 1, limit: 10, total: res.data.length, totalPages: 1 });
-      } else if (Array.isArray(res)) {
-        setOrganisations(res);
-      }
-    } catch (err) {
-      console.error('Failed to load organisations:', err);
-      showToast(err.message || 'Failed to fetch organisations', 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  useEffect(() => {
-    loadMarketplaceSetting();
-  }, [loadMarketplaceSetting]);
-
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
-  };
-
-  const handleResetFilters = () => {
-    setFilters({
-      search: '',
-      status: 'all',
-      plan: 'all',
-      operatingMode: 'all',
-      page: 1,
-      limit: 10,
-    });
-  };
-
-  const handleStatusChangeClick = (org, targetStatus) => {
-    setStatusModal({
-      isOpen: true,
-      organisation: org,
-      targetStatus,
-      loading: false,
-    });
-  };
-
-  const handleConfirmStatusChange = async (newStatus) => {
-    if (!statusModal.organisation) return;
-    setStatusModal((prev) => ({ ...prev, loading: true }));
-
-    try {
-      const res = await updateOrganisationStatus(
-        statusModal.organisation.id,
-        newStatus,
-      );
-      showToast(res.message || `Organisation ${newStatus} successfully.`);
-      setStatusModal({ isOpen: false, organisation: null, targetStatus: null, loading: false });
-      loadData();
-    } catch (err) {
-      console.error('Status update failed:', err);
-      showToast(err.message || 'Failed to update organisation status', 'error');
-      setStatusModal((prev) => ({ ...prev, loading: false }));
-    }
-  };
-
-  const handleDeleteClick = (org) => {
-    setDeleteModal({
-      isOpen: true,
-      organisation: org,
-      loading: false,
-    });
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!deleteModal.organisation) return;
-    setDeleteModal((prev) => ({ ...prev, loading: true }));
-
-    try {
-      await deleteOrganisation(deleteModal.organisation.id);
-      showToast('Organisation deleted successfully.');
-      setDeleteModal({ isOpen: false, organisation: null, loading: false });
-      loadData();
-    } catch (err) {
-      console.error('Delete organisation failed:', err);
-      showToast(err.message || 'Failed to delete organisation', 'error');
-      setDeleteModal((prev) => ({ ...prev, loading: false }));
-    }
-  };
-
-  // Marketplace Toggle Handlers
-  const handleMarketplaceToggleClick = () => {
-    setMarketplaceModal({
-      isOpen: true,
-      targetEnabled: !marketplaceEnabled,
-      loading: false,
-    });
-  };
-
-  const handleConfirmMarketplaceToggle = async (targetEnabled, reason) => {
-    setMarketplaceModal((prev) => ({ ...prev, loading: true }));
-    try {
-      const res = await updateMarketplaceSetting(targetEnabled, reason);
-      setMarketplaceEnabled(targetEnabled);
-      showToast(
-        res.message ||
-          `Central Marketplace has been ${
-            targetEnabled ? 'enabled' : 'disabled'
-          } successfully.`,
-      );
-      setMarketplaceModal({ isOpen: false, targetEnabled: false, loading: false });
-    } catch (err) {
-      console.error('Failed to update marketplace setting:', err);
-      showToast(err.message || 'Failed to update marketplace setting', 'error');
-      setMarketplaceModal((prev) => ({ ...prev, loading: false }));
-    }
-  };
+  const {
+    organisations,
+    loading,
+    viewMode,
+    setViewMode,
+    meta,
+    filters,
+    statusModal,
+    deleteModal,
+    marketplaceEnabled,
+    marketplaceLoading,
+    marketplaceModal,
+    canCreateOrg,
+    canEditOrg,
+    canDeleteOrg,
+    handleFilterChange,
+    handleResetFilters,
+    handlePageChange,
+    handlePageSizeChange,
+    handleStatusChangeClick,
+    handleCloseStatusModal,
+    handleConfirmStatusChange,
+    handleDeleteClick,
+    handleCloseDeleteModal,
+    handleConfirmDelete,
+    handleMarketplaceToggleClick,
+    handleCloseMarketplaceModal,
+    handleConfirmMarketplaceToggle,
+    handleCreateClick,
+  } = useOrganisationList();
 
   return (
     <div className="space-y-4 pb-12">
@@ -232,7 +59,7 @@ export const OrganisationListPage = () => {
         {canCreateOrg && (
           <Button
             icon={Plus}
-            onClick={() => navigate('/super-admin/organisations/create')}
+            onClick={handleCreateClick}
             className="self-start sm:self-auto"
           >
             Create Organisation
@@ -341,17 +168,15 @@ export const OrganisationListPage = () => {
         totalPages={meta.totalPages}
         totalItems={meta.total}
         pageSize={filters.limit}
-        onPageChange={(newPage) => handleFilterChange('page', newPage)}
-        onPageSizeChange={(newSize) => {
-          setFilters((prev) => ({ ...prev, limit: newSize, page: 1 }));
-        }}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
         pageSizeOptions={[10, 25, 50, 100]}
       />
 
       {/* Status Change Modal */}
       <StatusChangeModal
         isOpen={statusModal.isOpen}
-        onClose={() => setStatusModal({ isOpen: false, organisation: null, targetStatus: null, loading: false })}
+        onClose={handleCloseStatusModal}
         onConfirm={handleConfirmStatusChange}
         organisation={statusModal.organisation}
         targetStatus={statusModal.targetStatus}
@@ -361,7 +186,7 @@ export const OrganisationListPage = () => {
       {/* Delete Modal */}
       <DeleteOrganisationModal
         isOpen={deleteModal.isOpen}
-        onClose={() => setDeleteModal({ isOpen: false, organisation: null, loading: false })}
+        onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         organisation={deleteModal.organisation}
         loading={deleteModal.loading}
@@ -370,7 +195,7 @@ export const OrganisationListPage = () => {
       {/* Marketplace Toggle Modal */}
       <MarketplaceToggleModal
         isOpen={marketplaceModal.isOpen}
-        onClose={() => setMarketplaceModal({ isOpen: false, targetEnabled: false, loading: false })}
+        onClose={handleCloseMarketplaceModal}
         onConfirm={handleConfirmMarketplaceToggle}
         targetEnabled={marketplaceModal.targetEnabled}
         loading={marketplaceModal.loading}
@@ -380,4 +205,3 @@ export const OrganisationListPage = () => {
 };
 
 export default OrganisationListPage;
-

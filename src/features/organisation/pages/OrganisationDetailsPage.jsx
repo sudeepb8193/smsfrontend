@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import React from 'react';
 import {
   Building2,
   Edit,
@@ -20,16 +19,10 @@ import {
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
-import { toast } from 'sonner';
-import {
-  fetchOrganisationDetails,
-  updateOrganisationStatus,
-  deleteOrganisation,
-} from '../api/organisationApi';
 import StatusChangeModal from '../components/StatusChangeModal';
 import DeleteOrganisationModal from '../components/DeleteOrganisationModal';
 import UnderlineTabs from '../../../components/shared/UnderlineTabs';
-import { usePermission } from '../../../hooks/usePermission';
+import { useOrganisationDetails } from '../hooks/useOrganisation';
 
 const getLogoUrl = (logoUrl) => {
   if (!logoUrl || logoUrl.includes('key=undefined') || logoUrl.endsWith('undefined')) return '';
@@ -48,82 +41,25 @@ const getLogoUrl = (logoUrl) => {
 };
 
 export const OrganisationDetailsPage = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { organisationId } = useParams();
-  const { canEdit, canDelete } = usePermission();
-
-  const canEditOrg = canEdit('organizations');
-  const canDeleteOrg = canDelete('organizations');
-
-  const [organisation, setOrganisation] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview'); // overview | branches | users
-
-  const [statusModal, setStatusModal] = useState({
-    isOpen: false,
-    targetStatus: null,
-    loading: false,
-  });
-
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    loading: false,
-  });
-
-  useEffect(() => {
-    if (location.state?.message) {
-      toast.success(location.state.message);
-      window.history.replaceState({}, document.title);
-    }
-  }, [location.state]);
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchOrganisationDetails(organisationId);
-      setOrganisation(data);
-    } catch (err) {
-      console.error('Failed to fetch organisation details:', err);
-      toast.error(err.message || 'Failed to fetch organisation details');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (organisationId) {
-      loadData();
-    }
-  }, [organisationId]);
-
-  const handleConfirmStatusChange = async (newStatus) => {
-    setStatusModal((prev) => ({ ...prev, loading: true }));
-    try {
-      const res = await updateOrganisationStatus(organisationId, newStatus);
-      toast.success(res.message || `Organisation ${newStatus} successfully.`);
-      setStatusModal({ isOpen: false, targetStatus: null, loading: false });
-      loadData();
-    } catch (err) {
-      console.error('Failed status change:', err);
-      toast.error(err.message || 'Failed to update status');
-      setStatusModal((prev) => ({ ...prev, loading: false }));
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    setDeleteModal({ isOpen: true, loading: true });
-    try {
-      await deleteOrganisation(organisationId);
-      toast.success('Organisation deleted successfully.');
-      setDeleteModal({ isOpen: false, loading: false });
-      navigate('/super-admin/organisations');
-    } catch (err) {
-      console.error('Failed to delete organisation:', err);
-      toast.error(err.message || 'Failed to delete organisation');
-      setDeleteModal({ isOpen: false, loading: false });
-    }
-  };
+  const {
+    organisation,
+    loading,
+    activeTab,
+    setActiveTab,
+    statusModal,
+    deleteModal,
+    canEditOrg,
+    canDeleteOrg,
+    handleOpenStatusModal,
+    handleCloseStatusModal,
+    handleConfirmStatusChange,
+    handleOpenDeleteModal,
+    handleCloseDeleteModal,
+    handleConfirmDelete,
+    handleBack,
+    handleEdit,
+    handleSetup,
+  } = useOrganisationDetails();
 
   if (loading) {
     return (
@@ -147,7 +83,7 @@ export const OrganisationDetailsPage = () => {
           The requested organisation could not be retrieved or has been removed.
         </p>
         <button
-          onClick={() => navigate('/super-admin/organisations')}
+          onClick={handleBack}
           className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm rounded-xl transition-all cursor-pointer"
         >
           Back to Organisations
@@ -169,7 +105,6 @@ export const OrganisationDetailsPage = () => {
 
   return (
     <div className="space-y-8 pb-16">
-
       {/* Navigation & Actions Top Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[var(--border-color)] pb-4">
         <div>
@@ -237,14 +172,14 @@ export const OrganisationDetailsPage = () => {
           {canEditOrg && (
             <>
               <button
-                onClick={() => navigate(`/super-admin/organisations/${organisationId}/setup`)}
+                onClick={handleSetup}
                 className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
               >
                 <Settings2 className="w-4 h-4" />
                 Complete Setup
               </button>
               <button
-                onClick={() => navigate(`/super-admin/organisations/${organisationId}/edit`)}
+                onClick={handleEdit}
                 className="px-4 py-2 bg-[var(--bg-input)] hover:bg-white/10 text-[var(--text-secondary)] border border-[var(--border-color)] rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
               >
                 <Edit className="w-4 h-4 text-amber-500" />
@@ -253,7 +188,7 @@ export const OrganisationDetailsPage = () => {
 
               {organisation.status === 'active' ? (
                 <button
-                  onClick={() => setStatusModal({ isOpen: true, targetStatus: 'inactive', loading: false })}
+                  onClick={() => handleOpenStatusModal('inactive')}
                   className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Power className="w-4 h-4" />
@@ -261,7 +196,7 @@ export const OrganisationDetailsPage = () => {
                 </button>
               ) : (
                 <button
-                  onClick={() => setStatusModal({ isOpen: true, targetStatus: 'active', loading: false })}
+                  onClick={() => handleOpenStatusModal('active')}
                   className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Power className="w-4 h-4" />
@@ -273,7 +208,7 @@ export const OrganisationDetailsPage = () => {
 
           {canDeleteOrg && (
             <button
-              onClick={() => setDeleteModal({ isOpen: true, loading: false })}
+              onClick={handleOpenDeleteModal}
               className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer"
             >
               <Trash2 className="w-4 h-4" />
@@ -629,7 +564,7 @@ export const OrganisationDetailsPage = () => {
       {/* Modals */}
       <StatusChangeModal
         isOpen={statusModal.isOpen}
-        onClose={() => setStatusModal({ isOpen: false, targetStatus: null, loading: false })}
+        onClose={handleCloseStatusModal}
         onConfirm={handleConfirmStatusChange}
         organisation={organisation}
         targetStatus={statusModal.targetStatus}
@@ -638,7 +573,7 @@ export const OrganisationDetailsPage = () => {
 
       <DeleteOrganisationModal
         isOpen={deleteModal.isOpen}
-        onClose={() => setDeleteModal({ isOpen: false, loading: false })}
+        onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         organisation={organisation}
         loading={deleteModal.loading}

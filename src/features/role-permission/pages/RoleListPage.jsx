@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { rolePermissionApi } from '../api/rolePermissionApi';
+import React from 'react';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
 import Toggle from '../../../components/shared/Toggle';
@@ -30,9 +28,7 @@ import {
   Filter,
   Pencil,
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
-import { useAuth } from '../../../hooks/useAuth';
+import { useRoleList } from '../hooks/useRolePermission';
 
 const STANDARD_ACTIONS = [
   { key: 'view', label: 'View' },
@@ -45,510 +41,67 @@ const STANDARD_ACTIONS = [
 ];
 
 export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null }) => {
-  const navigate = useNavigate();
-  const { refreshUser } = useAuth();
-
-  // Roles state
-  const [roles, setRoles] = useState([]);
-  const [selectedRoleId, setSelectedRoleId] = useState(null);
-  const [loadingRoles, setLoadingRoles] = useState(true);
-  const [roleSearch, setRoleSearch] = useState('');
-
-  // Permissions & Matrix state for selected role
-  const [matrixTemplate, setMatrixTemplate] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [selectedPermissions, setSelectedPermissions] = useState({});
-  const [moduleScopes, setModuleScopes] = useState({});
-  const [versionToken, setVersionToken] = useState('');
-  const [loadingPermissions, setLoadingPermissions] = useState(false);
-  const [savingPermissions, setSavingPermissions] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [moduleSearch, setModuleSearch] = useState('');
-  const [moduleFilter, setModuleFilter] = useState('all');
-  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
-  const filterDropdownRef = useRef(null);
-  const [expandedRestrictedModule, setExpandedRestrictedModule] = useState(null);
-
-  // Close filter dropdown on click outside
-  useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (filterDropdownRef.current && !filterDropdownRef.current.contains(e.target)) {
-        setFilterDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
-
-  // Modals state
-  const [createRoleModalOpen, setCreateRoleModalOpen] = useState(false);
-  const [createModuleModalOpen, setCreateModuleModalOpen] = useState(false);
-  const [editingModule, setEditingModule] = useState(null);
-  const [deleteConfirmModule, setDeleteConfirmModule] = useState(null);
-  const [deletingModule, setDeletingModule] = useState(false);
-  const [deleteConfirmRole, setDeleteConfirmRole] = useState(null);
-  const [deletingRole, setDeletingRole] = useState(false);
-  const [pendingSwitchRoleId, setPendingSwitchRoleId] = useState(null);
-  const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
-
-  // 1. Initial Load: Fetch roles, matrix template, and branches
-  const fetchInitialData = async () => {
-    try {
-      setLoadingRoles(true);
-      const apiFn = isSuperAdminView
-        ? rolePermissionApi.getSuperAdminRoles
-        : rolePermissionApi.getRoles;
-
-      const [rolesRes, templateRes, branchesRes] = await Promise.all([
-        apiFn({ limit: 100, organizationId: selectedOrgId || undefined }),
-        rolePermissionApi.getMatrixTemplate(),
-        rolePermissionApi.getBranches(selectedOrgId || undefined),
-      ]);
-
-      const roleList = rolesRes?.items || (Array.isArray(rolesRes) ? rolesRes : []);
-      setRoles(roleList);
-      setMatrixTemplate(templateRes || []);
-      setBranches(branchesRes || []);
-
-      // Auto-select first role if none currently selected
-      if (roleList.length > 0 && !selectedRoleId) {
-        setSelectedRoleId(roleList[0].id);
-      }
-    } catch (err) {
-      toast.error(err.message || 'Failed to initialize role and permission data');
-    } finally {
-      setLoadingRoles(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchInitialData();
-  }, [selectedOrgId]);
-
-  // 2. Load Permissions whenever selectedRoleId changes
-  const loadRolePermissions = async (roleId) => {
-    if (!roleId) return;
-    try {
-      setLoadingPermissions(true);
-      const permData = await rolePermissionApi.getRolePermissions(roleId);
-      const assignments = permData.assignments || [];
-
-      const permMap = {};
-      const modScopeMap = {};
-
-      assignments.forEach((assign) => {
-        permMap[assign.permissionKey] = {
-          scope: assign.scope || 'own_branch',
-          restrictedBranchIds: assign.restrictedBranches?.map((b) => b.branchId) || [],
-        };
-
-        if (!modScopeMap[assign.moduleCode]) {
-          modScopeMap[assign.moduleCode] = {
-            scope: assign.scope || 'own_branch',
-            restrictedBranchIds: assign.restrictedBranches?.map((b) => b.branchId) || [],
-          };
-        }
-      });
-
-      setSelectedPermissions(permMap);
-      setModuleScopes(modScopeMap);
-      setVersionToken(permData.versionToken || permData.updatedAt || '');
-      setHasUnsavedChanges(false);
-    } catch (err) {
-      toast.error(err.message || 'Failed to load permissions for role');
-    } finally {
-      setLoadingPermissions(false);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedRoleId) {
-      loadRolePermissions(selectedRoleId);
-    }
-  }, [selectedRoleId]);
-
-  // Active Role Object
-  const selectedRole = useMemo(() => {
-    return roles.find((r) => r.id === selectedRoleId) || null;
-  }, [roles, selectedRoleId]);
-
-  // Filtered Roles (Left Panel)
-  const filteredRoles = useMemo(() => {
-    if (!roleSearch.trim()) return roles;
-    const q = roleSearch.toLowerCase().trim();
-    return roles.filter(
-      (r) =>
-        r.name?.toLowerCase().includes(q) ||
-        r.slug?.toLowerCase().includes(q) ||
-        r.description?.toLowerCase().includes(q)
-    );
-  }, [roles, roleSearch]);
-
-  // Filter Label for Dropdown
-  const filterLabel = useMemo(() => {
-    if (moduleFilter === 'all') return 'All Modules';
-    if (moduleFilter === 'granted') return 'Granted Only';
-    if (moduleFilter === 'revoked') return 'Revoked Only';
-    const found = matrixTemplate.find((m) => m.moduleCode === moduleFilter);
-    return found ? found.moduleLabel : 'Filter Module';
-  }, [moduleFilter, matrixTemplate]);
-
-  // Count of modules with at least 1 granted permission
-  const grantedModulesCount = useMemo(() => {
-    return matrixTemplate.filter((m) =>
-      m.permissions?.some((p) => selectedPermissions[p.permissionKey])
-    ).length;
-  }, [matrixTemplate, selectedPermissions]);
-
-  // Filtered Modules (Right Panel)
-  const filteredModules = useMemo(() => {
-    let result = matrixTemplate;
-
-    // Filter by dropdown
-    if (moduleFilter !== 'all') {
-      if (moduleFilter === 'granted') {
-        result = result.filter((m) =>
-          m.permissions?.some((p) => selectedPermissions[p.permissionKey])
-        );
-      } else if (moduleFilter === 'revoked') {
-        result = result.filter((m) =>
-          !m.permissions?.some((p) => selectedPermissions[p.permissionKey])
-        );
-      } else {
-        result = result.filter((m) => m.moduleCode === moduleFilter);
-      }
-    }
-
-    // Filter by text search
-    if (moduleSearch.trim()) {
-      const q = moduleSearch.toLowerCase().trim();
-      result = result.filter(
-        (m) =>
-          m.moduleLabel?.toLowerCase().includes(q) ||
-          m.moduleCode?.toLowerCase().includes(q)
-      );
-    }
-    return result;
-  }, [matrixTemplate, moduleSearch, moduleFilter, selectedPermissions]);
-
-  // Total permissions count stats
-  const totalAvailableCount = useMemo(() => {
-    return matrixTemplate.reduce((acc, mod) => acc + (mod.permissions?.length || 0), 0);
-  }, [matrixTemplate]);
-
-  const selectedCount = Object.keys(selectedPermissions).length;
-
-  // Safe Role Switcher (handles unsaved changes confirmation)
-  const handleSelectRole = (newRoleId) => {
-    if (newRoleId === selectedRoleId) return;
-    if (hasUnsavedChanges) {
-      setPendingSwitchRoleId(newRoleId);
-      setConfirmDiscardOpen(true);
-    } else {
-      setSelectedRoleId(newRoleId);
-    }
-  };
-
-  const handleConfirmRoleSwitch = () => {
-    setConfirmDiscardOpen(false);
-    if (pendingSwitchRoleId) {
-      setSelectedRoleId(pendingSwitchRoleId);
-      setPendingSwitchRoleId(null);
-    }
-  };
-
-  // Toggle Single Action Permission (strictly affects only the clicked permission)
-  const handleTogglePermission = (moduleCode, action, permission) => {
-    const key = permission.permissionKey;
-    const isCurrentlyChecked = Boolean(selectedPermissions[key]);
-    const next = { ...selectedPermissions };
-
-    const currentModScope = moduleScopes[moduleCode] || {
-      scope: 'own_branch',
-      restrictedBranchIds: [],
-    };
-
-    if (isCurrentlyChecked) {
-      delete next[key];
-    } else {
-      next[key] = {
-        scope: currentModScope.scope,
-        restrictedBranchIds: [...currentModScope.restrictedBranchIds],
-      };
-    }
-
-    setSelectedPermissions(next);
-    setHasUnsavedChanges(true);
-  };
-
-  // Grant All for a module
-  const handleGrantModuleAll = (moduleCode) => {
-    const moduleDef = matrixTemplate.find((m) => m.moduleCode === moduleCode);
-    if (!moduleDef) return;
-
-    const next = { ...selectedPermissions };
-    const currentModScope = moduleScopes[moduleCode] || {
-      scope: 'own_branch',
-      restrictedBranchIds: [],
-    };
-
-    moduleDef.permissions.forEach((p) => {
-      next[p.permissionKey] = {
-        scope: currentModScope.scope,
-        restrictedBranchIds: [...currentModScope.restrictedBranchIds],
-      };
-    });
-
-    setSelectedPermissions(next);
-    setHasUnsavedChanges(true);
-  };
-
-  // Revoke All for a module
-  const handleRevokeModuleAll = (moduleCode) => {
-    const moduleDef = matrixTemplate.find((m) => m.moduleCode === moduleCode);
-    if (!moduleDef) return;
-
-    const next = { ...selectedPermissions };
-    moduleDef.permissions.forEach((p) => {
-      delete next[p.permissionKey];
-    });
-
-    setSelectedPermissions(next);
-    setHasUnsavedChanges(true);
-  };
-
-  // Grant All globally for this role
-  const handleGrantAllGlobal = () => {
-    const next = {};
-    matrixTemplate.forEach((mod) => {
-      const scope = moduleScopes[mod.moduleCode]?.scope || 'own_branch';
-      const branchIds = moduleScopes[mod.moduleCode]?.restrictedBranchIds || [];
-      mod.permissions.forEach((p) => {
-        next[p.permissionKey] = {
-          scope,
-          restrictedBranchIds: [...branchIds],
-        };
-      });
-    });
-    setSelectedPermissions(next);
-    setHasUnsavedChanges(true);
-  };
-
-  // Revoke All globally for this role
-  const handleRevokeAllGlobal = () => {
-    setSelectedPermissions({});
-    setHasUnsavedChanges(true);
-  };
-
-  // Update Branch Scope for a module
-  const handleScopeChange = (moduleCode, newScope) => {
-    const nextScopes = {
-      ...moduleScopes,
-      [moduleCode]: {
-        scope: newScope,
-        restrictedBranchIds: moduleScopes[moduleCode]?.restrictedBranchIds || [],
-      },
-    };
-    setModuleScopes(nextScopes);
-
-    const nextPerms = { ...selectedPermissions };
-    const moduleDef = matrixTemplate.find((m) => m.moduleCode === moduleCode);
-    if (moduleDef) {
-      moduleDef.permissions.forEach((p) => {
-        if (nextPerms[p.permissionKey]) {
-          nextPerms[p.permissionKey] = {
-            ...nextPerms[p.permissionKey],
-            scope: newScope,
-          };
-        }
-      });
-    }
-
-    setSelectedPermissions(nextPerms);
-    setHasUnsavedChanges(true);
-    if (newScope === 'restricted_branches') {
-      setExpandedRestrictedModule(moduleCode);
-    }
-  };
-
-  // Toggle restricted branch chip
-  const handleToggleRestrictedBranch = (moduleCode, branchId) => {
-    const current = moduleScopes[moduleCode] || {
-      scope: 'restricted_branches',
-      restrictedBranchIds: [],
-    };
-    const branchIds = current.restrictedBranchIds.includes(branchId)
-      ? current.restrictedBranchIds.filter((id) => id !== branchId)
-      : [...current.restrictedBranchIds, branchId];
-
-    const nextScopes = {
-      ...moduleScopes,
-      [moduleCode]: {
-        ...current,
-        scope: 'restricted_branches',
-        restrictedBranchIds: branchIds,
-      },
-    };
-    setModuleScopes(nextScopes);
-
-    const nextPerms = { ...selectedPermissions };
-    const moduleDef = matrixTemplate.find((m) => m.moduleCode === moduleCode);
-    if (moduleDef) {
-      moduleDef.permissions.forEach((p) => {
-        if (nextPerms[p.permissionKey]) {
-          nextPerms[p.permissionKey] = {
-            ...nextPerms[p.permissionKey],
-            scope: 'restricted_branches',
-            restrictedBranchIds: branchIds,
-          };
-        }
-      });
-    }
-
-    setSelectedPermissions(nextPerms);
-    setHasUnsavedChanges(true);
-  };
-
-  // Save Permissions
-  const handleSavePermissions = async () => {
-    if (!selectedRoleId) return;
-
-    // Validate restricted branches
-    for (const mod of matrixTemplate) {
-      const scopeData = moduleScopes[mod.moduleCode];
-      if (scopeData?.scope === 'restricted_branches') {
-        const hasSelectedPerms = mod.permissions?.some((p) => selectedPermissions[p.permissionKey]);
-        if (hasSelectedPerms && (!scopeData.restrictedBranchIds || scopeData.restrictedBranchIds.length === 0)) {
-          toast.warning(`Module "${mod.moduleLabel}" has scope "Restricted Branches", but no branches are selected.`);
-          setExpandedRestrictedModule(mod.moduleCode);
-          return;
-        }
-      }
-    }
-
-    try {
-      setSavingPermissions(true);
-      const permissionsPayload = Object.entries(selectedPermissions).map(([key, data]) => ({
-        permissionKey: key,
-        scope: data.scope || 'own_branch',
-        restrictedBranchIds: data.scope === 'restricted_branches' ? data.restrictedBranchIds : undefined,
-      }));
-
-      const res = await rolePermissionApi.updateRolePermissions(selectedRoleId, {
-        permissions: permissionsPayload,
-        expectedUpdatedAt: versionToken,
-      });
-
-      toast.success(`Permissions saved successfully for "${selectedRole?.name}"`);
-      if (res.warning) toast.warning(res.warning);
-      setVersionToken(res.versionToken);
-      setHasUnsavedChanges(false);
-
-      // Immediately propagate updated permissions across state and tabs without page reload
-      notifyPermissionUpdate({ roleId: selectedRoleId });
-      await refreshUser();
-
-      // Refresh roles to update permission counters
-      const apiFn = isSuperAdminView ? rolePermissionApi.getSuperAdminRoles : rolePermissionApi.getRoles;
-      const rolesRes = await apiFn({ limit: 100, organizationId: selectedOrgId || undefined });
-      setRoles(rolesRes?.items || (Array.isArray(rolesRes) ? rolesRes : []));
-    } catch (err) {
-      toast.error(err.message || 'Failed to save permissions');
-    } finally {
-      setSavingPermissions(false);
-    }
-  };
-
-  // Create Role Submit
-  const handleCreateRoleSubmit = async (data) => {
-    try {
-      const apiFn = isSuperAdminView ? rolePermissionApi.createSuperAdminRole : rolePermissionApi.createRole;
-      const newRole = await apiFn(data);
-      toast.success(`Role "${newRole.name}" created successfully`);
-      setCreateRoleModalOpen(false);
-
-      // Refresh list & select newly created role
-      const rolesRes = await apiFn({ limit: 100, organizationId: selectedOrgId || undefined });
-      const roleList = rolesRes?.items || (Array.isArray(rolesRes) ? rolesRes : []);
-      setRoles(roleList);
-      setSelectedRoleId(newRole.id);
-    } catch (err) {
-      toast.error(err.message || 'Failed to create role');
-    }
-  };
-
-  // Create Module Submit
-  const handleCreateModuleSubmit = async (data) => {
-    const res = await rolePermissionApi.createModulePermissions(data);
-    toast.success(`Module "${res.moduleLabel}" registered with ${res.permissions?.length || 0} actions`);
-    // Refresh matrix template
-    const templateRes = await rolePermissionApi.getMatrixTemplate();
-    setMatrixTemplate(templateRes || []);
-  };
-
-  // Update Module Submit
-  const handleUpdateModuleSubmit = async (moduleCode, data) => {
-    try {
-      const res = await rolePermissionApi.updateModulePermissions(moduleCode, data);
-      toast.success(`Module "${res.moduleLabel || data.moduleLabel}" updated successfully`);
-      setEditingModule(null);
-      // Refresh template & current permissions
-      const templateRes = await rolePermissionApi.getMatrixTemplate();
-      setMatrixTemplate(templateRes || []);
-      if (selectedRoleId) {
-        await loadRolePermissions(selectedRoleId);
-      }
-    } catch (err) {
-      toast.error(err.message || 'Failed to update module');
-    }
-  };
-
-  // Delete Module Submit
-  const handleDeleteModuleSubmit = async () => {
-    if (!deleteConfirmModule) return;
-    try {
-      setDeletingModule(true);
-      await rolePermissionApi.deleteModule(deleteConfirmModule.moduleCode);
-      toast.success(`Module "${deleteConfirmModule.moduleLabel}" deleted successfully`);
-      setDeleteConfirmModule(null);
-      // Refresh template & current permissions
-      const templateRes = await rolePermissionApi.getMatrixTemplate();
-      setMatrixTemplate(templateRes || []);
-      if (selectedRoleId) {
-        await loadRolePermissions(selectedRoleId);
-      }
-    } catch (err) {
-      toast.error(err.message || 'Failed to delete module');
-    } finally {
-      setDeletingModule(false);
-    }
-  };
-
-  // Delete Role
-  const handleDeleteRoleSubmit = async () => {
-    if (!deleteConfirmRole) return;
-    try {
-      setDeletingRole(true);
-      await rolePermissionApi.deleteRole(deleteConfirmRole.id);
-      toast.success(`Role "${deleteConfirmRole.name}" deleted successfully`);
-      notifyPermissionUpdate({ roleId: deleteConfirmRole.id });
-      await refreshUser();
-      setDeleteConfirmRole(null);
-
-      // Refresh roles
-      const apiFn = isSuperAdminView ? rolePermissionApi.getSuperAdminRoles : rolePermissionApi.getRoles;
-      const rolesRes = await apiFn({ limit: 100, organizationId: selectedOrgId || undefined });
-      const roleList = rolesRes?.items || (Array.isArray(rolesRes) ? rolesRes : []);
-      setRoles(roleList);
-      if (selectedRoleId === deleteConfirmRole.id) {
-        setSelectedRoleId(roleList[0]?.id || null);
-      }
-    } catch (err) {
-      toast.error(err.message || 'Failed to delete role');
-    } finally {
-      setDeletingRole(false);
-    }
-  };
+  const {
+    roles,
+    selectedRoleId,
+    selectedRole,
+    loadingRoles,
+    roleSearch,
+    setRoleSearch,
+    filteredRoles,
+    matrixTemplate,
+    branches,
+    selectedPermissions,
+    moduleScopes,
+    loadingPermissions,
+    savingPermissions,
+    hasUnsavedChanges,
+    setHasUnsavedChanges,
+    moduleSearch,
+    setModuleSearch,
+    moduleFilter,
+    setModuleFilter,
+    filterDropdownOpen,
+    setFilterDropdownOpen,
+    filterDropdownRef,
+    expandedRestrictedModule,
+    setExpandedRestrictedModule,
+    filterLabel,
+    grantedModulesCount,
+    filteredModules,
+    totalAvailableCount,
+    selectedCount,
+    createRoleModalOpen,
+    setCreateRoleModalOpen,
+    createModuleModalOpen,
+    setCreateModuleModalOpen,
+    editingModule,
+    setEditingModule,
+    deleteConfirmModule,
+    setDeleteConfirmModule,
+    deletingModule,
+    deleteConfirmRole,
+    setDeleteConfirmRole,
+    deletingRole,
+    confirmDiscardOpen,
+    setConfirmDiscardOpen,
+    handleSelectRole,
+    handleConfirmRoleSwitch,
+    handleTogglePermission,
+    handleGrantModuleAll,
+    handleRevokeModuleAll,
+    handleGrantAllGlobal,
+    handleRevokeAllGlobal,
+    handleScopeChange,
+    handleToggleRestrictedBranch,
+    handleSavePermissions,
+    handleCreateRoleSubmit,
+    handleCreateModuleSubmit,
+    handleUpdateModuleSubmit,
+    handleDeleteModuleSubmit,
+    handleDeleteRoleSubmit,
+    loadRolePermissions,
+  } = useRoleList({ isSuperAdminView, selectedOrgId });
 
   return (
     <div>
@@ -1052,7 +605,12 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                               return (
                                 <div
                                   key={actionCol.key}
-                                  onClick={() => handleTogglePermission(module.moduleCode, actionCol.key, perm)}
+                                  onClick={(e) => {
+                                    if (e.target.closest('[role="switch"]') || e.target.closest('input') || e.target.closest('button')) {
+                                      return;
+                                    }
+                                    handleTogglePermission(module.moduleCode, actionCol.key, perm);
+                                  }}
                                   className={`p-2.5 rounded-xl border flex flex-col justify-between cursor-pointer transition-all ${isChecked
                                       ? 'bg-primary-500/15 border-primary-500 shadow-2xs'
                                       : 'bg-[var(--bg-input)] border-[var(--border-color)] hover:bg-white/5'

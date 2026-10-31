@@ -33,7 +33,7 @@ export const AppRoutes = () => {
           <Route path="/dashboard" element={<Dashboard />} />
 
           {/* User Management Route (Super Admin, Owner, Branch Manager only) */}
-          <Route element={<RoleGuard allowedRoles={['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER']} />}>
+          <Route element={<RoleGuard requiredPermission="users.view" resourceName="User Management" allowedRoles={['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER']} />}>
             <Route path="/users" element={<UserManagementPage />} />
           </Route>
 

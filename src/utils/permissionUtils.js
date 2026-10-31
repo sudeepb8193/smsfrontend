@@ -71,12 +71,10 @@ export const hasPermission = (user, permissionKey, branchId = null) => {
   const roleSlug = String(user?.roleSlug || user?.role || user?.roleName || '').toLowerCase().replace(/[\s_-]+/g, '-');
   const userRoles = (user?.roles || []).map((r) => String(r).toLowerCase().replace(/[\s_-]+/g, '-'));
 
-  // 1. Super Admin and Owner have unrestricted authority across all modules
+  // 1. Super Admin has unrestricted authority across all modules
   if (
     roleSlug === 'super-admin' ||
-    roleSlug === 'owner' ||
-    userRoles.includes('super-admin') ||
-    userRoles.includes('owner')
+    userRoles.includes('super-admin')
   ) {
     return true;
   }

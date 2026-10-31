@@ -13,6 +13,7 @@ export const BranchRoutes = (
       element={
         <RoleGuard
           requiredPermission="branches.view"
+          resourceName="Branch Management"
           allowedRoles={['OWNER', 'SUPER_ADMIN', 'BRANCH_MANAGER', 'ACCOUNTANT', 'FRONT_DESK']}
         />
       }
@@ -25,6 +26,7 @@ export const BranchRoutes = (
       element={
         <RoleGuard
           requiredPermission="branches.create"
+          resourceName="Create Branch"
           allowedRoles={['OWNER', 'SUPER_ADMIN']}
         />
       }
@@ -36,6 +38,7 @@ export const BranchRoutes = (
       element={
         <RoleGuard
           requiredPermission="branches.edit"
+          resourceName="Edit Branch"
           allowedRoles={['OWNER', 'SUPER_ADMIN', 'BRANCH_MANAGER']}
         />
       }

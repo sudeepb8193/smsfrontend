@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
 import {
   ArrowLeft,
   Building2,
@@ -22,72 +21,45 @@ import {
   ShieldCheck,
   Building,
 } from 'lucide-react';
-import { fetchBranchDetails, updateBranch } from '../api/branchApi';
-import { useBranch } from '../context/BranchContext';
-import { useAuth } from '../../../hooks/useAuth';
 import BranchStatusBadge from '../components/BranchStatusBadge';
 import BranchTypeBadge from '../components/BranchTypeBadge';
 import BranchDeleteModal from '../components/BranchDeleteModal';
 import CopySettingsModal from '../components/CopySettingsModal';
-import { usePermission } from '../../../hooks/usePermission';
-import { toast } from 'sonner';
+import UnauthorizedAccess from '../../../components/shared/UnauthorizedAccess';
+import { useBranchDetails } from '../hooks/useBranch';
 
 export const BranchDetailsPage = () => {
-  const { branchId } = useParams();
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { canEdit, canDelete } = usePermission();
-  const { currentBranch, setCurrentBranch, refreshBranches } = useBranch();
+  const {
+    branch,
+    loading,
+    error,
+    statusUpdating,
+    isCurrentActive,
+    canViewBranch,
+    canEditBranch,
+    canDeleteBranch,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isCopyModalOpen,
+    setIsCopyModalOpen,
+    handleStatusChange,
+    handleSetActiveContext,
+    handleBackToBranches,
+    handleNavigateToEdit,
+    handleDeleteSuccess,
+    handleCopySuccess,
+  } = useBranchDetails();
 
-  const userRole = String(
-    user?.roleSlug || user?.role || user?.roleName || '',
-  ).toLowerCase().replace(/_/g, '-');
-  const isOwner = userRole === 'owner' || userRole === 'super-admin';
-  const canEditBranch = isOwner || canEdit('branches', branchId);
-  const canDeleteBranch = isOwner || canDelete('branches', branchId);
-
-  const [branch, setBranch] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [statusUpdating, setStatusUpdating] = useState(false);
-
-  // Modals
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
-
-  const isCurrentActive = currentBranch?.id === branch?.id;
-
-  const loadBranch = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchBranchDetails(branchId);
-      setBranch(res?.data || res);
-    } catch (err) {
-      console.error('Failed to load branch details:', err);
-      setError(err?.message || 'Branch not found or inaccessible');
-    } finally {
-      setLoading(false);
-    }
-  }, [branchId]);
-
-  useEffect(() => {
-    loadBranch();
-  }, [loadBranch]);
-
-  const handleStatusChange = async (newStatus) => {
-    try {
-      setStatusUpdating(true);
-      await updateBranch(branch.id, { status: newStatus });
-      toast.success(`Branch status updated to ${newStatus.replace('_', ' ')}.`);
-      await loadBranch();
-      await refreshBranches();
-    } catch (err) {
-      toast.error(err?.message || 'Failed to update branch status');
-    } finally {
-      setStatusUpdating(false);
-    }
-  };
+  if (!canViewBranch) {
+    return (
+      <UnauthorizedAccess
+        title="Access Restricted"
+        message="You do not have permission to view salon branch details in this organization."
+        requiredPermission="branches.view"
+        resourceName="Branch Details"
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -99,6 +71,22 @@ export const BranchDetailsPage = () => {
   }
 
   if (error || !branch) {
+    const isPermissionError = error && (
+      String(error).toLowerCase().includes('permission') ||
+      String(error).toLowerCase().includes('forbidden') ||
+      String(error).toLowerCase().includes('403')
+    );
+
+    if (isPermissionError) {
+      return (
+        <UnauthorizedAccess
+          title="Access Restricted"
+          message={error}
+          requiredPermission="branches.view"
+          resourceName="Branch Details"
+        />
+      );
+    }
     return (
       <div className="mx-auto max-w-xl rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-8 text-center">
         <Building2 className="mx-auto mb-3 h-10 w-10 text-rose-500" />
@@ -108,7 +96,7 @@ export const BranchDetailsPage = () => {
         </p>
         <button
           type="button"
-          onClick={() => navigate('/branches')}
+          onClick={handleBackToBranches}
           className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-primary-500 hover:bg-primary-600 px-4 py-2 text-xs font-semibold text-white transition-colors"
         >
           <ArrowLeft size={14} /> Back to Branches
@@ -127,7 +115,7 @@ export const BranchDetailsPage = () => {
       <div className="flex items-center justify-between">
         <button
           type="button"
-          onClick={() => navigate('/branches')}
+          onClick={handleBackToBranches}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
           <ArrowLeft size={16} />
@@ -138,10 +126,7 @@ export const BranchDetailsPage = () => {
           {!isCurrentActive && branch.status === 'active' && (
             <button
               type="button"
-              onClick={() => {
-                setCurrentBranch(branch);
-                toast.success(`Active context switched to "${branch.name}".`);
-              }}
+              onClick={handleSetActiveContext}
               className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-primary-500/10 hover:bg-primary-500 text-primary-600 dark:text-primary-400 hover:text-white border border-primary-500/20 transition-all"
             >
               Set as Active Context
@@ -161,7 +146,7 @@ export const BranchDetailsPage = () => {
 
               <button
                 type="button"
-                onClick={() => navigate(`/branches/${branch.id}/edit`)}
+                onClick={handleNavigateToEdit}
                 className="px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-primary-500 hover:bg-primary-600 text-white transition-colors inline-flex items-center gap-1.5 shadow-sm"
               >
                 <Edit size={14} />
@@ -219,213 +204,226 @@ export const BranchDetailsPage = () => {
         <div className="p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="px-2.5 py-0.5 text-xs font-mono font-bold tracking-wider rounded-md bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-500/20">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold bg-primary-500/10 text-primary-500 border border-primary-500/20">
                   {branch.code}
                 </span>
+                <span className="text-xs text-[var(--text-muted)]">
+                  Created {new Date(branch.createdAt).toLocaleDateString()}
+                </span>
               </div>
-              <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">
+              <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
                 {branch.name}
               </h1>
-              <p className="text-xs text-[var(--text-secondary)] mt-1 flex items-center gap-1.5">
-                <MapPin size={14} className="text-primary-500" />
-                <span>
-                  {branch.branchAddress?.city
-                    ? `${branch.branchAddress.addressLine1}, ${branch.branchAddress.city}`
-                    : 'Physical operational address pending setup'}
-                </span>
-              </p>
+              {branch.branchAddress?.city && (
+                <p className="text-xs text-[var(--text-secondary)] mt-1 flex items-center gap-1.5">
+                  <MapPin size={14} className="text-primary-500" />
+                  <span>
+                    {branch.branchAddress.addressLine1 ? `${branch.branchAddress.addressLine1}, ` : ''}
+                    {branch.branchAddress.city}
+                    {branch.branchAddress.state ? `, ${branch.branchAddress.state}` : ''}
+                  </span>
+                </p>
+              )}
             </div>
 
-            {/* Quick Status State Transition actions */}
-            {isOwner && (
-              <div className="flex items-center gap-2 shrink-0">
-                {branch.status === 'draft' && (
-                  <button
-                    type="button"
-                    disabled={statusUpdating}
-                    onClick={() => handleStatusChange('active')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm transition-colors disabled:opacity-50"
-                  >
-                    <Play size={14} />
-                    <span>Activate Branch</span>
-                  </button>
-                )}
-
-                {branch.status === 'active' && (
+            {/* Quick Actions (Status toggling) */}
+            {canEditBranch && (
+              <div className="flex items-center gap-2 bg-[var(--bg-input)] p-1.5 rounded-2xl border border-[var(--border-color)]">
+                {branch.status === 'active' ? (
                   <button
                     type="button"
                     disabled={statusUpdating}
                     onClick={() => handleStatusChange('temporarily_closed')}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-orange-500/10 hover:bg-orange-500 text-orange-600 dark:text-orange-400 hover:text-white border border-orange-500/20 transition-all disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-colors inline-flex items-center gap-1.5"
                   >
                     <Pause size={14} />
-                    <span>Pause (Temp Close)</span>
+                    <span>Temporarily Close</span>
                   </button>
-                )}
-
-                {(branch.status === 'temporarily_closed' ||
-                  branch.status === 'permanently_closed') && (
+                ) : branch.status === 'temporarily_closed' || branch.status === 'draft' ? (
                   <button
                     type="button"
                     disabled={statusUpdating}
                     onClick={() => handleStatusChange('active')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm transition-colors disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-colors inline-flex items-center gap-1.5"
                   >
                     <Play size={14} />
-                    <span>Reopen Branch</span>
+                    <span>Activate Branch</span>
                   </button>
-                )}
+                ) : null}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Profile Overview Details Grid */}
+      {/* Main Grid: Details Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Core Attributes */}
-        <div className="p-5 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-4">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-color)] pb-2 flex items-center gap-1.5">
-            <ShieldCheck size={14} className="text-primary-500" />
-            Branch Attributes
-          </h3>
+        {/* Left Column (2 spans): Primary Details */}
+        <div className="md:col-span-2 space-y-6">
+          {/* Section: Contact & Location */}
+          <div className="p-6 rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <MapPin className="text-primary-500" size={18} />
+              <span>Location & Contact Details</span>
+            </h3>
 
-          <div className="space-y-3 text-xs">
-            <div>
-              <span className="text-[var(--text-secondary)] block mb-0.5">Branch Type</span>
-              <span className="font-bold text-[var(--text-primary)] capitalize">
-                {branch.branchType}
-              </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-input)] border border-[var(--border-color)]">
+                <span className="text-[var(--text-muted)] block mb-1">Street Address</span>
+                <p className="font-semibold text-[var(--text-primary)]">
+                  {branch.branchAddress?.addressLine1 || 'Not configured'}
+                </p>
+                {branch.branchAddress?.addressLine2 && (
+                  <p className="text-[var(--text-secondary)] mt-0.5">{branch.branchAddress.addressLine2}</p>
+                )}
+                {branch.branchAddress?.landmark && (
+                  <p className="text-[var(--text-muted)] mt-1 italic">
+                    Landmark: {branch.branchAddress.landmark}
+                  </p>
+                )}
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-input)] border border-[var(--border-color)]">
+                <span className="text-[var(--text-muted)] block mb-1">City & Postal Code</span>
+                <p className="font-semibold text-[var(--text-primary)]">
+                  {branch.branchAddress?.city || 'City pending'}
+                  {branch.branchAddress?.postalCode ? ` - ${branch.branchAddress.postalCode}` : ''}
+                </p>
+                <p className="text-[var(--text-secondary)] mt-0.5">
+                  {branch.branchAddress?.state || ''} ({branch.branchAddress?.countryCode || 'IN'})
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-input)] border border-[var(--border-color)]">
+                <span className="text-[var(--text-muted)] block mb-1">Front Desk Phone</span>
+                <p className="font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <Phone size={13} className="text-emerald-500" />
+                  <span>
+                    {branch.branchContact?.phoneCountryCode || '+91'} {branch.branchContact?.phoneNumber || 'Not provided'}
+                  </span>
+                </p>
+                {branch.branchContact?.whatsappNumber && (
+                  <p className="text-[var(--text-muted)] mt-1">
+                    WhatsApp: {branch.branchContact.whatsappNumber}
+                  </p>
+                )}
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-input)] border border-[var(--border-color)]">
+                <span className="text-[var(--text-muted)] block mb-1">Public Branch Email</span>
+                <p className="font-semibold text-[var(--text-primary)] flex items-center gap-1.5 truncate">
+                  <Mail size={13} className="text-primary-500 shrink-0" />
+                  <span className="truncate">{branch.branchContact?.email || 'Not configured'}</span>
+                </p>
+              </div>
             </div>
 
-            <div>
-              <span className="text-[var(--text-secondary)] block mb-0.5">Branch Code</span>
-              <span className="font-mono font-bold text-primary-500">
-                {branch.code}
-              </span>
-            </div>
+            {branch.branchAddress?.mapsUrl && (
+              <div className="pt-2">
+                <a
+                  href={branch.branchAddress.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-500 hover:underline"
+                >
+                  <Globe2 size={14} />
+                  <span>View location on Google Maps</span>
+                </a>
+              </div>
+            )}
+          </div>
 
-            <div>
-              <span className="text-[var(--text-secondary)] block mb-0.5">Lifecycle Status</span>
-              <BranchStatusBadge status={branch.status} />
-            </div>
+          {/* Section: Business Operating Hours */}
+          <div className="p-6 rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <Clock className="text-primary-500" size={18} />
+              <span>Weekly Business Hours</span>
+            </h3>
 
-            <div>
-              <span className="text-[var(--text-secondary)] block mb-0.5">Launch Date</span>
-              <span className="font-semibold text-[var(--text-primary)]">
-                {branch.launchedAt
-                  ? new Date(branch.launchedAt).toLocaleDateString(undefined, {
-                      dateStyle: 'medium',
-                    })
-                  : 'Not launched yet'}
-              </span>
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(
+                (dayName, idx) => {
+                  const dayNum = (idx + 1) % 7;
+                  const schedule = branch.businessHours?.find((h) => h.dayOfWeek === dayNum);
+                  const isOpen = schedule?.isOpen ?? false;
 
-            <div>
-              <span className="text-[var(--text-secondary)] block mb-0.5">Created By</span>
-              <span className="font-semibold text-[var(--text-primary)]">
-                {branch.createdBy?.displayName || branch.createdBy?.email || 'System Administrator'}
-              </span>
+                  return (
+                    <div
+                      key={dayName}
+                      className={`p-3 rounded-2xl border flex items-center justify-between ${
+                        isOpen
+                          ? 'border-[var(--border-color)] bg-[var(--bg-input)]/40'
+                          : 'border-transparent bg-white/5 opacity-60'
+                      }`}
+                    >
+                      <span className="font-semibold text-[var(--text-primary)]">{dayName}</span>
+                      {isOpen ? (
+                        <span className="font-mono text-[var(--text-secondary)]">
+                          {schedule.openTime || '09:00'} - {schedule.closeTime || '19:00'}
+                        </span>
+                      ) : (
+                        <span className="text-rose-400 font-medium">Closed</span>
+                      )}
+                    </div>
+                  );
+                },
+              )}
             </div>
           </div>
         </div>
 
-        {/* Address, Contact & Hours Real Details */}
-        <div className="md:col-span-2 space-y-6">
-          {/* Address & Location */}
-          <div className="p-5 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-color)] pb-2 flex items-center gap-1.5">
-              <MapPin size={14} className="text-primary-500" />
-              Address & Location
+        {/* Right Column (1 span): Manager, Staff, Scope Card */}
+        <div className="space-y-6">
+          {/* Branch Manager Card */}
+          <div className="p-6 rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <User className="text-purple-500" size={18} />
+              <span>Primary Branch Manager</span>
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div>
-                <span className="text-[var(--text-secondary)] block mb-0.5">Street Address</span>
-                <span className="font-semibold text-[var(--text-primary)]">
-                  {branch.branchAddress?.addressLine1 || 'Not specified'}
-                </span>
+            {primaryManager?.user ? (
+              <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-[var(--bg-input)] border border-[var(--border-color)]">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 font-bold flex items-center justify-center shrink-0">
+                  {primaryManager.user.displayName?.[0] || 'M'}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-[var(--text-primary)] truncate">
+                    {primaryManager.user.displayName}
+                  </p>
+                  <p className="text-[11px] text-[var(--text-muted)] truncate">
+                    {primaryManager.user.email}
+                  </p>
+                </div>
               </div>
-              <div>
-                <span className="text-[var(--text-secondary)] block mb-0.5">Landmark</span>
-                <span className="font-semibold text-[var(--text-primary)]">
-                  {branch.branchAddress?.landmark || 'None'}
-                </span>
+            ) : (
+              <div className="p-4 rounded-2xl bg-[var(--bg-input)]/50 border border-dashed border-[var(--border-color)] text-center">
+                <p className="text-xs text-[var(--text-muted)]">No primary manager assigned</p>
               </div>
-              <div>
-                <span className="text-[var(--text-secondary)] block mb-0.5">City & State</span>
-                <span className="font-semibold text-[var(--text-primary)]">
-                  {branch.branchAddress?.city
-                    ? `${branch.branchAddress.city}${branch.branchAddress.state ? `, ${branch.branchAddress.state}` : ''}`
-                    : 'Not specified'}
-                </span>
-              </div>
-              <div>
-                <span className="text-[var(--text-secondary)] block mb-0.5">Postal Code</span>
-                <span className="font-semibold text-[var(--text-primary)]">
-                  {branch.branchAddress?.postalCode || 'Not specified'}
-                </span>
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Contact & Operating Schedule Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {/* Contact Details */}
-            <div className="p-5 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-color)] pb-2 flex items-center gap-1.5">
-                <Phone size={14} className="text-primary-500" />
-                Contact & Communication
-              </h3>
-              <div className="space-y-3 text-xs">
-                <div>
-                  <span className="text-[var(--text-secondary)] block mb-0.5">Phone Number</span>
-                  <span className="font-semibold text-[var(--text-primary)]">
-                    {branch.branchContact?.phoneNumber
-                      ? `${branch.branchContact.phoneCountryCode || ''} ${branch.branchContact.phoneNumber}`
-                      : 'Not configured'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[var(--text-secondary)] block mb-0.5">WhatsApp</span>
-                  <span className="font-semibold text-[var(--text-primary)]">
-                    {branch.branchContact?.whatsappNumber || 'Same as primary phone'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[var(--text-secondary)] block mb-0.5">Email</span>
-                  <span className="font-semibold text-[var(--text-primary)]">
-                    {branch.branchContact?.email || 'Not configured'}
-                  </span>
-                </div>
-              </div>
+          {/* Operational Metrics */}
+          <div className="p-6 rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] shadow-sm space-y-3">
+            <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <Users className="text-emerald-500" size={18} />
+              <span>Staff Deployment</span>
+            </h3>
+
+            <div className="flex items-baseline justify-between p-3.5 rounded-2xl bg-[var(--bg-input)] border border-[var(--border-color)]">
+              <span className="text-xs text-[var(--text-secondary)]">Assigned Staff Members</span>
+              <span className="text-lg font-bold text-[var(--text-primary)] font-mono">
+                {branch._count?.staff ?? 0}
+              </span>
             </div>
 
-            {/* Operating Schedule */}
-            <div className="p-5 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-color)] pb-2 flex items-center gap-1.5">
-                <Clock size={14} className="text-primary-500" />
-                Operating Schedule
-              </h3>
-              <div className="space-y-1.5 text-xs max-h-48 overflow-y-auto pr-1">
-                {branch.businessHours?.length > 0 ? (
-                  branch.businessHours.map((bh) => {
-                    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                    const dayName = days[bh.dayOfWeek] || `Day ${bh.dayOfWeek}`;
-                    return (
-                      <div key={bh.dayOfWeek} className="flex items-center justify-between py-1 border-b border-[var(--border-color)]/50 last:border-0">
-                        <span className="text-[var(--text-secondary)]">{dayName}</span>
-                        <span className={`font-semibold ${bh.isOpen ? 'text-[var(--text-primary)]' : 'text-rose-500'}`}>
-                          {bh.isOpen ? `${bh.openTime || '09:00'} – ${bh.closeTime || '20:00'}` : 'Closed'}
-                        </span>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-[11px] text-[var(--text-muted)]">Standard schedule (09:00 – 20:00).</p>
-                )}
-              </div>
+            <div className="flex items-baseline justify-between p-3.5 rounded-2xl bg-[var(--bg-input)] border border-[var(--border-color)]">
+              <span className="text-xs text-[var(--text-secondary)]">Launch Milestone</span>
+              <span className="text-xs font-semibold text-[var(--text-primary)]">
+                {branch.launchedAt
+                  ? new Date(branch.launchedAt).toLocaleDateString()
+                  : 'Pending Launch'}
+              </span>
             </div>
           </div>
         </div>
@@ -437,10 +435,7 @@ export const BranchDetailsPage = () => {
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           branch={branch}
-          onSuccess={() => {
-            refreshBranches();
-            navigate('/branches');
-          }}
+          onSuccess={handleDeleteSuccess}
         />
       )}
 
@@ -449,7 +444,7 @@ export const BranchDetailsPage = () => {
           isOpen={isCopyModalOpen}
           onClose={() => setIsCopyModalOpen(false)}
           targetBranch={branch}
-          onSuccess={loadBranch}
+          onSuccess={handleCopySuccess}
         />
       )}
     </div>

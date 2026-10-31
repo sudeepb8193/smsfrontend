@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import React from 'react';
 import {
   ShieldCheck,
   Lock,
@@ -11,87 +10,30 @@ import {
   Clock,
   Building,
 } from 'lucide-react';
-import { userService } from '../../../services/userService';
-import { toast } from 'sonner';
 import Card from '../../../components/shared/Card';
 import Button from '../../../components/shared/Button';
 import Loader from '../../../components/shared/Loader';
 import ErrorMessage from '../../../components/shared/ErrorMessage';
+import { useAcceptInvite } from '../hooks/useUser';
 
 export const AcceptInvitePage = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const token = searchParams.get('token');
-
-  const [verifying, setVerifying] = useState(true);
-  const [tokenStatus, setTokenStatus] = useState(null); // { valid, expired, user, message }
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-
-  useEffect(() => {
-    if (!token) {
-      setVerifying(false);
-      setTokenStatus({
-        valid: false,
-        message: 'No invitation token found in the URL. Please check your invitation link.',
-      });
-      return;
-    }
-
-    const verify = async () => {
-      try {
-        const res = await userService.verifyInviteToken(token);
-        setTokenStatus(res);
-      } catch (err) {
-        setTokenStatus({
-          valid: false,
-          message: err.message || 'Invalid or already used invitation link.',
-        });
-      } finally {
-        setVerifying(false);
-      }
-    };
-
-    verify();
-  }, [token]);
-
-  // Password rules evaluation
-  const rules = {
-    length: password.length >= 8,
-    upper: /[A-Z]/.test(password),
-    lower: /[a-z]/.test(password),
-    number: /\d/.test(password),
-    special: /[@$!%*?&#^()_+=\-[\]{}|;:'",.<>/]/.test(password),
-    match: password.length > 0 && password === confirmPassword,
-  };
-
-  const isPasswordValid =
-    rules.length && rules.upper && rules.lower && rules.number && rules.special && rules.match;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isPasswordValid) {
-      setErrorMsg('Please satisfy all password security requirements');
-      return;
-    }
-
-    setErrorMsg('');
-    setSubmitting(true);
-
-    try {
-      await userService.acceptInvite({ token, password });
-      setSuccess(true);
-      toast.success('Your account has been activated!');
-    } catch (err) {
-      setErrorMsg(err.message || 'Failed to activate account');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const {
+    verifying,
+    tokenStatus,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    showPassword,
+    setShowPassword,
+    submitting,
+    success,
+    errorMsg,
+    rules,
+    isPasswordValid,
+    handleSubmit,
+    navigate,
+  } = useAcceptInvite();
 
   if (verifying) {
     return (
@@ -179,10 +121,10 @@ export const AcceptInvitePage = () => {
               </div>
               <div className="text-left overflow-hidden">
                 <div className="text-xs font-bold text-[var(--text-primary)] truncate">
-                  {tokenStatus.user?.organization?.name || 'Salon Workspace'}
+                  {tokenStatus?.user?.organization?.name || 'Salon Workspace'}
                 </div>
                 <div className="text-[11px] text-[var(--text-muted)] truncate">
-                  Welcome, <strong className="text-[var(--text-secondary)]">{tokenStatus.user?.displayName}</strong> ({tokenStatus.user?.email || tokenStatus.user?.phoneNumber})
+                  Welcome, <strong className="text-[var(--text-secondary)]">{tokenStatus?.user?.displayName}</strong> ({tokenStatus?.user?.email || tokenStatus?.user?.phoneNumber})
                 </div>
               </div>
             </div>

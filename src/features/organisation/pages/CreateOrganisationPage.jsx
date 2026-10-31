@@ -1,30 +1,10 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Building2, ArrowLeft } from 'lucide-react';
-import { createOrganisation } from '../api/organisationApi';
+import React from 'react';
+import { Building2 } from 'lucide-react';
 import OrganisationForm from '../components/OrganisationForm';
+import { useOrganisationCreate } from '../hooks/useOrganisation';
 
 export const CreateOrganisationPage = () => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState(null);
-
-  const handleSubmit = async (payload) => {
-    setLoading(true);
-    setServerError(null);
-
-    try {
-      await createOrganisation(payload);
-      navigate('/super-admin/organisations', {
-        state: { message: 'Organisation created successfully.' },
-      });
-    } catch (err) {
-      console.error('Failed to create organisation:', err);
-      setServerError(err.message || 'Failed to create organisation');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { loading, serverError, handleSubmit } = useOrganisationCreate();
 
   return (
     <div className="space-y-4 pb-6">

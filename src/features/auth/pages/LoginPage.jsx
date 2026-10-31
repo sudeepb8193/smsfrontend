@@ -1,115 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../../hooks/useAuth';
+import React from 'react';
 import { AuthLayout } from '../components/AuthLayout';
 import { AuthInput } from '../components/AuthInput';
 import { GoogleButton } from '../components/GoogleButton';
 import { SecurityReassurance } from '../components/SecurityReassurance';
-import { resolveRoleDestination } from '../utils/authRedirect';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { useLogin } from '../hooks/useAuth';
 
 export const LoginPage = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user, isAuthenticated, loginUser } = useAuth();
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      const from = location.state?.from?.pathname;
-      const target = resolveRoleDestination(user, from);
-      navigate(target, { replace: true });
-    }
-  }, [isAuthenticated, user, navigate, location]);
-
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false,
-  });
-
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [serverError, setServerError] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const msg = sessionStorage.getItem('auth_error_message');
-      if (msg) {
-        sessionStorage.removeItem('auth_error_message');
-        return msg;
-      }
-    }
-    return '';
-  });
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-
-    if (fieldErrors[name]) {
-      setFieldErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-    if (serverError) {
-      setServerError('');
-    }
-  };
-
-  const validate = () => {
-    const errors = {};
-    const emailTrimmed = formData.email.trim();
-
-    if (!emailTrimmed) {
-      errors.email = 'Email address is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
-      errors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.password) {
-      errors.password = 'Password is required';
-    }
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    try {
-      setSubmitting(true);
-      setServerError('');
-
-      const response = await loginUser(formData.email.trim(), formData.password);
-
-      toast.success('Welcome back! Signed in successfully.');
-
-      const from = location.state?.from?.pathname;
-      const destination = resolveRoleDestination(response?.user || user, from);
-      navigate(destination, { replace: true });
-    } catch (err) {
-      const errorMsg =
-        err?.response?.data?.message ||
-        err?.data?.message ||
-        err?.message ||
-        'Invalid email or password. Please verify your credentials.';
-      setServerError(errorMsg);
-      toast.error(errorMsg);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleForgotPassword = () => {
-    toast.info('Password reset is available through your administrator or support team.');
-  };
-
-  const handleGoogleSignIn = () => {
-    toast.info('Google OAuth integration is in progress. Please use email & password.');
-  };
+  const {
+    formData,
+    fieldErrors,
+    serverError,
+    submitting,
+    handleChange,
+    handleSubmit,
+    handleForgotPassword,
+    handleGoogleSignIn,
+  } = useLogin();
 
   return (
     <AuthLayout mode="login">
