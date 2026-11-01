@@ -333,6 +333,7 @@ export const Sidebar = ({
 
   const normUserRole = String(userRole).toUpperCase().replace(/[\s_-]+/g, '_');
   const isSuperAdmin = normUserRole === 'SUPER_ADMIN' || normUserRole === 'SUPERADMIN';
+  const isServiceStaff = normUserRole === 'SERVICE_STAFF' || normUserRole === 'STAFF';
 
   const displayLogoUrl = null;
   const displayName = 'SalonFlow Pro';
@@ -346,6 +347,9 @@ export const Sidebar = ({
       }
       if (module.id === 'my-organisation') {
         return normUserRole === 'OWNER';
+      }
+      if (module.id.startsWith('my-') && module.id !== 'my-organisation') {
+        return false;
       }
       return true;
     }
@@ -370,7 +374,8 @@ export const Sidebar = ({
       {/* Mobile Backdrop Overlay (Auto Closes Mobile Sidebar) */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-xs lg:hidden transition-opacity"
+          className="fixed -inset-10 z-30 bg-black/60 backdrop-blur-sm lg:hidden transition-opacity"
+          style={{ WebkitBackdropFilter: 'blur(4px)', backdropFilter: 'blur(4px)' }}
           onClick={onCloseMobile}
           aria-label="Close Navigation Overlay"
         />
@@ -428,10 +433,11 @@ export const Sidebar = ({
           ))}
         </nav>
 
-        {/* Sidebar Copyright Footer */}
+        {/* Sidebar Copyright & Version Footer */}
         {!isCollapsed && (
-          <div className="p-4 border-t border-white/10 bg-black/20 text-[10px] text-white/60 text-center font-medium leading-tight select-none">
-            © {new Date().getFullYear()} <span className="font-bold text-white">SalonFlow Pro</span>. All rights reserved.
+          <div className="p-3 border-t border-white/10 bg-black/20 text-[10px] text-white/60 text-center font-medium leading-tight select-none">
+            <div>© {new Date().getFullYear()} <span className="font-bold text-white">SalonFlow Pro</span></div>
+            <div className="text-[9px] text-white/40 mt-0.5 font-mono">v1.0.0</div>
           </div>
         )}
       </aside>

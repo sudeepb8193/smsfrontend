@@ -32,7 +32,7 @@ export const Button = ({
     ghost: 'bg-transparent text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)] border-none transition-all font-medium',
   };
 
-  const baseClasses = 'inline-flex items-center justify-center font-sans select-none whitespace-nowrap outline-none transition-all duration-200 disabled:opacity-60 disabled:pointer-events-none disabled:transform-none';
+  const baseClasses = 'inline-flex flex-row items-center justify-center font-sans select-none whitespace-nowrap outline-none transition-all duration-200 disabled:opacity-60 disabled:pointer-events-none disabled:transform-none';
 
   return (
     <button
@@ -44,14 +44,18 @@ export const Button = ({
       {...props}
     >
       {loading ? (
-        <span className="inline-flex items-center gap-2">
+        <span className="inline-flex flex-row items-center gap-2">
           <Spinner size={size === 'large' ? 'medium' : 'small'} />
-          {children && <span>{children}</span>}
+          {children}
         </span>
       ) : (
         <>
-          {Icon && <span className="inline-flex items-center justify-center">{React.isValidElement(Icon) ? Icon : <Icon size={size === 'small' ? 14 : size === 'large' ? 20 : 18} />}</span>}
-          {children && <span>{children}</span>}
+          {Icon && (
+            <span className="inline-flex items-center justify-center shrink-0">
+              {React.isValidElement(Icon) ? Icon : <Icon size={size === 'small' ? 14 : size === 'large' ? 20 : 16} />}
+            </span>
+          )}
+          {children}
         </>
       )}
     </button>

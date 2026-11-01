@@ -7,6 +7,10 @@ import {
   UserCheck,
   Store,
   Users,
+  User,
+  CalendarCheck,
+  Clock,
+  Scissors,
 } from 'lucide-react';
 
 export const SIDEBAR_MODULE_CONFIG = [
@@ -62,15 +66,41 @@ export const SIDEBAR_MODULE_CONFIG = [
     requiredPermission: 'branches.view',
     path: '/branches',
   },
+  {
+    id: 'staff',
+    label: 'Staff Management',
+    icon: UserCheck,
+    allowedRoles: ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER', 'ACCOUNTANT', 'FRONT_DESK'],
+    requiredPermission: 'staff.view',
+    path: '/staff',
+  },
+  // Service Staff dedicated navigation module
+  {
+    id: 'my-profile',
+    label: 'My Profile',
+    icon: UserCheck,
+    allowedRoles: ['SERVICE_STAFF', 'STAFF'],
+    requiredPermission: 'staff.view',
+    path: '/staff/me',
+  },
 ];
 
-export const getAuthorizedNavModules = (userRole = 'SUPER_ADMIN') => {
-  const normalizedRole = String(userRole).toUpperCase().replace(/[\s-]+/g, '_');
+export const getAuthorizedNavModules = (userRole = 'SUPER_ADMIN', allUserRoles = []) => {
+  const normUserRole = String(userRole || '').toUpperCase().replace(/[\s-]+/g, '_');
+  const roleList = [
+    normUserRole,
+    ...(Array.isArray(allUserRoles) ? allUserRoles : []).map((r) =>
+      String(r).toUpperCase().replace(/[\s-]+/g, '_'),
+    ),
+  ].filter(Boolean);
+
+  const effectiveRoles = roleList.length > 0 ? roleList : ['SUPER_ADMIN'];
+
   return SIDEBAR_MODULE_CONFIG.filter((module) => {
     if (!module.allowedRoles || module.allowedRoles.length === 0) return true;
-    return module.allowedRoles.some(
-      (allowedRole) =>
-        allowedRole.toUpperCase().replace(/[\s-]+/g, '_') === normalizedRole,
-    );
+    return module.allowedRoles.some((allowedRole) => {
+      const normAllowed = allowedRole.toUpperCase().replace(/[\s-]+/g, '_');
+      return effectiveRoles.includes(normAllowed);
+    });
   });
 };

@@ -42,15 +42,47 @@ export const getPermissionAliases = (key) => {
     spellingVariants.push(module.replace(/organization/g, 'organisation'));
   }
 
+  // Action variants (e.g. update <-> edit)
+  const actionVariants = [action];
+  if (action === 'update') actionVariants.push('edit');
+  if (action === 'edit') actionVariants.push('update');
+
+  // Module 05 standardized operation mappings
+  if (normalized.startsWith('staff')) {
+    if (action === 'manage') {
+      aliases.add(`${module}.manage_status`);
+      aliases.add(`${module}.terminate`);
+      aliases.add(`${module}.link_user`);
+      aliases.add(`${module}.reveal_sensitive`);
+      aliases.add(`${module}.manage_versions`);
+      aliases.add(`${module}.transfer`);
+    }
+    if (['manage_status', 'terminate', 'link_user', 'reveal_sensitive', 'manage_versions', 'transfer'].includes(action)) {
+      aliases.add(`${module}.manage`);
+    }
+    if (action === 'upload' || action === 'assign') {
+      aliases.add(`${module}.create`);
+    }
+    if (action === 'download') {
+      aliases.add(`${module}.view`);
+    }
+    if (action === 'remove') {
+      aliases.add(`${module}.delete`);
+      aliases.add(`${module}.manage`);
+    }
+  }
+
   for (const m of spellingVariants) {
-    aliases.add(`${m}.${action}`);
-    if (m.endsWith('es')) {
-      aliases.add(`${m.slice(0, -2)}.${action}`); // branches.create -> branch.create
-    } else if (m.endsWith('s')) {
-      aliases.add(`${m.slice(0, -1)}.${action}`); // users.view -> user.view, roles.edit -> role.edit, organizations.view -> organization.view
-    } else {
-      aliases.add(`${m}s.${action}`); // user.view -> users.view, role.edit -> roles.edit, organization.view -> organizations.view
-      aliases.add(`${m}es.${action}`); // branch.create -> branches.create
+    for (const act of actionVariants) {
+      aliases.add(`${m}.${act}`);
+      if (m.endsWith('es')) {
+        aliases.add(`${m.slice(0, -2)}.${act}`); // branches.create -> branch.create
+      } else if (m.endsWith('s')) {
+        aliases.add(`${m.slice(0, -1)}.${act}`); // users.view -> user.view, roles.update -> role.update
+      } else {
+        aliases.add(`${m}s.${act}`); // user.view -> users.view, role.update -> roles.update
+        aliases.add(`${m}es.${act}`); // branch.create -> branches.create
+      }
     }
   }
 

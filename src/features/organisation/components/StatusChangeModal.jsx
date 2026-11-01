@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { AlertTriangle, X, CheckCircle2, PauseCircle, Power } from 'lucide-react';
 
 export const StatusChangeModal = ({
@@ -38,8 +39,16 @@ export const StatusChangeModal = ({
   const meta = statusMeta[targetStatus] || statusMeta.inactive;
   const IconComponent = meta.icon;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] overflow-y-auto">
+      {/* Backdrop with oversized bleed */}
+      <div
+        className="fixed -inset-10 bg-black/75 backdrop-blur-md transition-opacity duration-200 animate-fadeOnly"
+        style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div className="min-h-full flex items-center justify-center p-4 relative z-10" onClick={onClose}>
       <div className="w-full max-w-md bg-[var(--bg-card)] rounded-2xl shadow-2xl border border-[var(--border-color)] overflow-hidden text-[var(--text-primary)]">
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]">
@@ -53,7 +62,7 @@ export const StatusChangeModal = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors"
+            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -83,14 +92,14 @@ export const StatusChangeModal = ({
           <button
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-colors"
+            className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={() => onConfirm(targetStatus)}
             disabled={loading}
-            className={`px-4 py-2 text-sm font-semibold rounded-lg shadow-sm transition-all flex items-center gap-2 ${meta.btnColor}`}
+            className={`px-4 py-2 text-sm font-semibold rounded-lg shadow-sm transition-all flex items-center gap-2 cursor-pointer ${meta.btnColor}`}
           >
             {loading ? (
               <>
@@ -103,8 +112,13 @@ export const StatusChangeModal = ({
           </button>
         </div>
       </div>
+      </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 };
 
 export default StatusChangeModal;

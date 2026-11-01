@@ -62,12 +62,15 @@ export const resolveRoleDestination = (user, explicitReturnUrl = null) => {
     return '/dashboard';
   }
 
-  // Staff roles (Branch Manager, Front Desk, Service Staff, Inventory Manager, Accountant, etc.)
+  // Service Staff destination (directly to own profile page)
+  if (normalized === 'SERVICE_STAFF' || normalized === 'STAFF') {
+    return '/staff/me';
+  }
+
+  // Management & Operations staff roles
   if (
     normalized === 'BRANCH_MANAGER' ||
     normalized === 'FRONT_DESK' ||
-    normalized === 'SERVICE_STAFF' ||
-    normalized === 'STAFF' ||
     normalized === 'INVENTORY_MANAGER' ||
     normalized === 'ACCOUNTANT' ||
     normalized === 'MARKETING_MANAGER'

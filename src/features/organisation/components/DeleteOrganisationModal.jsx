@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { AlertTriangle, X, Trash2 } from 'lucide-react';
 
 export const DeleteOrganisationModal = ({
@@ -29,8 +30,16 @@ export const DeleteOrganisationModal = ({
     onConfirm();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] overflow-y-auto">
+      {/* Backdrop with oversized bleed */}
+      <div
+        className="fixed -inset-10 bg-black/75 backdrop-blur-md transition-opacity duration-200 animate-fadeOnly"
+        style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div className="min-h-full flex items-center justify-center p-4 relative z-10" onClick={onClose}>
       <div className="w-full max-w-lg bg-[var(--bg-card)] rounded-2xl shadow-2xl border border-rose-500/20 overflow-hidden text-[var(--text-primary)]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)] bg-rose-500/5">
@@ -114,8 +123,13 @@ export const DeleteOrganisationModal = ({
           </button>
         </div>
       </div>
+      </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 };
 
 export default DeleteOrganisationModal;

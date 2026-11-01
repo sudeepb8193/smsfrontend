@@ -60,7 +60,6 @@ export const Input = ({
           value={value ?? ''}
           onChange={handleChange}
           placeholder={placeholder}
-          required={required}
           disabled={disabled}
           readOnly={readOnly}
           maxLength={maxLength}

@@ -478,6 +478,8 @@ export const useBranchDetails = () => {
   };
 };
 
+export { useBranch } from '../context/BranchContext';
+
 export default {
   useBranchList,
   useBranchCreate,
