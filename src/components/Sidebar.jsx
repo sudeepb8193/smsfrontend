@@ -39,7 +39,7 @@ export const Sidebar = ({ currentModule: propsCurrentModule, activeSubtask: prop
   });
   const [hoveredModule, setHoveredModule] = useState(null);
 
-  const modules = getAuthorizedNavModules(role);
+  const modules = getAuthorizedNavModules(userRole, user?.roles);
 
   // Determine current active module and subtask from location URL if not explicitly passed
   const currentPath = location.pathname;

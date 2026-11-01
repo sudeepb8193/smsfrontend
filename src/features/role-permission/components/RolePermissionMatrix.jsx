@@ -7,6 +7,7 @@ import Tooltip from '../../../components/shared/Tooltip';
 import Spinner from '../../../components/shared/Spinner';
 import ConfirmDialog from '../../../components/shared/ConfirmDialog';
 import Toggle from '../../../components/shared/Toggle';
+import StaffPermissionGroups from './StaffPermissionGroups';
 import {
   Shield,
   Save,
@@ -26,9 +27,11 @@ import {
 const STANDARD_ACTIONS = [
   { key: 'view', label: 'View', color: 'primary' },
   { key: 'create', label: 'Create', color: 'success' },
-  { key: 'edit', label: 'Edit', color: 'warning' },
+  { key: 'update', label: 'Update', color: 'warning' },
   { key: 'delete', label: 'Delete', color: 'danger' },
+  { key: 'manage', label: 'Manage', color: 'brand' },
   { key: 'approve', label: 'Approve', color: 'brand' },
+  { key: 'reject', label: 'Reject', color: 'danger' },
   { key: 'export', label: 'Export', color: 'secondary' },
   { key: 'print', label: 'Print', color: 'neutral' },
 ];
@@ -527,7 +530,9 @@ export const RolePermissionMatrix = ({
 
                       {/* Standard Action Toggle Cells */}
                       {STANDARD_ACTIONS.map((actionCol) => {
-                        const perm = module.permissions.find((p) => p.action === actionCol.key);
+                        const perm = module.permissions.find(
+                          (p) => p.action === actionCol.key || (actionCol.key === 'update' && p.action === 'edit')
+                        );
                         if (!perm) {
                           return (
                             <td key={actionCol.key} className="py-4 px-3 text-center text-[var(--text-muted)] opacity-40 select-none">
@@ -587,7 +592,34 @@ export const RolePermissionMatrix = ({
                       </td>
                     </tr>
 
-
+                    {/* Module 05: Expandable 7 Groups for Employee / Staff Management */}
+                    {module.moduleCode === 'staff' && (
+                      <tr className="bg-[var(--bg-input)]/20 border-b border-[var(--border-color)]">
+                        <td colSpan={STANDARD_ACTIONS.length + 2} className="p-0">
+                          <StaffPermissionGroups
+                            module={module}
+                            selectedPermissions={selectedPermissions}
+                            onTogglePermission={handleTogglePermission}
+                            onGrantGroup={(modCode, keys) => {
+                              const next = { ...selectedPermissions };
+                              const curScope = moduleScopes[modCode] || { scope: 'own_branch', restrictedBranchIds: [] };
+                              next[`${modCode}.view`] = { scope: curScope.scope, restrictedBranchIds: [...curScope.restrictedBranchIds] };
+                              keys.forEach((k) => {
+                                next[k] = { scope: curScope.scope, restrictedBranchIds: [...curScope.restrictedBranchIds] };
+                              });
+                              setSelectedPermissions(next);
+                              setHasUnsavedChanges(true);
+                            }}
+                            onRevokeGroup={(modCode, keys) => {
+                              const next = { ...selectedPermissions };
+                              keys.forEach((k) => { delete next[k]; });
+                              setSelectedPermissions(next);
+                              setHasUnsavedChanges(true);
+                            }}
+                          />
+                        </td>
+                      </tr>
+                    )}
                   </React.Fragment>
                 );
               })}

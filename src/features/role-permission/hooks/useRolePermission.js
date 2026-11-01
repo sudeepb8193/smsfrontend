@@ -236,7 +236,8 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
       delete next[key];
 
       // If removing View, remove all dependent non-view actions in this module
-      if (action === 'view') {
+      // Note: For granular modules like staff, only removing the master 'staff.view' triggers dependency revocation
+      if (key === `${moduleCode}.view` || (action === 'view' && moduleCode !== 'staff')) {
         const moduleDef = matrixTemplate.find((m) => m.moduleCode === moduleCode);
         if (moduleDef) {
           moduleDef.permissions.forEach((p) => {
@@ -254,9 +255,10 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
 
       // Dependency Rule: Any non-view action automatically implies and grants View
       if (action !== 'view') {
+        const viewPermKey = `${moduleCode}.view`;
         const viewPerm = matrixTemplate
           .find((m) => m.moduleCode === moduleCode)
-          ?.permissions?.find((p) => p.action === 'view');
+          ?.permissions?.find((p) => p.permissionKey === viewPermKey || p.action === 'view');
 
         if (viewPerm && !next[viewPerm.permissionKey]) {
           next[viewPerm.permissionKey] = {
@@ -267,6 +269,47 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
       }
     }
 
+    setSelectedPermissions(next);
+    setHasUnsavedChanges(true);
+  };
+
+  // Grant All permissions within a specific group (e.g. Module 05 groups)
+  const handleGrantPermissionGroup = (moduleCode, groupKeys) => {
+    const next = { ...selectedPermissions };
+    const currentModScope = moduleScopes[moduleCode] || {
+      scope: 'own_branch',
+      restrictedBranchIds: [],
+    };
+
+    // Ensure master view permission is also granted
+    const masterViewKey = `${moduleCode}.view`;
+    next[masterViewKey] = {
+      scope: currentModScope.scope,
+      restrictedBranchIds: [...currentModScope.restrictedBranchIds],
+    };
+
+    const moduleDef = matrixTemplate.find((m) => m.moduleCode === moduleCode);
+    if (moduleDef) {
+      moduleDef.permissions.forEach((p) => {
+        if (groupKeys.includes(p.permissionKey)) {
+          next[p.permissionKey] = {
+            scope: currentModScope.scope,
+            restrictedBranchIds: [...currentModScope.restrictedBranchIds],
+          };
+        }
+      });
+    }
+
+    setSelectedPermissions(next);
+    setHasUnsavedChanges(true);
+  };
+
+  // Revoke All permissions within a specific group
+  const handleRevokePermissionGroup = (moduleCode, groupKeys) => {
+    const next = { ...selectedPermissions };
+    groupKeys.forEach((key) => {
+      delete next[key];
+    });
     setSelectedPermissions(next);
     setHasUnsavedChanges(true);
   };
@@ -593,6 +636,8 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
     handleTogglePermission,
     handleGrantModuleAll,
     handleRevokeModuleAll,
+    handleGrantPermissionGroup,
+    handleRevokePermissionGroup,
     handleGrantAllGlobal,
     handleRevokeAllGlobal,
     handleScopeChange,

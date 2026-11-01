@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 export const BranchSwitcher = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { canCreate, isSuperAdmin } = usePermission();
+  const { canCreate, isSuperAdmin, isOwner } = usePermission();
   const { branches, currentBranch, setCurrentBranch, loading } = useBranch();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -27,10 +27,6 @@ export const BranchSwitcher = () => {
   const dropdownRef = useRef(null);
   const searchInputRef = useRef(null);
 
-  const userRole = String(
-    user?.roleSlug || user?.role || user?.roleName || '',
-  ).toLowerCase().replace(/_/g, '-');
-  const isOwner = userRole === 'owner' || userRole === 'super-admin';
   const canCreateBranch = isSuperAdmin || canCreate('branches');
 
   // Close when clicking outside
@@ -66,7 +62,8 @@ export const BranchSwitcher = () => {
     toast.success(`Active context switched to ${branch.name}.`);
   };
 
-  if (!user?.organizationId) return null;
+  // Branch switcher is strictly restricted to Owner and Super Admin
+  if (!user?.organizationId || (!isOwner && !isSuperAdmin)) return null;
 
   return (
     <div className="relative" ref={dropdownRef}>

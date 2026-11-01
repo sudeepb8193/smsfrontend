@@ -8,6 +8,7 @@ import ConfirmDialog from '../../../components/shared/ConfirmDialog';
 import CreateRoleModal from '../components/CreateRoleModal';
 import CreateModuleModal from '../components/CreateModuleModal';
 import EditModuleModal from '../components/EditModuleModal';
+import StaffPermissionGroups from '../components/StaffPermissionGroups';
 import {
   Shield,
   Plus,
@@ -33,9 +34,11 @@ import { useRoleList } from '../hooks/useRolePermission';
 const STANDARD_ACTIONS = [
   { key: 'view', label: 'View' },
   { key: 'create', label: 'Create' },
-  { key: 'edit', label: 'Edit' },
+  { key: 'update', label: 'Update' },
   { key: 'delete', label: 'Delete' },
+  { key: 'manage', label: 'Manage' },
   { key: 'approve', label: 'Approve' },
+  { key: 'reject', label: 'Reject' },
   { key: 'export', label: 'Export' },
   { key: 'print', label: 'Print' },
 ];
@@ -90,6 +93,8 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
     handleTogglePermission,
     handleGrantModuleAll,
     handleRevokeModuleAll,
+    handleGrantPermissionGroup,
+    handleRevokePermissionGroup,
     handleGrantAllGlobal,
     handleRevokeAllGlobal,
     handleScopeChange,
@@ -514,6 +519,9 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                     const hasNonViewChecked = module.permissions.some(
                       (p) => p.action !== 'view' && selectedPermissions[p.permissionKey]
                     );
+                    const grantedInModule = module.permissions.filter(
+                      (p) => selectedPermissions[p.permissionKey]
+                    ).length;
 
                     return (
                       <div
@@ -522,7 +530,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                       >
                         {/* Module Card Header */}
                         <div className="p-3.5 sm:p-4 border-b border-[var(--border-color)] flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[var(--bg-input)]">
-                          {/* Module Title */}
+                          {/* Module Title & Granted Badge */}
                           <div className="flex items-center gap-2.5">
                             <div className="w-8 h-8 rounded-lg bg-primary-500/10 text-primary-500 flex items-center justify-center shrink-0 font-bold text-xs">
                               <Layers size={16} />
@@ -535,12 +543,37 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                                 <span className="text-[10px] text-[var(--text-muted)] font-mono">
                                   ({module.moduleCode})
                                 </span>
+                                <span
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                    grantedInModule > 0
+                                      ? 'bg-primary-500/15 text-primary-400 border-primary-500/30'
+                                      : 'bg-white/5 text-[var(--text-muted)] border-[var(--border-color)]'
+                                  }`}
+                                >
+                                  {grantedInModule} / {module.permissions.length} Granted
+                                </span>
                               </div>
                             </div>
                           </div>
 
-                          {/* Quick Select All / None & Module Management */}
-                          <div className="flex items-center gap-3 text-xs font-semibold">
+                          {/* Controls: Branch Scope & Actions */}
+                          <div className="flex flex-wrap items-center gap-3 text-xs font-semibold">
+                            {/* Branch Scope Selector */}
+                            <div className="flex items-center gap-1.5 bg-[var(--bg-card)] px-2 py-1 rounded-xl border border-[var(--border-color)]">
+                              <Building size={13} className="text-[var(--text-muted)] shrink-0" />
+                              <select
+                                value={currentScope}
+                                onChange={(e) => handleScopeChange(module.moduleCode, e.target.value)}
+                                className="bg-transparent text-xs text-[var(--text-primary)] focus:outline-none cursor-pointer font-medium"
+                                title="Branch Access Scope"
+                              >
+                                <option value="all_branches">All Branches (Global)</option>
+                                <option value="own_branch">Own Branch Only</option>
+                                <option value="restricted_branches">Restricted Branches...</option>
+                              </select>
+                            </div>
+
+                            {/* Select All / None */}
                             <div className="flex items-center gap-1.5">
                               <button
                                 type="button"
@@ -592,59 +625,103 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
                           </div>
                         </div>
 
-                        {/* Module Actions Grid */}
-                        <div className="p-3.5 sm:p-4">
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
-                            {STANDARD_ACTIONS.map((actionCol) => {
-                              const perm = module.permissions.find((p) => p.action === actionCol.key);
-                              if (!perm) return null;
-
-                              const isChecked = Boolean(selectedPermissions[perm.permissionKey]);
-                              const isImpliedView = actionCol.key === 'view' && hasNonViewChecked && isViewChecked;
-
-                              return (
-                                <div
-                                  key={actionCol.key}
-                                  onClick={(e) => {
-                                    if (e.target.closest('[role="switch"]') || e.target.closest('input') || e.target.closest('button')) {
-                                      return;
-                                    }
-                                    handleTogglePermission(module.moduleCode, actionCol.key, perm);
-                                  }}
-                                  className={`p-2.5 rounded-xl border flex flex-col justify-between cursor-pointer transition-all ${isChecked
-                                      ? 'bg-primary-500/15 border-primary-500 shadow-2xs'
-                                      : 'bg-[var(--bg-input)] border-[var(--border-color)] hover:bg-white/5'
-                                    }`}
-                                >
-                                  <div className="flex items-center justify-between gap-1 mb-2">
-                                    <span className="text-xs font-bold text-[var(--text-primary)]">
-                                      {actionCol.label}
-                                    </span>
-                                    <Toggle
-                                      checked={isChecked}
-                                      onChange={() => handleTogglePermission(module.moduleCode, actionCol.key, perm)}
-                                      size="sm"
-                                      color="primary"
-                                      isImplied={isImpliedView}
-                                      aria-label={`Toggle ${actionCol.label}`}
-                                    />
-                                  </div>
-
-                                  <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
-                                    <span className="truncate" title={perm.description || perm.label}>
-                                      {perm.action}
-                                    </span>
-                                    {isImpliedView && (
-                                      <span className="text-[9px] font-bold text-primary-500 uppercase tracking-tighter shrink-0">
-                                        Implied
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })}
+                        {/* Restricted Branches Banner if Selected */}
+                        {currentScope === 'restricted_branches' && (
+                          <div className="p-3 bg-white/5 border-b border-[var(--border-color)] text-xs">
+                            <span className="font-bold text-[var(--text-secondary)] block mb-1.5 text-[11px]">
+                              Select Permitted Branches ({restrictedBranchIds.length} of {branches.length} selected):
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {branches.length === 0 ? (
+                                <span className="text-xs text-[var(--text-muted)]">No branches available</span>
+                              ) : (
+                                branches.map((b) => {
+                                  const isSelected = restrictedBranchIds.includes(b.id);
+                                  return (
+                                    <button
+                                      key={b.id}
+                                      type="button"
+                                      onClick={() => handleToggleRestrictedBranch(module.moduleCode, b.id)}
+                                      className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors cursor-pointer ${
+                                        isSelected
+                                          ? 'bg-primary-500/20 text-primary-400 border-primary-500/50'
+                                          : 'bg-[var(--bg-input)] text-[var(--text-muted)] border-[var(--border-color)] hover:text-[var(--text-primary)]'
+                                      }`}
+                                    >
+                                      {b.name}
+                                    </button>
+                                  );
+                                })
+                              )}
+                            </div>
                           </div>
-                        </div>
+                        )}
+
+                        {/* Module Body: Special 7 Groups for Employee/Staff OR Standard Grid */}
+                        {module.moduleCode === 'staff' ? (
+                          <StaffPermissionGroups
+                            module={module}
+                            selectedPermissions={selectedPermissions}
+                            onTogglePermission={handleTogglePermission}
+                            onGrantGroup={handleGrantPermissionGroup}
+                            onRevokeGroup={handleRevokePermissionGroup}
+                          />
+                        ) : (
+                          <div className="p-3.5 sm:p-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
+                              {STANDARD_ACTIONS.map((actionCol) => {
+                                const perm = module.permissions.find(
+                                  (p) => p.action === actionCol.key || (actionCol.key === 'update' && p.action === 'edit')
+                                );
+                                if (!perm) return null;
+
+                                const isChecked = Boolean(selectedPermissions[perm.permissionKey]);
+                                const isImpliedView = actionCol.key === 'view' && hasNonViewChecked && isViewChecked;
+
+                                return (
+                                  <div
+                                    key={actionCol.key}
+                                    onClick={(e) => {
+                                      if (e.target.closest('[role="switch"]') || e.target.closest('input') || e.target.closest('button')) {
+                                        return;
+                                      }
+                                      handleTogglePermission(module.moduleCode, actionCol.key, perm);
+                                    }}
+                                    className={`p-2.5 rounded-xl border flex flex-col justify-between cursor-pointer transition-all ${isChecked
+                                        ? 'bg-primary-500/15 border-primary-500 shadow-2xs'
+                                        : 'bg-[var(--bg-input)] border-[var(--border-color)] hover:bg-white/5'
+                                      }`}
+                                  >
+                                    <div className="flex items-center justify-between gap-1 mb-2">
+                                      <span className="text-xs font-bold text-[var(--text-primary)]">
+                                        {actionCol.label}
+                                      </span>
+                                      <Toggle
+                                        checked={isChecked}
+                                        onChange={() => handleTogglePermission(module.moduleCode, actionCol.key, perm)}
+                                        size="sm"
+                                        color="primary"
+                                        isImplied={isImpliedView}
+                                        aria-label={`Toggle ${actionCol.label}`}
+                                      />
+                                    </div>
+
+                                    <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+                                      <span className="truncate" title={perm.description || perm.label}>
+                                        {perm.action}
+                                      </span>
+                                      {isImpliedView && (
+                                        <span className="text-[9px] font-bold text-primary-500 uppercase tracking-tighter shrink-0">
+                                          Implied
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}

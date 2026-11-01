@@ -1,31 +1,112 @@
 import React from 'react';
 import { Route, Navigate } from 'react-router-dom';
-import Card from '../components/shared/Card';
-import PageHeader from '../components/layout/PageHeader/PageHeader';
-import { Scissors, Clock } from 'lucide-react';
-
+import RoleGuard from './RoleGuard';
+import StaffListPage from '../features/staff/pages/StaffListPage';
+import StaffCreatePage from '../features/staff/pages/StaffCreatePage';
+import StaffDetailsPage from '../features/staff/pages/StaffDetailsPage';
+import StaffSelfProfilePage from '../features/staff/pages/StaffSelfProfilePage';
 import { UserManagementPage } from '../features/user/pages/UserManagementPage';
+import { useAuth } from '../hooks/useAuth';
 
-const ModulePlaceholder = ({ title, description, icon: Icon }) => (
-  <div className="space-y-6">
-    <PageHeader title={title} description={description} />
-    <Card>
-      <div className="flex flex-col items-center justify-center p-12 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-primary-500/15 text-primary-500 flex items-center justify-center mb-4">
-          <Icon size={32} />
-        </div>
-        <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{title}</h2>
-        <p className="text-sm text-slate-500 dark:text-[#8E7A86] max-w-md">
-          {description || 'This feature module is ready for business logic integration.'}
-        </p>
-      </div>
-    </Card>
-  </div>
+function StaffIndexRedirect() {
+  const { user, role } = useAuth();
+  const rawRole =
+    role ||
+    user?.role ||
+    user?.roleSlug ||
+    user?.roleName ||
+    (Array.isArray(user?.roles) ? user.roles[0] : '') ||
+    '';
+  const normRole = String(rawRole).toUpperCase().replace(/[\s_-]+/g, '_');
+  const allRoles = (user?.roles || []).map((r) => String(r).toUpperCase().replace(/[\s_-]+/g, '_'));
+  const isManagement = ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER', 'ACCOUNTANT', 'FRONT_DESK'].some(
+    (m) => normRole === m || allRoles.includes(m),
+  );
+  const isServiceStaff =
+    (normRole === 'SERVICE_STAFF' ||
+      normRole === 'STAFF' ||
+      allRoles.includes('SERVICE_STAFF') ||
+      allRoles.includes('STAFF')) &&
+    !isManagement;
+
+  if (isServiceStaff) {
+    return <Navigate to="/staff/me" replace />;
+  }
+  return <Navigate to="/staff/directory" replace />;
+}
+
+export const StaffRoutes = (
+  <>
+    {/* Staff Root Smart Redirector */}
+    <Route path="/staff" element={<StaffIndexRedirect />} />
+
+    {/* Dedicated Service Staff Self-Profile Page */}
+    <Route
+      element={
+        <RoleGuard
+          requiredPermission="staff.view"
+          resourceName="My Profile"
+          allowedRoles={[
+            'SERVICE_STAFF',
+            'STAFF',
+            'OWNER',
+            'SUPER_ADMIN',
+            'BRANCH_MANAGER',
+            'ACCOUNTANT',
+            'FRONT_DESK',
+          ]}
+        />
+      }
+    >
+      <Route path="/staff/me" element={<StaffSelfProfilePage />} />
+    </Route>
+
+    {/* Staff Management Directory (HR Management View) */}
+    <Route
+      element={
+        <RoleGuard
+          requiredPermission="staff.view"
+          resourceName="Staff Management"
+          allowedRoles={[
+            'OWNER',
+            'SUPER_ADMIN',
+            'BRANCH_MANAGER',
+            'ACCOUNTANT',
+            'FRONT_DESK',
+          ]}
+        />
+      }
+    >
+      <Route path="/staff/directory" element={<StaffListPage />} />
+      <Route path="/staff/:id" element={<StaffDetailsPage />} />
+    </Route>
+
+    {/* Create Staff Record */}
+    <Route
+      element={
+        <RoleGuard
+          requiredPermission="staff.create"
+          resourceName="Add Staff"
+          allowedRoles={['OWNER', 'SUPER_ADMIN', 'BRANCH_MANAGER']}
+        />
+      }
+    >
+      <Route path="/staff/create" element={<StaffCreatePage />} />
+    </Route>
+
+    {/* User Management via Staff submenu */}
+    <Route
+      element={
+        <RoleGuard
+          requiredPermission="users.view"
+          resourceName="User Management"
+          allowedRoles={['OWNER', 'SUPER_ADMIN', 'BRANCH_MANAGER']}
+        />
+      }
+    >
+      <Route path="/staff/users" element={<UserManagementPage />} />
+    </Route>
+  </>
 );
 
-export const StaffRoutes = [
-  <Route key="user-roles" path="/staff/users" element={<UserManagementPage />} />,
-  <Route key="staff-directory" path="/staff/directory" element={<ModulePlaceholder title="Staff HR Directory" description="Manage hair stylists, staff employee records, and designations." icon={Scissors} />} />,
-  <Route key="staff-rosters" path="/staff/rosters" element={<ModulePlaceholder title="Shift Rosters & Schedules" description="Weekly staff work rosters and shift scheduling interface." icon={Clock} />} />,
-  <Route key="staff-redirect" path="/staff" element={<Navigate to="/staff/directory" replace />} />,
-];
+export default StaffRoutes;

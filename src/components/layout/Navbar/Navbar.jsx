@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bell, PanelLeftClose, PanelLeftOpen, ArrowLeft, ShieldCheck, Sun, Moon, Palette, LogOut, ChevronDown } from 'lucide-react';
 import { useTheme } from '../../../hooks/useTheme';
 import { useAuth } from '../../../hooks/useAuth';
+import { usePermission } from '../../../hooks/usePermission';
 import { useNavigate } from 'react-router-dom';
 import ThemeSettingsModal from '../../shared/ThemeSettingsModal';
 import Tooltip from '../../shared/Tooltip';
@@ -11,6 +12,7 @@ import OrganisationPicker from '../../../features/organisation/components/Organi
 export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOpenSecurityModal }) => {
   const { isDark, toggleTheme, openThemeModal } = useTheme();
   const { user, role, logout } = useAuth();
+  const { isOwner, isSuperAdmin } = usePermission();
   const navigate = useNavigate();
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -70,10 +72,12 @@ export const Navbar = ({ onToggleSidebar, isSidebarCollapsed, isMobileOpen, onOp
             <OrganisationPicker />
           </div>
 
-          {/* Persistent Branch Switcher */}
-          <div className="ml-1 sm:ml-2">
-            <BranchSwitcher />
-          </div>
+          {/* Persistent Branch Switcher (Owner and Super Admin only) */}
+          {(isOwner || isSuperAdmin) && (
+            <div className="ml-1 sm:ml-2">
+              <BranchSwitcher />
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-3">

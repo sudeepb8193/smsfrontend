@@ -10,13 +10,13 @@ export const EmptyState = ({
 }) => {
   return (
     <div
-      className={`flex flex-col items-center justify-center text-center p-12 bg-[#271820]/50 border border-dashed border-white/10 rounded-2xl ${className}`}
+      className={`flex flex-col items-center justify-center text-center p-12 bg-[var(--bg-input)] border border-dashed border-[var(--border-color)] rounded-2xl ${className}`}
     >
-      <div className="w-16 h-16 rounded-2xl bg-primary-500/15 text-primary-400 flex items-center justify-center mb-4">
+      <div className="w-16 h-16 rounded-2xl bg-primary-500/15 text-primary-500 flex items-center justify-center mb-4">
         {React.isValidElement(Icon) ? Icon : <Icon size={32} />}
       </div>
-      <h3 className="text-lg font-bold text-[#F9FAFB] mb-1">{title}</h3>
-      <p className="text-sm text-[#8E7A86] max-w-sm mb-6">{description}</p>
+      <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">{title}</h3>
+      <p className="text-sm text-[var(--text-muted)] max-w-sm mb-6">{description}</p>
       {action && <div>{action}</div>}
     </div>
   );

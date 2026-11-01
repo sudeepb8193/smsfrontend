@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import Modal from '../../../components/shared/Modal';
 import {
   ChevronDown,
   Plus,
@@ -557,98 +558,88 @@ export default function SalonSuiteSettingsHub({
               </div>
 
               {/* Add Holiday Modal */}
-              {showAddHolidayModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                  <div className="w-full max-w-md bg-[var(--bg-card)] rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-color)] text-[var(--text-primary)]">
-                    <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
-                      <h3 className="text-lg font-bold text-[var(--text-primary)]">Add a holiday</h3>
-                      <button
-                        type="button"
-                        onClick={() => setShowAddHolidayModal(false)}
-                        className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors cursor-pointer"
+              <Modal
+                isOpen={showAddHolidayModal}
+                onClose={() => setShowAddHolidayModal(false)}
+                title="Add a holiday"
+                size="small"
+              >
+                <form onSubmit={handleAddHolidaySubmit} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-semibold text-[var(--text-primary)]">
+                      Holiday name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newHoliday.name}
+                      onChange={(e) => setNewHoliday({ ...newHoliday, name: e.target.value })}
+                      placeholder="e.g. Eid al-Fitr"
+                      className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-primary)] text-sm focus:outline-none focus:border-primary-500 placeholder:text-[var(--text-muted)]"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-semibold text-[var(--text-primary)]">
+                      Date
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newHoliday.date}
+                      onChange={(e) => setNewHoliday({ ...newHoliday, date: e.target.value })}
+                      placeholder="e.g. 10 Apr 2026"
+                      className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-primary)] text-sm focus:outline-none focus:border-primary-500 placeholder:text-[var(--text-muted)]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="block text-sm font-semibold text-[var(--text-primary)]">
+                        Repeats
+                      </label>
+                      <select
+                        value={newHoliday.repeats}
+                        onChange={(e) => setNewHoliday({ ...newHoliday, repeats: e.target.value })}
+                        className="w-full h-11 px-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-primary)] text-sm focus:outline-none focus:border-primary-500 cursor-pointer"
                       >
-                        <X className="h-5 w-5" />
-                      </button>
+                        <option value="Every year">Every year</option>
+                        <option value="One-off">One-off</option>
+                      </select>
                     </div>
 
-                    <form onSubmit={handleAddHolidaySubmit} className="space-y-4 pt-4">
-                      <div className="space-y-1.5">
-                        <label className="block text-sm font-semibold text-[var(--text-primary)]">
-                          Holiday name
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={newHoliday.name}
-                          onChange={(e) => setNewHoliday({ ...newHoliday, name: e.target.value })}
-                          placeholder="e.g. Eid al-Fitr"
-                          className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-primary)] text-sm focus:outline-none focus:border-primary-500 placeholder:text-[var(--text-muted)]"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="block text-sm font-semibold text-[var(--text-primary)]">
-                          Date
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={newHoliday.date}
-                          onChange={(e) => setNewHoliday({ ...newHoliday, date: e.target.value })}
-                          placeholder="e.g. 10 Apr 2026"
-                          className="w-full h-11 px-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-primary)] text-sm focus:outline-none focus:border-primary-500 placeholder:text-[var(--text-muted)]"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                          <label className="block text-sm font-semibold text-[var(--text-primary)]">
-                            Repeats
-                          </label>
-                          <select
-                            value={newHoliday.repeats}
-                            onChange={(e) => setNewHoliday({ ...newHoliday, repeats: e.target.value })}
-                            className="w-full h-11 px-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-primary)] text-sm focus:outline-none focus:border-primary-500 cursor-pointer"
-                          >
-                            <option value="Every year">Every year</option>
-                            <option value="One-off">One-off</option>
-                          </select>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="block text-sm font-semibold text-[var(--text-primary)]">
-                            Applies to
-                          </label>
-                          <select
-                            value={newHoliday.appliesTo}
-                            onChange={(e) => setNewHoliday({ ...newHoliday, appliesTo: e.target.value })}
-                            className="w-full h-11 px-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-primary)] text-sm focus:outline-none focus:border-primary-500 cursor-pointer"
-                          >
-                            <option value="All branches">All branches</option>
-                            <option value="MG Road branch">MG Road branch</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="pt-4 flex items-center justify-end gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setShowAddHolidayModal(false)}
-                          className="px-5 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors cursor-pointer"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="px-6 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition cursor-pointer"
-                        >
-                          Add holiday
-                        </button>
-                      </div>
-                    </form>
+                    <div className="space-y-1.5">
+                      <label className="block text-sm font-semibold text-[var(--text-primary)]">
+                        Applies to
+                      </label>
+                      <select
+                        value={newHoliday.appliesTo}
+                        onChange={(e) => setNewHoliday({ ...newHoliday, appliesTo: e.target.value })}
+                        className="w-full h-11 px-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-[var(--text-primary)] text-sm focus:outline-none focus:border-primary-500 cursor-pointer"
+                      >
+                        <option value="All branches">All branches</option>
+                        <option value="MG Road branch">MG Road branch</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
-              )}
+
+                  <div className="pt-4 flex items-center justify-end gap-3 border-t border-[var(--border-color)]">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddHolidayModal(false)}
+                      className="px-5 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-input)] text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition cursor-pointer"
+                    >
+                      Add holiday
+                    </button>
+                  </div>
+                </form>
+              </Modal>
             </div>
           )}
 

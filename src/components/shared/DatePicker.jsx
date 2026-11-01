@@ -1,5 +1,6 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import CustomSelector from './CustomSelector';
 
 export const DatePicker = ({
   label,
@@ -8,6 +9,8 @@ export const DatePicker = ({
   placeholder = 'Select date',
   minDate,
   maxDate,
+  minYear,
+  maxYear,
   direction = 'auto', // 'auto' | 'down' | 'up'
   disabled = false,
   required = false,
@@ -22,7 +25,7 @@ export const DatePicker = ({
   const containerRef = useRef(null);
   const generatedId = useId();
 
-  // Parse input value to Date object or current date
+  // Parse input value to Date object or null
   const parseDate = (val) => {
     if (!val) return null;
     const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(val);
@@ -35,17 +38,38 @@ export const DatePicker = ({
   const selectedDate = parseDate(value);
   const [viewDate, setViewDate] = useState(() => selectedDate || new Date());
 
+  // Keep viewDate synchronized whenever external value prop changes
+  useEffect(() => {
+    const parsed = parseDate(value);
+    if (parsed && !isNaN(parsed.getTime())) {
+      setViewDate(parsed);
+    }
+  }, [value]);
+
   const dateId = id || name || generatedId;
 
+  // Determine popover position defensively to prevent clipping and overlay issues
   const toggleDropdown = () => {
     if (disabled) return;
     if (!isOpen && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
-      if (direction === 'up' || (direction === 'auto' && spaceBelow < 320)) {
+      const spaceAbove = rect.top;
+      const popoverHeight = 350;
+
+      if (direction === 'up') {
         setOpenUpwards(true);
-      } else {
+      } else if (direction === 'down') {
         setOpenUpwards(false);
+      } else {
+        // 'auto' mode:
+        // Only flip upwards if there is insufficient room below AND plenty of room above
+        // AND space above is greater than space below
+        if (spaceBelow < popoverHeight && spaceAbove >= popoverHeight && spaceAbove > spaceBelow) {
+          setOpenUpwards(true);
+        } else {
+          setOpenUpwards(false);
+        }
       }
     }
     setIsOpen(!isOpen);
@@ -81,23 +105,31 @@ export const DatePicker = ({
     return `${year}-${month}-${day}`;
   };
 
+  // Dispatch change supporting BOTH string consumers: onChange(val)
+  // and event-object consumers: onChange(e => e.target.value)
+  const triggerChange = (valStr) => {
+    if (!onChange) return;
+    const hybrid = new String(valStr);
+    hybrid.target = { value: valStr, name: name || id || '' };
+    hybrid.currentTarget = { value: valStr, name: name || id || '' };
+    hybrid.value = valStr;
+    hybrid.toJSON = () => valStr;
+    onChange(hybrid, valStr);
+  };
+
   const handleSelectDay = (dayNum) => {
     const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), dayNum);
     const newDateISO = formatISO(newDate);
     if ((minDate && newDateISO < minDate.slice(0, 10)) || (maxDate && newDateISO > maxDate.slice(0, 10))) {
       return;
     }
-    if (onChange) {
-      onChange(newDateISO);
-    }
+    triggerChange(newDateISO);
     setIsOpen(false);
   };
 
   const handleClear = (e) => {
     e.stopPropagation();
-    if (onChange) {
-      onChange('');
-    }
+    triggerChange('');
   };
 
   const handleToday = () => {
@@ -107,28 +139,85 @@ export const DatePicker = ({
       return;
     }
     setViewDate(today);
-    if (onChange) {
-      onChange(todayISO);
-    }
+    triggerChange(todayISO);
     setIsOpen(false);
   };
 
   const prevMonth = () => {
-    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
+    const prevDate = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1);
+    if (prevDate.getFullYear() < effectiveMinYear) {
+      return;
+    }
+    setViewDate(prevDate);
   };
 
   const nextMonth = () => {
-    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
+    const nextDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1);
+    if (nextDate.getFullYear() > effectiveMaxYear) {
+      return;
+    }
+    setViewDate(nextDate);
+  };
+
+  const handleMonthChange = (newMonth) => {
+    const m = Number(newMonth);
+    const curYear = viewDate.getFullYear();
+    const maxDays = new Date(curYear, m + 1, 0).getDate();
+    const curDay = Math.min(viewDate.getDate(), maxDays);
+    setViewDate(new Date(curYear, m, curDay));
+  };
+
+  const handleYearChange = (newYear) => {
+    const y = Number(newYear);
+    const curMonth = viewDate.getMonth();
+    const maxDays = new Date(y, curMonth + 1, 0).getDate();
+    const curDay = Math.min(viewDate.getDate(), maxDays);
+    setViewDate(new Date(y, curMonth, curDay));
   };
 
   // Calendar math
   const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
   const firstDayOfWeek = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
 
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+  // Month options for CustomSelector
+  const monthOptions = [
+    { value: 0, label: 'January' },
+    { value: 1, label: 'February' },
+    { value: 2, label: 'March' },
+    { value: 3, label: 'April' },
+    { value: 4, label: 'May' },
+    { value: 5, label: 'June' },
+    { value: 6, label: 'July' },
+    { value: 7, label: 'August' },
+    { value: 8, label: 'September' },
+    { value: 9, label: 'October' },
+    { value: 10, label: 'November' },
+    { value: 11, label: 'December' },
   ];
+
+  // Year range computation — show up to current year by default
+  const currentYear = new Date().getFullYear();
+  const effectiveMinYear = minYear ?? (minDate ? parseDate(minDate)?.getFullYear() ?? 1940 : 1940);
+  const effectiveMaxYear = maxYear ?? (maxDate ? parseDate(maxDate)?.getFullYear() ?? currentYear : currentYear);
+
+  // Generate years list descending from effectiveMaxYear (current year) down to effectiveMinYear
+  const years = useMemo(() => {
+    const list = [];
+    for (let y = effectiveMaxYear; y >= effectiveMinYear; y--) {
+      list.push(y);
+    }
+    const viewYear = viewDate.getFullYear();
+    if (viewYear > effectiveMaxYear) {
+      list.unshift(viewYear);
+    } else if (viewYear < effectiveMinYear) {
+      list.push(viewYear);
+    }
+    return list;
+  }, [effectiveMinYear, effectiveMaxYear, viewDate]);
+
+  const yearOptions = useMemo(() => {
+    return years.map((y) => ({ value: y, label: String(y) }));
+  }, [years]);
 
   return (
     <div className={`relative flex flex-col gap-1.5 w-full ${className}`} ref={containerRef}>
@@ -176,30 +265,65 @@ export const DatePicker = ({
       {/* Calendar Popover */}
       {isOpen && (
         <div
-          className={`absolute left-0 z-50 w-72 p-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl animate-fadeIn text-[var(--text-primary)] select-none ${
+          className={`absolute left-0 z-[100] w-[332px] p-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl animate-fadeIn text-[var(--text-primary)] select-none ${
             openUpwards ? 'bottom-full mb-2' : 'top-full mt-2'
           }`}
         >
-          {/* Header Month / Year Controls */}
-          <div className="flex items-center justify-between mb-4">
+          {/* Header Month / Year Controls with CustomSelector */}
+          <div className="flex items-center justify-between gap-1.5 mb-3.5">
             <button
               type="button"
               onClick={prevMonth}
-              className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-all cursor-pointer"
+              disabled={viewDate.getFullYear() <= effectiveMinYear && viewDate.getMonth() === 0}
+              className={`p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-all cursor-pointer flex-shrink-0 ${
+                viewDate.getFullYear() <= effectiveMinYear && viewDate.getMonth() === 0 ? 'opacity-25 cursor-not-allowed pointer-events-none' : ''
+              }`}
+              aria-label="Previous Month"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={16} />
             </button>
 
-            <span className="text-sm font-bold text-[var(--text-primary)]">
-              {monthNames[viewDate.getMonth()]} {viewDate.getFullYear()}
-            </span>
+            <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-center">
+              {/* Month CustomSelector */}
+              <div className="w-[126px]">
+                <CustomSelector
+                  value={viewDate.getMonth()}
+                  onChange={handleMonthChange}
+                  options={monthOptions}
+                  isClearable={false}
+                  isSearchable={false}
+                  direction="down"
+                  size="sm"
+                  placeholder="Month"
+                />
+              </div>
+
+              {/* Year CustomSelector */}
+              <div className="w-[96px]">
+                <CustomSelector
+                  value={viewDate.getFullYear()}
+                  onChange={handleYearChange}
+                  options={yearOptions}
+                  isClearable={false}
+                  isSearchable={true}
+                  searchPlaceholder="Year..."
+                  direction="down"
+                  size="sm"
+                  placeholder="Year"
+                />
+              </div>
+            </div>
 
             <button
               type="button"
               onClick={nextMonth}
-              className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-all cursor-pointer"
+              disabled={viewDate.getFullYear() >= effectiveMaxYear && viewDate.getMonth() === 11}
+              className={`p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 rounded-lg transition-all cursor-pointer flex-shrink-0 ${
+                viewDate.getFullYear() >= effectiveMaxYear && viewDate.getMonth() === 11 ? 'opacity-25 cursor-not-allowed pointer-events-none' : ''
+              }`}
+              aria-label="Next Month"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={16} />
             </button>
           </div>
 

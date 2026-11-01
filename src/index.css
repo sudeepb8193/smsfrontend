@@ -89,6 +89,19 @@ input, textarea, [contenteditable="true"] {
   --color-warning-500: #F59E0B;
   --color-warning-600: #D97706;
 
+  /* Default theme fallbacks */
+  --bg-app: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-sidebar: #0F172A;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F1F5F9;
+  --bg-input: #F8FAFC;
+  --border-color: #E2E8F0;
+  --border-hover: #EA580C;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -271,6 +284,19 @@ input, textarea, [contenteditable="true"] {
 
 .animate-fadeIn {
   animation: fadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeOnly {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeOnly {
+  animation: fadeOnly 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes wave {

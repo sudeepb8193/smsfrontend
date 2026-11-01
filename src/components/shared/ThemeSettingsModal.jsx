@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Check,
@@ -70,17 +71,22 @@ export const ThemeSettingsModal = () => {
     { val: 16, label: 'Pill (16px)' },
   ];
 
-  return (
+  const modalContent = (
     <>
-      {/* 100% Solid Dimmed Backdrop with Blur */}
+      {/* 100% Solid Dimmed Backdrop with Oversized Bleed & Blur */}
       <div
-        className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md transition-opacity animate-fadeIn"
+        className="fixed -inset-10 z-[9999] bg-black/75 backdrop-blur-md transition-opacity duration-200 animate-fadeOnly"
         onClick={closeThemeModal}
+        aria-hidden="true"
+        style={{
+          WebkitBackdropFilter: 'blur(8px)',
+          backdropFilter: 'blur(8px)',
+        }}
       />
 
       {/* Floating Theme Customizer Container */}
       <div
-        className="fixed top-14 right-3 sm:right-6 z-50 w-full max-w-lg bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl shadow-2xl overflow-hidden text-[var(--text-primary)] transition-all duration-200 ease-out flex flex-col max-h-[90vh] animate-slideInRight"
+        className="fixed top-14 right-3 sm:right-6 z-[9999] w-full max-w-lg bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl shadow-2xl overflow-hidden text-[var(--text-primary)] transition-all duration-200 ease-out flex flex-col max-h-[90vh] animate-slideInRight"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -503,6 +509,10 @@ export const ThemeSettingsModal = () => {
       </div>
     </>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 };
 
 export default ThemeSettingsModal;

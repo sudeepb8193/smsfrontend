@@ -167,8 +167,16 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const role =
+    user?.role ||
+    user?.roleSlug ||
+    user?.roleName ||
+    (Array.isArray(user?.roles) ? user.roles[0] : '') ||
+    '';
+
   const value = {
     user,
+    role,
     accessToken,
     loading,
     isAuthenticated: !!accessToken && !!user,

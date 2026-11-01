@@ -63,8 +63,10 @@ export const usePermission = () => {
    */
   const canView = (moduleCode, branchId = null) => can(`${moduleCode}.view`, branchId);
   const canCreate = (moduleCode, branchId = null) => can(`${moduleCode}.create`, branchId);
-  const canEdit = (moduleCode, branchId = null) => can(`${moduleCode}.edit`, branchId);
+  const canUpdate = (moduleCode, branchId = null) => can(`${moduleCode}.update`, branchId);
+  const canEdit = (moduleCode, branchId = null) => can(`${moduleCode}.update`, branchId);
   const canDelete = (moduleCode, branchId = null) => can(`${moduleCode}.delete`, branchId);
+  const canManage = (moduleCode, branchId = null) => can(`${moduleCode}.manage`, branchId);
   const canApprove = (moduleCode, branchId = null) => can(`${moduleCode}.approve`, branchId);
   const canExport = (moduleCode, branchId = null) => can(`${moduleCode}.export`, branchId);
   const canPrint = (moduleCode, branchId = null) => can(`${moduleCode}.print`, branchId);
@@ -75,6 +77,8 @@ export const usePermission = () => {
     canAll,
     canView,
     canCreate,
+    canUpdate,
+    canManage,
     canEdit,
     canDelete,
     canApprove,

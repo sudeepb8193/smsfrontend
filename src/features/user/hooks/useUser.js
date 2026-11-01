@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { userService } from '../../../services/userService';
@@ -81,7 +81,15 @@ export const useUserManagement = () => {
   const [deleting, setDeleting] = useState(false);
   const [statusModalUser, setStatusModalUser] = useState(null);
 
+  const selectedUserRef = useRef(null);
+  selectedUserRef.current = selectedUser;
+
   const handleSelectUser = useCallback(async (u) => {
+    if (!u) {
+      setSelectedUser(null);
+      setUserDetails(null);
+      return;
+    }
     setSelectedUser(u);
     setDetailsLoading(true);
     try {
@@ -94,11 +102,13 @@ export const useUserManagement = () => {
     }
   }, []);
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (keepSelectedId = null) => {
     if (isSuperAdmin && !effectiveOrgId) {
       setUsers([]);
       setAvailableRoles([]);
       setAvailableBranches([]);
+      setSelectedUser(null);
+      setUserDetails(null);
       setLoading(false);
       return;
     }
@@ -107,7 +117,7 @@ export const useUserManagement = () => {
     try {
       const [usersRes, rolesData, branchesRes] = await Promise.all([
         userService.getUsers(effectiveOrgId ? { organizationId: effectiveOrgId } : {}),
-        userService.getAvailableRoles(),
+        userService.getAvailableRoles(effectiveOrgId),
         fetchBranches(
           effectiveOrgId
             ? { organizationId: effectiveOrgId, limit: 100 }
@@ -129,17 +139,17 @@ export const useUserManagement = () => {
       setAvailableRoles(roleList);
       setAvailableBranches(branchList);
 
-      if (userList.length > 0 && !selectedUser) {
-        handleSelectUser(userList[0]);
-      } else if (selectedUser) {
-        const refreshed = userList.find((u) => u.id === selectedUser.id);
-        if (refreshed) {
-          handleSelectUser(refreshed);
-        } else if (userList.length > 0) {
-          handleSelectUser(userList[0]);
+      const targetId = keepSelectedId || selectedUserRef.current?.id;
+      if (userList.length > 0) {
+        const found = targetId ? userList.find((u) => u.id === targetId) : null;
+        const targetUser = found || userList[0];
+
+        // If target user is already selected and we are not explicitly forcing a detail refresh,
+        // just sync the user object without causing another role details network call.
+        if (selectedUserRef.current?.id === targetUser.id && !keepSelectedId) {
+          setSelectedUser(targetUser);
         } else {
-          setSelectedUser(null);
-          setUserDetails(null);
+          handleSelectUser(targetUser);
         }
       } else {
         setSelectedUser(null);
@@ -150,7 +160,7 @@ export const useUserManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [effectiveOrgId, isSuperAdmin, selectedUser, handleSelectUser]);
+  }, [effectiveOrgId, isSuperAdmin, handleSelectUser]);
 
   useEffect(() => {
     loadData();
@@ -232,7 +242,7 @@ export const useUserManagement = () => {
     try {
       await userService.setPrimaryRole(selectedUser.id, roleId);
       toast.success(`Set "${role.name}" as Primary Role`);
-      await loadData();
+      await loadData(selectedUser.id);
     } catch (err) {
       toast.error(err.message || 'Failed to set primary role');
     }
@@ -246,7 +256,7 @@ export const useUserManagement = () => {
       toast.success('Role assigned successfully');
       notifyPermissionUpdate({ userId: selectedUser.id });
       await refreshUser();
-      await loadData();
+      await loadData(selectedUser.id);
     } catch (err) {
       toast.error(err.message || 'Failed to assign role');
       throw err;
@@ -267,7 +277,7 @@ export const useUserManagement = () => {
       toast.success('Role assignment removed');
       notifyPermissionUpdate({ userId: selectedUser.id });
       await refreshUser();
-      await loadData();
+      await loadData(selectedUser.id);
     } catch (err) {
       toast.error(err.message || 'Failed to remove role');
       throw err;
