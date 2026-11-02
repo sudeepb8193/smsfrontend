@@ -57,6 +57,7 @@ import {
   Trash2,
   Edit2,
   AlertTriangle,
+  Scissors,
 } from 'lucide-react';
 
 export function StaffDetailsPage() {
@@ -278,23 +279,56 @@ export function StaffDetailsPage() {
 
   const current = staff.currentEmployment || {};
 
+  const canManageStatus =
+    can('staff.manage', staff?.homeBranchId) ||
+    can('staff.manage_status', staff?.homeBranchId) ||
+    can('staff.update', staff?.homeBranchId);
+  const canLinkAccount =
+    can('staff.manage', staff?.homeBranchId) ||
+    can('staff.link_user', staff?.homeBranchId);
+  const canTerminate =
+    can('staff.manage', staff?.homeBranchId) ||
+    can('staff.delete', staff?.homeBranchId) ||
+    can('staff.terminate', staff?.homeBranchId);
+
   return (
     <div className="w-full space-y-4 pb-8">
       {/* Hero Header Card */}
       <Card>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center space-x-4">
-            {staff.profilePhotoUrl ? (
-              <img
-                src={staff.profilePhotoUrl}
-                alt={staff.fullName}
-                className="w-20 h-20 rounded-2xl object-cover border-2 border-primary-500 shadow-sm"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-2xl bg-primary-500/15 text-primary-600 dark:text-primary-400 font-bold text-2xl flex items-center justify-center">
-                {staff.fullName.slice(0, 2).toUpperCase()}
-              </div>
-            )}
+          <div className="flex items-center space-x-4 min-w-0 flex-1">
+            <div
+              className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-primary-500 shadow-sm shrink-0 bg-[var(--bg-main)] flex items-center justify-center"
+              style={{
+                width: '80px',
+                height: '80px',
+                minWidth: '80px',
+                maxWidth: '80px',
+                minHeight: '80px',
+                maxHeight: '80px',
+                flexShrink: 0,
+              }}
+            >
+              {staff.profilePhotoUrl ? (
+                <img
+                  src={staff.profilePhotoUrl}
+                  alt={staff.fullName}
+                  className="w-full h-full object-cover block"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-primary-500/15 text-primary-600 dark:text-primary-400 font-bold text-2xl flex items-center justify-center">
+                  {staff.fullName.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+            </div>
 
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -331,72 +365,61 @@ export function StaffDetailsPage() {
             </div>
           </div>
 
-          {/* Quick Header Actions (Conditionally rendered by permission) */}
-          {(() => {
-            const canManageStatus =
-              can('staff.manage', staff.homeBranchId) ||
-              can('staff.manage_status', staff.homeBranchId) ||
-              can('staff.update', staff.homeBranchId);
-            const canLinkAccount =
-              can('staff.manage', staff.homeBranchId) ||
-              can('staff.link_user', staff.homeBranchId);
-            const canTerminate =
-              can('staff.manage', staff.homeBranchId) ||
-              can('staff.delete', staff.homeBranchId) ||
-              can('staff.terminate', staff.homeBranchId);
+          {/* Quick Header Actions */}
+          <div className="flex flex-wrap items-center gap-2 self-start md:self-center">
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => navigate(`/staff/${staff.id}/assignments`)}
+            >
+              <Scissors size={14} className="mr-1.5" />
+              Services & Designations
+            </Button>
 
-            if (!canManageStatus && !canLinkAccount && !canTerminate) {
-              return null;
-            }
+            {canManageStatus && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsStatusModalOpen(true)}
+              >
+                Change Status
+              </Button>
+            )}
 
-            return (
-              <div className="flex flex-wrap items-center gap-2 self-start md:self-center">
-                {canManageStatus && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsStatusModalOpen(true)}
-                  >
-                    Change Status
-                  </Button>
-                )}
+            {canLinkAccount && (!staff.user ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsLinkModalOpen(true)}
+              >
+                <Link size={14} className="mr-1.5" />
+                Link Account
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-rose-600 border-rose-300 hover:bg-rose-50"
+                onClick={handleUnlinkUser}
+                loading={unlinkingUser}
+              >
+                <Unlink size={14} className="mr-1.5" />
+                Unlink Account
+              </Button>
+            ))}
 
-                {canLinkAccount && (!staff.user ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsLinkModalOpen(true)}
-                  >
-                    <Link size={14} className="mr-1.5" />
-                    Link Account
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-rose-600 border-rose-300 hover:bg-rose-50"
-                    onClick={handleUnlinkUser}
-                    loading={unlinkingUser}
-                  >
-                    <Unlink size={14} className="mr-1.5" />
-                    Unlink Account
-                  </Button>
-                ))}
-
-                {canTerminate && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-rose-600 border-rose-200 hover:bg-rose-50"
-                    onClick={() => setIsDeleteConfirmOpen(true)}
-                    title="Terminate / Delete Employee"
-                  >
-                    <Trash2 size={14} />
-                  </Button>
-                )}
-              </div>
-            );
-          })()}
+            {canTerminate && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-rose-600 border-rose-200 hover:bg-rose-50"
+                onClick={() => setIsDeleteConfirmOpen(true)}
+                title="Terminate / Delete Employee"
+              >
+                <Trash2 size={14} />
+              </Button>
+            )}
+          </div>
         </div>
       </Card>
 

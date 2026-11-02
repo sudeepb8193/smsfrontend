@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import Card from '../../../components/shared/Card';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
@@ -300,15 +300,25 @@ export default function StaffSelfProfilePage() {
             </div>
           </div>
 
-          {/* Right Info Pill Card */}
-          <div className="flex items-center gap-3 bg-[var(--bg-card)]/80 backdrop-blur-md border border-[var(--border-color)] rounded-2xl px-5 py-3.5 shadow-xs shrink-0 self-start md:self-center">
-            <div className="w-10 h-10 rounded-xl bg-primary-500/15 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0">
-              <UserCheck size={20} />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-[var(--text-primary)]">My Employee Info</div>
-              <div className="text-[11px] text-[var(--text-muted)]">
-                Employee Since {formatDate(staff.createdAt)}
+          {/* Right Info Pill Card & Actions */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 self-start md:self-center">
+            <Link
+              to="/staff/my-services"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold bg-primary-500 text-white hover:bg-primary-600 shadow-xs transition-all"
+            >
+              <Scissors size={14} />
+              My Services & Skills
+            </Link>
+
+            <div className="flex items-center gap-3 bg-[var(--bg-card)]/80 backdrop-blur-md border border-[var(--border-color)] rounded-2xl px-5 py-3 shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-primary-500/15 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0">
+                <UserCheck size={18} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-[var(--text-primary)]">My Employee Info</div>
+                <div className="text-[11px] text-[var(--text-muted)]">
+                  Since {formatDate(staff.createdAt)}
+                </div>
               </div>
             </div>
           </div>
