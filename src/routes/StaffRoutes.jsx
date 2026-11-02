@@ -5,6 +5,8 @@ import StaffListPage from '../features/staff/pages/StaffListPage';
 import StaffCreatePage from '../features/staff/pages/StaffCreatePage';
 import StaffDetailsPage from '../features/staff/pages/StaffDetailsPage';
 import StaffSelfProfilePage from '../features/staff/pages/StaffSelfProfilePage';
+import StaffServicesPage from '../features/staff/pages/StaffServicesPage';
+import StaffDesignationWorkspacePage from '../features/staff-designation/pages/StaffDesignationWorkspacePage';
 import { UserManagementPage } from '../features/user/pages/UserManagementPage';
 import { useAuth } from '../hooks/useAuth';
 
@@ -59,6 +61,7 @@ export const StaffRoutes = (
       }
     >
       <Route path="/staff/me" element={<StaffSelfProfilePage />} />
+      <Route path="/staff/my-services" element={<StaffServicesPage />} />
     </Route>
 
     {/* Staff Management Directory (HR Management View) */}
@@ -79,6 +82,8 @@ export const StaffRoutes = (
     >
       <Route path="/staff/directory" element={<StaffListPage />} />
       <Route path="/staff/:id" element={<StaffDetailsPage />} />
+      <Route path="/staff/:id/assignments" element={<StaffDesignationWorkspacePage />} />
+      <Route path="/staff/:id/designations" element={<StaffDesignationWorkspacePage />} />
     </Route>
 
     {/* Create Staff Record */}

@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   UserCheck,
   CheckCircle2,
+  Scissors,
 } from 'lucide-react';
 import StaffStatusBadge from './StaffStatusBadge';
 import { usePermission } from '../../../hooks/usePermission';
@@ -66,6 +67,14 @@ export function StaffCard({
             onClick: () => {
               setMenuOpen(false);
               navigate(`/staff/${staff.id}`);
+            },
+          },
+          {
+            label: 'Services & Designations',
+            icon: Scissors,
+            onClick: () => {
+              setMenuOpen(false);
+              navigate(`/staff/${staff.id}/assignments`);
             },
           },
         ]
