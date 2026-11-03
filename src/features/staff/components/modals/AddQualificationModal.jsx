@@ -89,8 +89,10 @@ export function AddQualificationModal({
           <Input
             label={recordType === 'formal_qualification' ? 'Qualification Title' : 'Skill Name'}
             value={title}
+            maxLength={150}
+            showCharCount
             onChange={(e) => {
-              setTitle(e.target.value);
+              setTitle(e.target.value.slice(0, 150));
               if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
             }}
             placeholder={
@@ -110,7 +112,9 @@ export function AddQualificationModal({
                 <Input
                   label="Issuing Institution"
                   value={issuingInstitution}
-                  onChange={(e) => setIssuingInstitution(e.target.value)}
+                  maxLength={150}
+                  showCharCount
+                  onChange={(e) => setIssuingInstitution(e.target.value.slice(0, 150))}
                   placeholder="e.g. L'Oréal Professional Academy"
                 />
               </div>
@@ -119,7 +123,9 @@ export function AddQualificationModal({
                 <Input
                   label="Certificate / License Number"
                   value={certificateNumber}
-                  onChange={(e) => setCertificateNumber(e.target.value)}
+                  maxLength={80}
+                  showCharCount
+                  onChange={(e) => setCertificateNumber(e.target.value.slice(0, 80))}
                   placeholder="e.g. CERT-2024-9981"
                 />
               </div>

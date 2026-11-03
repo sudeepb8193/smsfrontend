@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../../../components/shared/Input';
+import CharCount from '../../../components/shared/CharCount';
 import CustomSelector from '../../../components/shared/CustomSelector';
 import MediaUpload from '../../../components/shared/MediaUpload';
 import DatePicker from '../../../components/shared/DatePicker';
@@ -305,7 +306,9 @@ export function StaffCreatePage() {
                   name="fullName"
                   label="Full Name"
                   value={formData.fullName}
-                  onChange={(e) => handleFieldChange('fullName', e.target.value)}
+                  maxLength={150}
+                  showCharCount
+                  onChange={(e) => handleFieldChange('fullName', e.target.value.slice(0, 150))}
                   placeholder="e.g. Sarah Jenkins"
                   error={errors.fullName}
                   required
@@ -316,20 +319,24 @@ export function StaffCreatePage() {
                     <label className="block text-xs font-semibold text-[var(--text-primary)]">
                       Employee Code
                     </label>
-                    <button
-                      type="button"
-                      onClick={handleSuggestCode}
-                      className="text-[11px] text-primary-500 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <Sparkles size={11} />
-                      Auto-generate
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <CharCount current={formData.employeeCode} max={30} />
+                      <button
+                        type="button"
+                        onClick={handleSuggestCode}
+                        className="text-[11px] text-primary-500 hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <Sparkles size={11} />
+                        Auto-generate
+                      </button>
+                    </div>
                   </div>
                   <Input
                     id="employeeCode"
                     name="employeeCode"
                     value={formData.employeeCode}
-                    onChange={(e) => handleFieldChange('employeeCode', e.target.value)}
+                    maxLength={30}
+                    onChange={(e) => handleFieldChange('employeeCode', e.target.value.slice(0, 30))}
                     placeholder="e.g. EMP-0042 (Auto if blank)"
                     error={errors.employeeCode}
                   />
@@ -440,7 +447,9 @@ export function StaffCreatePage() {
               name="designation"
               label="Designation / Title"
               value={formData.designation}
-              onChange={(e) => handleFieldChange('designation', e.target.value)}
+              maxLength={100}
+              showCharCount
+              onChange={(e) => handleFieldChange('designation', e.target.value.slice(0, 100))}
               placeholder="e.g. Master Stylist"
               error={errors.designation}
             />
@@ -450,7 +459,9 @@ export function StaffCreatePage() {
               name="department"
               label="Department"
               value={formData.department}
-              onChange={(e) => handleFieldChange('department', e.target.value)}
+              maxLength={100}
+              showCharCount
+              onChange={(e) => handleFieldChange('department', e.target.value.slice(0, 100))}
               placeholder="e.g. Hair Care, Spa"
               error={errors.department}
             />
@@ -495,7 +506,9 @@ export function StaffCreatePage() {
               name="personalPhone"
               label="Personal Phone"
               value={formData.personalPhone}
-              onChange={(e) => handleFieldChange('personalPhone', e.target.value)}
+              maxLength={20}
+              showCharCount
+              onChange={(e) => handleFieldChange('personalPhone', e.target.value.slice(0, 20))}
               placeholder="+91 9876543210"
               error={errors.personalPhone}
             />
@@ -506,7 +519,9 @@ export function StaffCreatePage() {
               label="Personal Email"
               type="email"
               value={formData.personalEmail}
-              onChange={(e) => handleFieldChange('personalEmail', e.target.value)}
+              maxLength={150}
+              showCharCount
+              onChange={(e) => handleFieldChange('personalEmail', e.target.value.slice(0, 150))}
               placeholder="employee@personal.com"
               error={errors.personalEmail}
             />
@@ -518,7 +533,9 @@ export function StaffCreatePage() {
               name="addressLine1"
               label="Address Line 1"
               value={formData.addressLine1}
-              onChange={(e) => handleFieldChange('addressLine1', e.target.value)}
+              maxLength={200}
+              showCharCount
+              onChange={(e) => handleFieldChange('addressLine1', e.target.value.slice(0, 200))}
               placeholder="Street address, flat / unit number"
               error={errors.addressLine1}
             />
@@ -529,7 +546,9 @@ export function StaffCreatePage() {
                 name="city"
                 label="City"
                 value={formData.city}
-                onChange={(e) => handleFieldChange('city', e.target.value)}
+                maxLength={80}
+                showCharCount
+                onChange={(e) => handleFieldChange('city', e.target.value.slice(0, 80))}
                 placeholder="City"
                 error={errors.city}
               />
@@ -538,7 +557,9 @@ export function StaffCreatePage() {
                 name="postalCode"
                 label="Postal Code"
                 value={formData.postalCode}
-                onChange={(e) => handleFieldChange('postalCode', e.target.value)}
+                maxLength={20}
+                showCharCount
+                onChange={(e) => handleFieldChange('postalCode', e.target.value.slice(0, 20))}
                 placeholder="ZIP / PIN"
                 error={errors.postalCode}
               />
@@ -587,7 +608,9 @@ export function StaffCreatePage() {
               <Input
                 label="National ID (Encrypted at rest)"
                 value={formData.nationalIdNumber}
-                onChange={(e) => setFormData({ ...formData, nationalIdNumber: e.target.value })}
+                maxLength={100}
+                showCharCount
+                onChange={(e) => setFormData({ ...formData, nationalIdNumber: e.target.value.slice(0, 100) })}
                 placeholder="e.g. Aadhaar / SSN"
                 helperText="Encrypted with AES-256 before storage."
               />

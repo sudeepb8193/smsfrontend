@@ -303,6 +303,14 @@ export default function StaffSelfProfilePage() {
           {/* Right Info Pill Card & Actions */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 self-start md:self-center">
             <Link
+              to="/scheduling/my-schedule"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-xs transition-all"
+            >
+              <Calendar size={14} />
+              My Schedule
+            </Link>
+
+            <Link
               to="/staff/my-services"
               className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold bg-primary-500 text-white hover:bg-primary-600 shadow-xs transition-all"
             >
@@ -1074,7 +1082,9 @@ export default function StaffSelfProfilePage() {
             <Input
               label="Full Name"
               value={editFormData.fullName}
-              onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
+              maxLength={150}
+              showCharCount
+              onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value.slice(0, 150) })}
               error={editErrors.fullName}
             />
 
@@ -1097,7 +1107,9 @@ export default function StaffSelfProfilePage() {
             <Input
               label="Mobile Phone"
               value={editFormData.personalPhone}
-              onChange={(e) => setEditFormData({ ...editFormData, personalPhone: e.target.value })}
+              maxLength={20}
+              showCharCount
+              onChange={(e) => setEditFormData({ ...editFormData, personalPhone: e.target.value.slice(0, 20) })}
               placeholder="e.g. +91 81237 02812"
             />
 
@@ -1105,14 +1117,18 @@ export default function StaffSelfProfilePage() {
               label="Personal Email"
               type="email"
               value={editFormData.personalEmail}
-              onChange={(e) => setEditFormData({ ...editFormData, personalEmail: e.target.value })}
+              maxLength={150}
+              showCharCount
+              onChange={(e) => setEditFormData({ ...editFormData, personalEmail: e.target.value.slice(0, 150) })}
               placeholder="name@example.com"
             />
 
             <Input
               label="Address"
               value={editFormData.addressLine1}
-              onChange={(e) => setEditFormData({ ...editFormData, addressLine1: e.target.value })}
+              maxLength={200}
+              showCharCount
+              onChange={(e) => setEditFormData({ ...editFormData, addressLine1: e.target.value.slice(0, 200) })}
               placeholder="Street or house address"
             />
 
@@ -1120,13 +1136,17 @@ export default function StaffSelfProfilePage() {
               <Input
                 label="City"
                 value={editFormData.city}
-                onChange={(e) => setEditFormData({ ...editFormData, city: e.target.value })}
+                maxLength={80}
+                showCharCount
+                onChange={(e) => setEditFormData({ ...editFormData, city: e.target.value.slice(0, 80) })}
                 placeholder="City"
               />
               <Input
                 label="Postal Code"
                 value={editFormData.postalCode}
-                onChange={(e) => setEditFormData({ ...editFormData, postalCode: e.target.value })}
+                maxLength={20}
+                showCharCount
+                onChange={(e) => setEditFormData({ ...editFormData, postalCode: e.target.value.slice(0, 20) })}
                 placeholder="PIN / Postal Code"
               />
             </div>

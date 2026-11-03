@@ -45,12 +45,18 @@ export const CustomSelector = ({
       }
 
       if (direction === 'up') {
-        setOpenUpwards(true);
+        // Only open upwards if there is sufficient space above; otherwise open downwards to prevent covering headers/tabs
+        if (spaceAbove < 140 && spaceBelow > spaceAbove) {
+          setOpenUpwards(false);
+        } else {
+          setOpenUpwards(true);
+        }
       } else if (direction === 'down') {
         setOpenUpwards(false);
       } else {
-        // If room below inside container/window is tight (< 220px) and there is more room above
-        if (spaceBelow < 220 && spaceAbove > spaceBelow && spaceAbove >= 180) {
+        // 'auto' mode: only open upwards if space below is tight AND room above is sufficient and greater
+        const requiredHeight = isSmall ? 140 : 180;
+        if (spaceBelow < requiredHeight && spaceAbove >= requiredHeight) {
           setOpenUpwards(true);
         } else {
           setOpenUpwards(false);

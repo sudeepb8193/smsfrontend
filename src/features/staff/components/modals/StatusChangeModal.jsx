@@ -65,8 +65,10 @@ export function StatusChangeModal({ isOpen, onClose, staff, onConfirm, loading }
           <Textarea
             label="Reason for Status Change"
             value={reason}
+            maxLength={255}
+            showCharCount
             onChange={(e) => {
-              setReason(e.target.value);
+              setReason(e.target.value.slice(0, 255));
               if (error) setError('');
             }}
             placeholder="e.g. Parental leave, medical leave, resignation, contract completion..."

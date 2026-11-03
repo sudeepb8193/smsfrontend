@@ -94,8 +94,10 @@ export function UploadDocumentModal({
           <Input
             label="Display File Name"
             value={customFileName}
+            maxLength={255}
+            showCharCount
             onChange={(e) => {
-              setCustomFileName(e.target.value);
+              setCustomFileName(e.target.value.slice(0, 255));
               if (errors.customFileName) setErrors((prev) => ({ ...prev, customFileName: undefined }));
             }}
             placeholder="e.g. Passport_Scan_2026.png or Contract_Signed.pdf"

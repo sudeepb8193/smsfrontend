@@ -74,15 +74,15 @@ export default function AddEditSkillModal({
         )}
 
         <div>
-          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
-            Skill / Technique Name <span className="text-rose-500">*</span>
-          </label>
           <Input
             type="text"
+            label="Skill / Technique Name"
             placeholder="e.g. Balayage, Keratin, Gel Extension"
             value={skillName}
+            maxLength={100}
+            showCharCount
             onChange={(e) => {
-              setSkillName(e.target.value);
+              setSkillName(e.target.value.slice(0, 100));
               setError('');
             }}
             required

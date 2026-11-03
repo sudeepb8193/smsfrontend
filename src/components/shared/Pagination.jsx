@@ -11,6 +11,7 @@ export const Pagination = ({
   pageSizeOptions = [10, 25, 50, 100],
   totalItems,
   className = '',
+  direction = 'auto',
 }) => {
   const handlePrev = () => {
     if (currentPage > 1 && onPageChange) {
@@ -64,7 +65,8 @@ export const Pagination = ({
                 onChange={(val) => onPageSizeChange && onPageSizeChange(Number(val))}
                 isSearchable={false}
                 isClearable={false}
-                direction="up"
+                direction={direction}
+                size="sm"
                 placeholder={String(pageSize)}
               />
             </div>

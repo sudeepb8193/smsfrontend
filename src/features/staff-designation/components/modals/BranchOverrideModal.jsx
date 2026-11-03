@@ -98,14 +98,14 @@ export default function BranchOverrideModal({
 
         {!isAvailable && (
           <div>
-            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
-              Reason for Limitation (Optional)
-            </label>
             <Input
               type="text"
+              label="Reason for Limitation (Optional)"
               placeholder="e.g. Specialized ventilation or equipment unavailable at this location"
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              maxLength={255}
+              showCharCount
+              onChange={(e) => setReason(e.target.value.slice(0, 255))}
             />
             <p className="text-[11px] text-[var(--text-muted)] mt-1">
               Internal explanation of why this service cannot be booked at this location.

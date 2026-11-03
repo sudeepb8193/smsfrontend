@@ -352,24 +352,24 @@ export function StaffContactTab({
         <form onSubmit={handleSaveContacts} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                Personal Phone Number
-              </label>
               <Input
+                label="Personal Phone Number"
                 value={formData.personalPhone}
-                onChange={(e) => setFormData({ ...formData, personalPhone: e.target.value })}
+                maxLength={20}
+                showCharCount
+                onChange={(e) => setFormData({ ...formData, personalPhone: e.target.value.slice(0, 20) })}
                 placeholder="+91 9876543210"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                Personal Email Address
-              </label>
               <Input
+                label="Personal Email Address"
                 type="email"
                 value={formData.personalEmail}
-                onChange={(e) => setFormData({ ...formData, personalEmail: e.target.value })}
+                maxLength={150}
+                showCharCount
+                onChange={(e) => setFormData({ ...formData, personalEmail: e.target.value.slice(0, 150) })}
                 placeholder="stylist@personalmail.com"
               />
             </div>
@@ -419,58 +419,58 @@ export function StaffContactTab({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-              Address Line 1
-            </label>
             <Input
+              label="Address Line 1"
               value={formData.addressLine1}
-              onChange={(e) => setFormData({ ...formData, addressLine1: e.target.value })}
+              maxLength={200}
+              showCharCount
+              onChange={(e) => setFormData({ ...formData, addressLine1: e.target.value.slice(0, 200) })}
               placeholder="Street name, flat / building number"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                City
-              </label>
               <Input
+                label="City"
                 value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                maxLength={80}
+                showCharCount
+                onChange={(e) => setFormData({ ...formData, city: e.target.value.slice(0, 80) })}
                 placeholder="City"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                State / Province
-              </label>
               <Input
+                label="State / Province"
                 value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                maxLength={80}
+                showCharCount
+                onChange={(e) => setFormData({ ...formData, state: e.target.value.slice(0, 80) })}
                 placeholder="State"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-                Postal Code
-              </label>
               <Input
+                label="Postal Code"
                 value={formData.postalCode}
-                onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                maxLength={20}
+                showCharCount
+                onChange={(e) => setFormData({ ...formData, postalCode: e.target.value.slice(0, 20) })}
                 placeholder="ZIP / Postal code"
               />
             </div>
           </div>
 
           <div className="pt-2 border-t border-[var(--border-color)]">
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
-              National ID Number (Update Encrypted Value)
-            </label>
             <Input
+              label="National ID Number (Update Encrypted Value)"
               value={formData.nationalIdNumber}
-              onChange={(e) => setFormData({ ...formData, nationalIdNumber: e.target.value })}
+              maxLength={100}
+              showCharCount
+              onChange={(e) => setFormData({ ...formData, nationalIdNumber: e.target.value.slice(0, 100) })}
               placeholder={
                 contacts?.hasNationalId
                   ? '•••• •••• •••• (Leave blank to keep existing)'

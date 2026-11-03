@@ -68,8 +68,10 @@ export function AddEmergencyContactModal({
           <Input
             label="Contact Full Name"
             value={contactName}
+            maxLength={120}
+            showCharCount
             onChange={(e) => {
-              setContactName(e.target.value);
+              setContactName(e.target.value.slice(0, 120));
               if (errors.contactName) setErrors((prev) => ({ ...prev, contactName: undefined }));
             }}
             placeholder="e.g. Jane Doe"
@@ -83,8 +85,10 @@ export function AddEmergencyContactModal({
             <Input
               label="Relationship"
               value={relationship}
+              maxLength={60}
+              showCharCount
               onChange={(e) => {
-                setRelationship(e.target.value);
+                setRelationship(e.target.value.slice(0, 60));
                 if (errors.relationship) setErrors((prev) => ({ ...prev, relationship: undefined }));
               }}
               placeholder="e.g. Spouse, Parent, Sibling"
@@ -97,8 +101,10 @@ export function AddEmergencyContactModal({
             <Input
               label="Phone Number"
               value={phoneNumber}
+              maxLength={20}
+              showCharCount
               onChange={(e) => {
-                setPhoneNumber(e.target.value);
+                setPhoneNumber(e.target.value.slice(0, 20));
                 if (errors.phoneNumber) setErrors((prev) => ({ ...prev, phoneNumber: undefined }));
               }}
               placeholder="+91 9876543210"

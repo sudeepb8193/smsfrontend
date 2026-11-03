@@ -120,8 +120,10 @@ export function RecordEmploymentChangeModal({
             <Input
               label="New / Updated Designation"
               value={designation}
+              maxLength={100}
+              showCharCount
               onChange={(e) => {
-                setDesignation(e.target.value);
+                setDesignation(e.target.value.slice(0, 100));
                 if (errors.designation) setErrors((prev) => ({ ...prev, designation: undefined }));
               }}
               placeholder="e.g. Senior Master Stylist"
@@ -134,8 +136,10 @@ export function RecordEmploymentChangeModal({
             <Input
               label="Department"
               value={department}
+              maxLength={100}
+              showCharCount
               onChange={(e) => {
-                setDepartment(e.target.value);
+                setDepartment(e.target.value.slice(0, 100));
                 if (errors.department) setErrors((prev) => ({ ...prev, department: undefined }));
               }}
               placeholder="e.g. Hair Care, Skin & Spa"
