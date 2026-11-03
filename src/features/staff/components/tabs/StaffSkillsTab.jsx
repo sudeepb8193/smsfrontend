@@ -62,14 +62,16 @@ export function StaffSkillsTab({
 
         {/* Add Skill Tag Input */}
         {(can('staff_qualification.create') || can('staff_qualification.manage')) && (
-          <form onSubmit={handleAddSkillSubmit} className="flex gap-2 mb-4 max-w-md">
+          <form onSubmit={handleAddSkillSubmit} className="flex gap-2 mb-4 max-w-md items-end">
             <Input
               value={newSkillText}
-              onChange={(e) => setNewSkillText(e.target.value)}
+              maxLength={150}
+              showCharCount
+              onChange={(e) => setNewSkillText(e.target.value.slice(0, 150))}
               placeholder="e.g. Balayage, Bridal Makeup, Keratin..."
               className="flex-1"
             />
-            <Button type="submit" variant="primary" size="sm" disabled={!newSkillText.trim() || loading}>
+            <Button type="submit" variant="primary" size="sm" disabled={!newSkillText.trim() || loading} className="mb-0.5">
               <Plus size={14} className="mr-1" />
               Add Tag
             </Button>

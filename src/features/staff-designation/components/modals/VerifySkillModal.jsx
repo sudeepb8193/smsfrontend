@@ -47,14 +47,14 @@ export default function VerifySkillModal({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
-            Verification Note (Optional)
-          </label>
           <Input
             type="text"
+            label="Verification Note (Optional)"
             placeholder="e.g. Evaluated on live client work. Exceptional color graduation."
             value={note}
-            onChange={(e) => setNote(e.target.value)}
+            maxLength={255}
+            showCharCount
+            onChange={(e) => setNote(e.target.value.slice(0, 255))}
           />
         </div>
 

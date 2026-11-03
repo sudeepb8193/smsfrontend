@@ -111,7 +111,9 @@ export function TransferHomeBranchModal({
           <Input
             label="Transfer Reason (Optional)"
             value={reason}
-            onChange={(e) => setReason(e.target.value)}
+            maxLength={255}
+            showCharCount
+            onChange={(e) => setReason(e.target.value.slice(0, 255))}
             placeholder="e.g. Relocation, Branch opening requirement, Staff reassignment"
           />
         </div>

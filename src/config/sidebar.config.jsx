@@ -11,6 +11,7 @@ import {
   CalendarCheck,
   Clock,
   Scissors,
+  CalendarRange,
 } from 'lucide-react';
 
 export const SIDEBAR_MODULE_CONFIG = [
@@ -74,7 +75,16 @@ export const SIDEBAR_MODULE_CONFIG = [
     requiredPermission: 'staff.view',
     path: '/staff',
   },
-  // Service Staff dedicated navigation module
+  // Staff Scheduling Management (Module 07)
+  {
+    id: 'staff-scheduling',
+    label: 'Staff Scheduling',
+    icon: CalendarRange,
+    allowedRoles: ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER', 'FRONT_DESK'],
+    requiredPermission: 'staff_schedule.view',
+    path: '/scheduling',
+  },
+  // Service Staff dedicated navigation modules
   {
     id: 'my-profile',
     label: 'My Profile',
@@ -82,6 +92,14 @@ export const SIDEBAR_MODULE_CONFIG = [
     allowedRoles: ['SERVICE_STAFF', 'STAFF'],
     requiredPermission: 'staff.view',
     path: '/staff/me',
+  },
+  {
+    id: 'my-schedule',
+    label: 'My Schedule',
+    icon: CalendarCheck,
+    allowedRoles: ['SERVICE_STAFF', 'STAFF'],
+    requiredPermission: 'staff_schedule.view',
+    path: '/scheduling/my-schedule',
   },
 ];
 

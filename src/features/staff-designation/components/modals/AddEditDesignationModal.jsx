@@ -93,14 +93,14 @@ export default function AddEditDesignationModal({
 
         {designationType === 'other' && (
           <div>
-            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
-              Custom Designation Title <span className="text-rose-500">*</span>
-            </label>
             <Input
               type="text"
+              label="Custom Designation Title"
               placeholder="e.g. Bridal Specialist, Colorist"
               value={customLabel}
-              onChange={(e) => setCustomLabel(e.target.value)}
+              maxLength={100}
+              showCharCount
+              onChange={(e) => setCustomLabel(e.target.value.slice(0, 100))}
               required
             />
           </div>
