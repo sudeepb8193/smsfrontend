@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../hooks/useAuth';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
 import { useBranch } from '../../branch/hooks/useBranch';
+import { queryClient, queryKeys } from '../../../config/queryClient';
 import {
   fetchSchedulingOverview,
   fetchShiftTemplates,
@@ -11,13 +13,22 @@ import {
   fetchBlockedTimes,
 } from '../api/staffSchedulingApi';
 
-export function useStaffScheduling() {
+/**
+ * Tab-level lazy fetching and caching for Staff Scheduling Workspace.
+ * Automatically gates network calls by active tab and caches results via TanStack Query.
+ */
+export function useStaffScheduling(currentTab = 'overview') {
   const { user } = useAuth();
   const { selectedOrganisation, isSuperAdmin } = useOrganisation();
-  const { branches, currentBranch } = useBranch();
+  const { branches, currentBranch, loading: branchLoading } = useBranch();
 
   const effectiveOrgId = isSuperAdmin ? selectedOrganisation?.id : user?.organizationId;
-  const activeBranchId = currentBranch?.id || branches?.[0]?.id || '';
+  const activeBranchId =
+    currentBranch?.id ||
+    branches?.[0]?.id ||
+    (effectiveOrgId ? localStorage.getItem(`sms_active_branch_id_${effectiveOrgId}`) : null) ||
+    localStorage.getItem('sms_active_branch_id') ||
+    '';
 
   // Get current week's Monday as default weekStartDate (YYYY-MM-DD)
   const getInitialMonday = () => {
@@ -33,139 +44,143 @@ export function useStaffScheduling() {
 
   // Sync with global branch selection from the top bar whenever currentBranch changes
   useEffect(() => {
-    if (currentBranch?.id) {
+    if (currentBranch?.id && currentBranch.id !== selectedBranchId) {
       setSelectedBranchId(currentBranch.id);
     } else if (activeBranchId && !selectedBranchId) {
       setSelectedBranchId(activeBranchId);
     }
   }, [currentBranch?.id, activeBranchId, selectedBranchId]);
 
-  // Loading & error states
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // Tab Data States
-  const [overview, setOverview] = useState(null);
-  const [templates, setTemplates] = useState([]);
-  const [teamSchedule, setTeamSchedule] = useState(null);
-  const [preferences, setPreferences] = useState([]);
-  const [overrides, setOverrides] = useState([]);
-  const [blockedTimes, setBlockedTimes] = useState([]);
-
-  // Load Overview
-  const loadOverview = useCallback(async () => {
-    if (!effectiveOrgId) return;
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchSchedulingOverview(
+  // Tab 1: Overview
+  const overviewQuery = useQuery({
+    queryKey: queryKeys.staffScheduling.tab('overview', effectiveOrgId, selectedBranchId),
+    queryFn: () =>
+      fetchSchedulingOverview(
         { branchId: selectedBranchId || undefined },
         effectiveOrgId,
-      );
-      setOverview(data);
-    } catch (err) {
-      console.error('Failed to load scheduling overview:', err);
-      setError(err?.message || 'Failed to load scheduling overview');
-    } finally {
-      setLoading(false);
-    }
-  }, [effectiveOrgId, selectedBranchId]);
+      ),
+    enabled: Boolean(effectiveOrgId && currentTab === 'overview'),
+    staleTime: 60 * 1000,
+  });
 
-  // Load Shift Templates
-  const loadTemplates = useCallback(async () => {
-    if (!effectiveOrgId) return;
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchShiftTemplates(
+  // Tab 2: Shift Templates
+  const templatesQuery = useQuery({
+    queryKey: queryKeys.staffScheduling.tab('templates', effectiveOrgId, selectedBranchId),
+    queryFn: () =>
+      fetchShiftTemplates(
         { branchId: selectedBranchId || undefined, status: 'all' },
         effectiveOrgId,
-      );
-      setTemplates(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Failed to load shift templates:', err);
-      setError(err?.message || 'Failed to load shift templates');
-    } finally {
-      setLoading(false);
-    }
-  }, [effectiveOrgId, selectedBranchId]);
+      ),
+    enabled: Boolean(effectiveOrgId && (currentTab === 'templates' || currentTab === 'weekly')),
+    staleTime: 60 * 1000,
+  });
 
-  // Load Weekly Team Schedule
-  const loadTeamSchedule = useCallback(async () => {
-    if (!effectiveOrgId || !selectedBranchId) return;
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchBranchTeamSchedule(
+  // Tab 3: Weekly Team Schedule
+  const teamScheduleQuery = useQuery({
+    queryKey: queryKeys.staffScheduling.tab('teamSchedule', effectiveOrgId, selectedBranchId, {
+      weekStartDate: selectedWeekStartDate,
+    }),
+    queryFn: () =>
+      fetchBranchTeamSchedule(
         selectedBranchId,
         selectedWeekStartDate,
         effectiveOrgId,
-      );
-      setTeamSchedule(data);
-    } catch (err) {
-      console.error('Failed to load team schedule grid:', err);
-      setError(err?.message || 'Failed to load team schedule');
-    } finally {
-      setLoading(false);
-    }
-  }, [effectiveOrgId, selectedBranchId, selectedWeekStartDate]);
+      ),
+    enabled: Boolean(effectiveOrgId && selectedBranchId && currentTab === 'weekly'),
+    staleTime: 60 * 1000,
+  });
 
-  // Load Availability Preferences
-  const loadPreferences = useCallback(async () => {
-    if (!effectiveOrgId) return;
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchAvailabilityPreferences(
+  // Tab 4: Availability Preferences
+  const preferencesQuery = useQuery({
+    queryKey: queryKeys.staffScheduling.tab('preferences', effectiveOrgId, selectedBranchId),
+    queryFn: () =>
+      fetchAvailabilityPreferences(
         { branchId: selectedBranchId || undefined },
         effectiveOrgId,
-      );
-      setPreferences(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Failed to load availability preferences:', err);
-      setError(err?.message || 'Failed to load preferences');
-    } finally {
-      setLoading(false);
-    }
-  }, [effectiveOrgId, selectedBranchId]);
+      ),
+    enabled: Boolean(effectiveOrgId && currentTab === 'preferences'),
+    staleTime: 60 * 1000,
+  });
 
-  // Load Overrides
-  const loadOverrides = useCallback(async () => {
-    if (!effectiveOrgId) return;
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchScheduleOverrides(
+  // Tab 5: Schedule Overrides
+  const overridesQuery = useQuery({
+    queryKey: queryKeys.staffScheduling.tab('overrides', effectiveOrgId, selectedBranchId),
+    queryFn: () =>
+      fetchScheduleOverrides(
         { branchId: selectedBranchId || undefined },
         effectiveOrgId,
-      );
-      setOverrides(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Failed to load schedule overrides:', err);
-      setError(err?.message || 'Failed to load overrides');
-    } finally {
-      setLoading(false);
-    }
-  }, [effectiveOrgId, selectedBranchId]);
+      ),
+    enabled: Boolean(effectiveOrgId && currentTab === 'overrides'),
+    staleTime: 60 * 1000,
+  });
 
-  // Load Blocked Time
-  const loadBlockedTimes = useCallback(async () => {
-    if (!effectiveOrgId) return;
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchBlockedTimes(
+  // Tab 6: Blocked Times
+  const blockedTimesQuery = useQuery({
+    queryKey: queryKeys.staffScheduling.tab('blockedTimes', effectiveOrgId, selectedBranchId),
+    queryFn: () =>
+      fetchBlockedTimes(
         { branchId: selectedBranchId || undefined },
         effectiveOrgId,
-      );
-      setBlockedTimes(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Failed to load blocked times:', err);
-      setError(err?.message || 'Failed to load blocked times');
-    } finally {
-      setLoading(false);
+      ),
+    enabled: Boolean(effectiveOrgId && currentTab === 'blocked'),
+    staleTime: 60 * 1000,
+  });
+
+  // Tab-specific loading state
+  const loading = useMemo(() => {
+    switch (currentTab) {
+      case 'overview':
+        return overviewQuery.isLoading;
+      case 'templates':
+        return templatesQuery.isLoading;
+      case 'weekly':
+        return teamScheduleQuery.isLoading || templatesQuery.isLoading;
+      case 'preferences':
+        return preferencesQuery.isLoading;
+      case 'overrides':
+        return overridesQuery.isLoading;
+      case 'blocked':
+        return blockedTimesQuery.isLoading;
+      default:
+        return false;
     }
-  }, [effectiveOrgId, selectedBranchId]);
+  }, [
+    currentTab,
+    overviewQuery.isLoading,
+    templatesQuery.isLoading,
+    teamScheduleQuery.isLoading,
+    preferencesQuery.isLoading,
+    overridesQuery.isLoading,
+    blockedTimesQuery.isLoading,
+  ]);
+
+  const error =
+    overviewQuery.error ||
+    templatesQuery.error ||
+    teamScheduleQuery.error ||
+    preferencesQuery.error ||
+    overridesQuery.error ||
+    blockedTimesQuery.error ||
+    null;
+
+  const loadOverview = useCallback(() => overviewQuery.refetch(), [overviewQuery]);
+  const loadTemplates = useCallback(() => templatesQuery.refetch(), [templatesQuery]);
+  const loadTeamSchedule = useCallback(() => teamScheduleQuery.refetch(), [teamScheduleQuery]);
+  const loadPreferences = useCallback(() => preferencesQuery.refetch(), [preferencesQuery]);
+  const loadOverrides = useCallback(() => overridesQuery.refetch(), [overridesQuery]);
+  const loadBlockedTimes = useCallback(() => blockedTimesQuery.refetch(), [blockedTimesQuery]);
+
+  const invalidateSchedulingCache = useCallback((tabName) => {
+    if (tabName) {
+      queryClient.invalidateQueries({
+        queryKey: ['staffScheduling', tabName],
+      });
+    } else {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.staffScheduling.all,
+      });
+    }
+  }, []);
 
   return {
     effectiveOrgId,
@@ -176,18 +191,18 @@ export function useStaffScheduling() {
     setSelectedWeekStartDate,
     loading,
     error,
-    overview,
-    templates,
-    teamSchedule,
-    preferences,
-    overrides,
-    blockedTimes,
+    overview: overviewQuery.data || null,
+    templates: Array.isArray(templatesQuery.data) ? templatesQuery.data : [],
+    teamSchedule: teamScheduleQuery.data || null,
+    preferences: Array.isArray(preferencesQuery.data) ? preferencesQuery.data : [],
+    overrides: Array.isArray(overridesQuery.data) ? overridesQuery.data : [],
+    blockedTimes: Array.isArray(blockedTimesQuery.data) ? blockedTimesQuery.data : [],
     loadOverview,
     loadTemplates,
     loadTeamSchedule,
     loadPreferences,
     loadOverrides,
     loadBlockedTimes,
+    invalidateSchedulingCache,
   };
 }
-

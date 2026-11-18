@@ -517,7 +517,7 @@ export const BranchListPage = () => {
             setLimit(newSize);
             setPage(1);
           }}
-          pageSizeOptions={[6, 9, 12, 18, 24]}
+          pageSizeOptions={[10, 20, 50, 100]}
         />
       )}
 

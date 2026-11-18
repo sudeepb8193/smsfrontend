@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   fetchBranches,
   fetchBranchDetails,
@@ -10,6 +11,8 @@ import { useBranch as useBranchContext } from '../context/BranchContext';
 import { useAuth } from '../../../hooks/useAuth';
 import { usePermission } from '../../../hooks/usePermission';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
+import { useDebounce } from '../../../hooks/useDebounce';
+import { queryClient, queryKeys } from '../../../config/queryClient';
 import { toast } from 'sonner';
 
 /**
@@ -37,19 +40,16 @@ export const useBranchList = () => {
 
   // Filters State
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 350);
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
 
-  // Pagination & Data State
+  // Pagination State
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(12);
-  const [branchesData, setBranchesData] = useState([]);
-  const [meta, setMeta] = useState({ total: 0, totalPages: 1 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [limit, setLimit] = useState(10);
 
   // Modals & Menu State
   const [deleteModalBranch, setDeleteModalBranch] = useState(null);
@@ -69,66 +69,62 @@ export const useBranchList = () => {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [activeMenuBranchId]);
 
-  const loadData = useCallback(async () => {
-    if (!canViewBranch) {
-      setBranchesData([]);
-      setMeta({ total: 0, totalPages: 1 });
-      setLoading(false);
-      return;
-    }
+  // Construct query params
+  const queryParams = useMemo(
+    () => ({
+      organizationId: effectiveOrgId,
+      search: debouncedSearch ? debouncedSearch.trim() : undefined,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      branchType: typeFilter !== 'all' ? typeFilter : undefined,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    }),
+    [effectiveOrgId, debouncedSearch, statusFilter, typeFilter, page, limit, sortBy, sortOrder],
+  );
 
-    if (isSuperAdmin && !effectiveOrgId) {
-      setBranchesData([]);
-      setMeta({ total: 0, totalPages: 1 });
-      setLoading(false);
-      return;
-    }
+  const shouldFetch = canViewBranch && (!isSuperAdmin || Boolean(effectiveOrgId));
 
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchBranches({
-        organizationId: effectiveOrgId,
-        search,
-        status: statusFilter,
-        branchType: typeFilter,
-        page,
-        limit,
-        sortBy,
-        sortOrder,
-      });
+  const {
+    data: branchResponse,
+    isLoading: loading,
+    error: queryError,
+    refetch: loadData,
+  } = useQuery({
+    queryKey: queryKeys.branches.list(effectiveOrgId, queryParams),
+    queryFn: () => fetchBranches(queryParams),
+    enabled: Boolean(shouldFetch),
+    staleTime: 60 * 1000,
+  });
 
-      const list = Array.isArray(res?.data)
-        ? res.data
-        : Array.isArray(res?.items)
-        ? res.items
-        : Array.isArray(res)
-        ? res
-        : [];
-      setBranchesData(list);
+  const branchesData = useMemo(() => {
+    if (Array.isArray(branchResponse?.data)) return branchResponse.data;
+    if (Array.isArray(branchResponse?.items)) return branchResponse.items;
+    if (Array.isArray(branchResponse)) return branchResponse;
+    return [];
+  }, [branchResponse]);
 
-      const total = res?.meta?.total ?? res?.total ?? list.length;
-      const totalPages = res?.meta?.totalPages ?? (limit > 0 ? Math.ceil(total / limit) : 1);
-      setMeta({
-        total,
-        totalPages: totalPages || 1,
-        page: res?.meta?.page ?? page,
-        limit: res?.meta?.limit ?? limit,
-      });
-    } catch (err) {
-      console.error('Failed to load branches:', err);
-      setError(err?.message || 'Failed to fetch salon branches');
-    } finally {
-      setLoading(false);
-    }
-  }, [canViewBranch, effectiveOrgId, isSuperAdmin, search, statusFilter, typeFilter, page, limit, sortBy, sortOrder]);
+  const total = branchResponse?.pagination?.totalRecords ?? branchResponse?.meta?.total ?? branchResponse?.total ?? branchesData.length;
+  const totalPages =
+    branchResponse?.pagination?.totalPages ??
+    branchResponse?.meta?.totalPages ??
+    (limit > 0 ? Math.ceil(total / limit) : 1);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const meta = useMemo(
+    () => ({
+      total,
+      totalPages: totalPages || 1,
+      page,
+      limit,
+    }),
+    [total, totalPages, page, limit],
+  );
+
+  const error = queryError ? queryError.message || 'Failed to fetch salon branches' : null;
 
   const handleRefresh = async () => {
-    await loadData();
+    queryClient.invalidateQueries({ queryKey: queryKeys.branches.all });
     await refreshBranches();
   };
 

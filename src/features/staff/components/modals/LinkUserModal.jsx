@@ -31,7 +31,7 @@ export function LinkUserModal({ isOpen, onClose, staff, onLink, loading, existin
       setFetchError(null);
       setError('');
       userService
-        .getUsers({ organizationId: staff.organizationId, limit: 100 })
+        .getUsers({ organizationId: staff.organizationId, limit: 10 })
         .then((res) => {
           const list = res?.users || res?.data || res || [];
           setUsers(Array.isArray(list) ? list : []);

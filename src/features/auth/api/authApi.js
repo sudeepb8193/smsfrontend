@@ -40,15 +40,35 @@ export function login(payload) {
   });
 }
 
+// In-flight request deduplication promises to eliminate concurrent duplicate network requests
+let refreshInFlightPromise = null;
+let fetchMeInFlightPromise = null;
+
 export function refreshTokens(refreshToken) {
-  return request('/auth/refresh', {
+  if (refreshInFlightPromise) {
+    return refreshInFlightPromise;
+  }
+
+  refreshInFlightPromise = request('/auth/refresh', {
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
+  }).finally(() => {
+    refreshInFlightPromise = null;
   });
+
+  return refreshInFlightPromise;
 }
 
 export function fetchMe(accessToken) {
-  return request('/auth/me', {
+  if (fetchMeInFlightPromise) {
+    return fetchMeInFlightPromise;
+  }
+
+  fetchMeInFlightPromise = request('/auth/me', {
     headers: { Authorization: `Bearer ${accessToken}` },
+  }).finally(() => {
+    fetchMeInFlightPromise = null;
   });
+
+  return fetchMeInFlightPromise;
 }

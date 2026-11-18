@@ -129,6 +129,8 @@ export const UserManagementPage = () => {
     setStatusModalUser,
     filteredUsers,
     paginatedTableUsers,
+    total,
+    totalPages,
     activeCount,
     pendingCount,
     expiredCount,
@@ -662,11 +664,11 @@ export const UserManagementPage = () => {
           </div>
 
           {/* Table Pagination */}
-          {filteredUsers.length > 0 && (
+          {total > 0 && (
             <Pagination
               currentPage={page}
-              totalPages={Math.ceil(filteredUsers.length / limit) || 1}
-              totalItems={filteredUsers.length}
+              totalPages={totalPages || 1}
+              totalItems={total}
               pageSize={limit}
               onPageChange={setPage}
               onPageSizeChange={(newSize) => {

@@ -1,15 +1,19 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { userService } from '../../../services/userService';
 import { fetchBranches } from '../../branch/api/branchApi';
 import { useAuth } from '../../../hooks/useAuth';
 import { usePermission } from '../../../hooks/usePermission';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
+import { useDebounce } from '../../../hooks/useDebounce';
+import { queryClient, queryKeys } from '../../../config/queryClient';
 import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
 
 /**
  * 1. State Management Hook for User Management & Access Control Page
+ * Powered by TanStack Query for caching, server-side filtering, and instant deduplication.
  */
 export const useUserManagement = () => {
   const { user, refreshUser } = useAuth();
@@ -40,28 +44,23 @@ export const useUserManagement = () => {
   const canDeleteUser = isSuperAdmin || canDelete('users');
   const canManageRoles = isSuperAdmin || canEdit('roles') || canEdit('users');
 
-  const [users, setUsers] = useState([]);
-  const [availableRoles, setAvailableRoles] = useState([]);
-  const [availableBranches, setAvailableBranches] = useState([]);
-  const [loading, setLoading] = useState(true);
-
   // Layout View Mode ('split' | 'table')
   const [viewMode, setViewMode] = useState('split');
 
-  // Filters & Search
+  // Server-Side Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 350);
+
   const [statusFilter, setStatusFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('');
   const [branchFilter, setBranchFilter] = useState('');
 
-  // Pagination for Table View
+  // Server-Side Pagination
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
   // Selection
   const [selectedUser, setSelectedUser] = useState(null);
-  const [userDetails, setUserDetails] = useState(null);
-  const [detailsLoading, setDetailsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('effective-permissions');
 
   // Modals state
@@ -81,94 +80,109 @@ export const useUserManagement = () => {
   const [deleting, setDeleting] = useState(false);
   const [statusModalUser, setStatusModalUser] = useState(null);
 
-  const selectedUserRef = useRef(null);
-  selectedUserRef.current = selectedUser;
+  // 1. TanStack Query: Users list with Server-Side Search, Filtering, and Pagination
+  const queryParams = useMemo(
+    () => ({
+      page,
+      limit,
+      search: debouncedSearch || undefined,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      roleId: roleFilter || undefined,
+      branchId: branchFilter || undefined,
+      organizationId: effectiveOrgId || undefined,
+    }),
+    [page, limit, debouncedSearch, statusFilter, roleFilter, branchFilter, effectiveOrgId],
+  );
 
-  const handleSelectUser = useCallback(async (u) => {
-    if (!u) {
+  const {
+    data: usersResponse,
+    isLoading: loading,
+    refetch: loadData,
+  } = useQuery({
+    queryKey: queryKeys.users.list(effectiveOrgId, queryParams),
+    queryFn: () => userService.getUsers(queryParams),
+    enabled: Boolean(!isSuperAdmin || effectiveOrgId),
+    staleTime: 45 * 1000,
+  });
+
+  const users = useMemo(() => {
+    if (Array.isArray(usersResponse?.items)) return usersResponse.items;
+    if (Array.isArray(usersResponse?.data)) return usersResponse.data;
+    if (Array.isArray(usersResponse)) return usersResponse;
+    return [];
+  }, [usersResponse]);
+
+  // Keep selected user synchronized with query data
+  useEffect(() => {
+    if (users.length > 0) {
+      if (!selectedUser || !users.some((u) => u.id === selectedUser.id)) {
+        setSelectedUser(users[0]);
+      }
+    } else {
       setSelectedUser(null);
-      setUserDetails(null);
-      return;
     }
+  }, [users]);
+
+  // 2. TanStack Query: User Role Details (Lazy-fetched when a user is selected)
+  const {
+    data: userDetails,
+    isLoading: detailsLoading,
+  } = useQuery({
+    queryKey: queryKeys.users.detail(effectiveOrgId, selectedUser?.id),
+    queryFn: () => userService.getUserRoleDetails(selectedUser.id),
+    enabled: Boolean(selectedUser?.id),
+    staleTime: 60 * 1000,
+  });
+
+  // 3. TanStack Query: Available Roles (Cached with long staleTime)
+  const { data: rolesResponse } = useQuery({
+    queryKey: queryKeys.users.roles(effectiveOrgId),
+    queryFn: () => userService.getAvailableRoles(effectiveOrgId),
+    enabled: Boolean(!isSuperAdmin || effectiveOrgId),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const availableRoles = useMemo(() => {
+    if (Array.isArray(rolesResponse?.data)) return rolesResponse.data;
+    if (Array.isArray(rolesResponse)) return rolesResponse;
+    return [];
+  }, [rolesResponse]);
+
+  // 4. TanStack Query: Available Branches (Cached with long staleTime)
+  const { data: branchesResponse } = useQuery({
+    queryKey: queryKeys.branches.list(effectiveOrgId, {
+      limit: 10,
+      sortBy: 'createdAt',
+      sortOrder: 'asc',
+    }),
+    queryFn: () =>
+      fetchBranches(
+        effectiveOrgId
+          ? { organizationId: effectiveOrgId, limit: 10, sortBy: 'createdAt', sortOrder: 'asc' }
+          : { limit: 10, sortBy: 'createdAt', sortOrder: 'asc' },
+      ),
+    enabled: Boolean(!isSuperAdmin || effectiveOrgId),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const availableBranches = useMemo(() => {
+    if (Array.isArray(branchesResponse?.data)) return branchesResponse.data;
+    if (Array.isArray(branchesResponse?.branches)) return branchesResponse.branches;
+    if (Array.isArray(branchesResponse)) return branchesResponse;
+    return [];
+  }, [branchesResponse]);
+
+  const handleSelectUser = useCallback((u) => {
     setSelectedUser(u);
-    setDetailsLoading(true);
-    try {
-      const details = await userService.getUserRoleDetails(u.id);
-      setUserDetails(details);
-    } catch (err) {
-      toast.error(err.message || 'Failed to load user role details');
-    } finally {
-      setDetailsLoading(false);
-    }
   }, []);
 
-  const loadData = useCallback(async (keepSelectedId = null) => {
-    if (isSuperAdmin && !effectiveOrgId) {
-      setUsers([]);
-      setAvailableRoles([]);
-      setAvailableBranches([]);
-      setSelectedUser(null);
-      setUserDetails(null);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const [usersRes, rolesData, branchesRes] = await Promise.all([
-        userService.getUsers(effectiveOrgId ? { organizationId: effectiveOrgId } : {}),
-        userService.getAvailableRoles(effectiveOrgId),
-        fetchBranches(
-          effectiveOrgId
-            ? { organizationId: effectiveOrgId, limit: 100 }
-            : { limit: 100 },
-        ).catch(() => ({ data: [] })),
-      ]);
-
-      const userList = Array.isArray(usersRes)
-        ? usersRes
-        : usersRes?.data || [];
-      const roleList = Array.isArray(rolesData)
-        ? rolesData
-        : rolesData?.data || [];
-      const branchList = Array.isArray(branchesRes)
-        ? branchesRes
-        : branchesRes?.data || branchesRes?.branches || [];
-
-      setUsers(userList);
-      setAvailableRoles(roleList);
-      setAvailableBranches(branchList);
-
-      const targetId = keepSelectedId || selectedUserRef.current?.id;
-      if (userList.length > 0) {
-        const found = targetId ? userList.find((u) => u.id === targetId) : null;
-        const targetUser = found || userList[0];
-
-        // If target user is already selected and we are not explicitly forcing a detail refresh,
-        // just sync the user object without causing another role details network call.
-        if (selectedUserRef.current?.id === targetUser.id && !keepSelectedId) {
-          setSelectedUser(targetUser);
-        } else {
-          handleSelectUser(targetUser);
-        }
-      } else {
-        setSelectedUser(null);
-        setUserDetails(null);
-      }
-    } catch (err) {
-      toast.error(err.message || 'Failed to load user management data');
-    } finally {
-      setLoading(false);
-    }
-  }, [effectiveOrgId, isSuperAdmin, handleSelectUser]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const invalidateUsers = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+  };
 
   const handleInviteSuccess = async (payload) => {
     const result = await userService.inviteUser(payload);
-    await loadData();
+    invalidateUsers();
     return result;
   };
 
@@ -184,7 +198,7 @@ export const useUserManagement = () => {
         const fullUrl = `${window.location.origin}/accept-invite?token=${res.inviteToken}`;
         navigator.clipboard.writeText(fullUrl);
       }
-      await loadData();
+      invalidateUsers();
     } catch (err) {
       toast.error(err.message || 'Failed to resend invitation');
     } finally {
@@ -203,7 +217,7 @@ export const useUserManagement = () => {
     if (selectedUser?.id === userId) {
       setSelectedUser((prev) => ({ ...prev, ...updated }));
     }
-    await loadData();
+    invalidateUsers();
     return updated;
   };
 
@@ -217,9 +231,8 @@ export const useUserManagement = () => {
       setUserToDelete(null);
       if (selectedUser?.id === userToDelete.id) {
         setSelectedUser(null);
-        setUserDetails(null);
       }
-      await loadData();
+      invalidateUsers();
     } catch (err) {
       const blockers =
         err.dependencies ||
@@ -242,7 +255,7 @@ export const useUserManagement = () => {
     try {
       await userService.setPrimaryRole(selectedUser.id, roleId);
       toast.success(`Set "${role.name}" as Primary Role`);
-      await loadData(selectedUser.id);
+      invalidateUsers();
     } catch (err) {
       toast.error(err.message || 'Failed to set primary role');
     }
@@ -256,12 +269,12 @@ export const useUserManagement = () => {
       toast.success('Role assigned successfully');
       notifyPermissionUpdate({ userId: selectedUser.id });
       await refreshUser();
-      await loadData(selectedUser.id);
+      invalidateUsers();
     } catch (err) {
       toast.error(err.message || 'Failed to assign role');
-      throw err;
     } finally {
       setActionLoading(false);
+      setIsAddRoleOpen(false);
     }
   };
 
@@ -270,65 +283,29 @@ export const useUserManagement = () => {
     setIsRemoveImpactOpen(true);
   };
 
-  const handleConfirmRoleRemoval = async (roleId) => {
-    if (!selectedUser) return;
+  const handleConfirmRoleRemoval = async () => {
+    if (!selectedUser || !roleToRemove) return;
+    setActionLoading(true);
+    const roleId = roleToRemove.roleId || roleToRemove.id;
     try {
       await userService.removeRole(selectedUser.id, roleId);
-      toast.success('Role assignment removed');
+      toast.success(`Removed role "${roleToRemove.name}"`);
       notifyPermissionUpdate({ userId: selectedUser.id });
       await refreshUser();
-      await loadData(selectedUser.id);
+      invalidateUsers();
+      setIsRemoveImpactOpen(false);
+      setRoleToRemove(null);
     } catch (err) {
       toast.error(err.message || 'Failed to remove role');
-      throw err;
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  // Client filtering
-  const filteredUsers = useMemo(() => {
-    return users.filter((u) => {
-      const q = searchQuery.toLowerCase().trim();
-      const matchesName = u.displayName?.toLowerCase().includes(q);
-      const matchesEmail = u.email?.toLowerCase().includes(q);
-      const matchesPhone = u.phoneNumber?.includes(q);
-      const matchesRole = u.activeRoles?.some((r) =>
-        r.name?.toLowerCase().includes(q),
-      );
-      const matchesQuery =
-        !q || matchesName || matchesEmail || matchesPhone || matchesRole;
+  // Quick KPI metrics from current paginated and total metadata
+  const total = usersResponse?.pagination?.totalRecords ?? usersResponse?.total ?? users.length;
+  const totalPages = usersResponse?.pagination?.totalPages ?? usersResponse?.totalPages ?? 1;
 
-      let matchesStatus = true;
-      if (statusFilter !== 'all') {
-        matchesStatus = u.status === statusFilter;
-      }
-
-      let matchesRoleFilter = true;
-      if (roleFilter) {
-        matchesRoleFilter = u.activeRoles?.some(
-          (r) => r.roleId === roleFilter || r.id === roleFilter,
-        );
-      }
-
-      let matchesBranchFilter = true;
-      if (branchFilter) {
-        matchesBranchFilter =
-          u.homeBranch?.branchId === branchFilter ||
-          u.assignedBranches?.some((b) => b.branchId === branchFilter);
-      }
-
-      return (
-        matchesQuery && matchesStatus && matchesRoleFilter && matchesBranchFilter
-      );
-    });
-  }, [users, searchQuery, statusFilter, roleFilter, branchFilter]);
-
-  // Paginated users for Table view
-  const paginatedTableUsers = useMemo(() => {
-    const start = (page - 1) * limit;
-    return filteredUsers.slice(start, start + limit);
-  }, [filteredUsers, page, limit]);
-
-  // Quick KPI metrics
   const activeCount = useMemo(
     () => users.filter((u) => u.status === 'active').length,
     [users],
@@ -394,13 +371,25 @@ export const useUserManagement = () => {
     viewMode,
     setViewMode,
     searchQuery,
-    setSearchQuery,
+    setSearchQuery: (val) => {
+      setSearchQuery(val);
+      setPage(1);
+    },
     statusFilter,
-    setStatusFilter,
+    setStatusFilter: (val) => {
+      setStatusFilter(val);
+      setPage(1);
+    },
     roleFilter,
-    setRoleFilter,
+    setRoleFilter: (val) => {
+      setRoleFilter(val);
+      setPage(1);
+    },
     branchFilter,
-    setBranchFilter,
+    setBranchFilter: (val) => {
+      setBranchFilter(val);
+      setPage(1);
+    },
     statusFilterOptions,
     roleFilterOptions,
     branchFilterOptions,
@@ -408,6 +397,8 @@ export const useUserManagement = () => {
     setPage,
     limit,
     setLimit,
+    total,
+    totalPages,
     selectedUser,
     setSelectedUser,
     userDetails,
@@ -438,8 +429,8 @@ export const useUserManagement = () => {
     deleting,
     statusModalUser,
     setStatusModalUser,
-    filteredUsers,
-    paginatedTableUsers,
+    filteredUsers: users, // Direct server-filtered data
+    paginatedTableUsers: users, // Direct server-paginated data (NO local slice!)
     activeCount,
     pendingCount,
     expiredCount,
@@ -465,7 +456,7 @@ export const useAcceptInvite = () => {
   const token = searchParams.get('token');
 
   const [verifying, setVerifying] = useState(true);
-  const [tokenStatus, setTokenStatus] = useState(null); // { valid, expired, user, message }
+  const [tokenStatus, setTokenStatus] = useState(null);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -500,7 +491,6 @@ export const useAcceptInvite = () => {
     verify();
   }, [token]);
 
-  // Password rules evaluation
   const rules = {
     length: password.length >= 8,
     upper: /[A-Z]/.test(password),
@@ -559,4 +549,3 @@ export default {
   useUserManagement,
   useAcceptInvite,
 };
-

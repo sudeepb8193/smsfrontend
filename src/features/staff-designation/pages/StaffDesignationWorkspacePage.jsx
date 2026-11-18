@@ -60,7 +60,10 @@ export default function StaffDesignationWorkspacePage() {
     loadStaffMaster();
   }, [id, effectiveOrgId]);
 
-  // Hook for Module 06 data and mutations
+  // Active Tab
+  const activeTab = searchParams.get('tab') || 'designations';
+
+  // Hook for Module 06 data and mutations with tab-level lazy fetching
   const {
     loading: moduleLoading,
     error: moduleError,
@@ -88,7 +91,7 @@ export default function StaffDesignationWorkspacePage() {
     createCommOverride,
     updateCommOverride,
     deleteCommOverride,
-  } = useStaffDesignation(id, effectiveOrgId);
+  } = useStaffDesignation(id, effectiveOrgId, activeTab);
 
   // Dynamic permission-checked tabs
   const canViewDesignations = can('staff_designation.view', staff?.homeBranchId);
@@ -149,7 +152,6 @@ export default function StaffDesignationWorkspacePage() {
   ];
 
   const defaultTab = availableTabs[0]?.id || 'designations';
-  const activeTab = searchParams.get('tab') || defaultTab;
 
   const handleTabChange = (newTab) => {
     setSearchParams({ tab: newTab });

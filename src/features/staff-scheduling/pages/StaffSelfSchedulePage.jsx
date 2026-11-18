@@ -103,7 +103,7 @@ export default function StaffSelfSchedulePage() {
           const peers = await fetchStaffList({
             organizationId: effectiveOrgId,
             branchId: myData.homeBranchId,
-            limit: 50,
+            limit: 10,
           });
           const peerItems = peers?.items || peers || [];
           setStaffList(Array.isArray(peerItems) ? peerItems : []);
