@@ -218,6 +218,15 @@ export const apiClient = {
       body.success !== undefined &&
       body.data !== undefined
     ) {
+      if (body.pagination !== undefined) {
+        return {
+          data: body.data,
+          items: Array.isArray(body.data) ? body.data : body.data?.items || [],
+          pagination: body.pagination,
+          total: body.pagination.totalRecords,
+          totalPages: body.pagination.totalPages,
+        };
+      }
       return body.data;
     }
 

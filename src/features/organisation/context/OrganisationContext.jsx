@@ -1,24 +1,47 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { fetchOrganisations } from '../api/organisationApi';
 import { useAuth } from '../../../hooks/useAuth';
+import { clearTenantCache, queryKeys } from '../../../config/queryClient';
 
 export const OrganisationContext = createContext(null);
 
 export const OrganisationProvider = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
-  const [organisations, setOrganisations] = useState([]);
   const [selectedOrganisation, setSelectedOrganisationState] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const userRole = String(
     user?.roleSlug || user?.role || user?.roleName || '',
   ).toLowerCase().replace(/_/g, '-');
   const isSuperAdmin = userRole === 'super-admin';
 
-  const refreshOrganisations = useCallback(async () => {
-    if (!isAuthenticated || !isSuperAdmin) {
-      setOrganisations([]);
+  // Use centralized TanStack Query with standard limit=10 and 5-min staleTime
+  const {
+    data: orgsRes,
+    isLoading: loading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.organisations.list({ limit: 10, sortBy: 'name', sortOrder: 'asc' }),
+    queryFn: () => fetchOrganisations({ limit: 10, sortBy: 'name', sortOrder: 'asc' }),
+    enabled: Boolean(isAuthenticated && isSuperAdmin),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const organisations = useMemo(() => {
+    if (!isAuthenticated || !isSuperAdmin) return [];
+    if (Array.isArray(orgsRes?.data)) return orgsRes.data;
+    if (Array.isArray(orgsRes?.items)) return orgsRes.items;
+    if (Array.isArray(orgsRes)) return orgsRes;
+    return [];
+  }, [isAuthenticated, isSuperAdmin, orgsRes]);
+
+  const refreshOrganisations = useCallback(() => {
+    return refetch();
+  }, [refetch]);
+
+  useEffect(() => {
+    if (!isSuperAdmin) {
       if (user?.organizationId) {
         setSelectedOrganisationState({
           id: user.organizationId,
@@ -30,39 +53,23 @@ export const OrganisationProvider = ({ children }) => {
       return;
     }
 
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetchOrganisations({ limit: 100, sortBy: 'name', sortOrder: 'asc' });
-      const orgList = res?.data || res || [];
-      setOrganisations(orgList);
-
+    if (organisations.length > 0) {
       const savedOrgId = localStorage.getItem('sms_active_organization_id');
-      const matched = orgList.find((org) => org.id === savedOrgId);
+      const matched = organisations.find((org) => org.id === savedOrgId);
 
       if (matched) {
         setSelectedOrganisationState(matched);
-      } else if (orgList.length > 0) {
-        const activeFirst = orgList.find((org) => org.status === 'active') || orgList[0];
+      } else {
+        const activeFirst = organisations.find((org) => org.status === 'active') || organisations[0];
         setSelectedOrganisationState(activeFirst);
         localStorage.setItem('sms_active_organization_id', activeFirst.id);
-      } else {
-        setSelectedOrganisationState(null);
       }
-    } catch (err) {
-      console.error('Failed to load organisations for Super Admin:', err);
-      setError(err?.message || 'Failed to load organisations');
-    } finally {
-      setLoading(false);
     }
-  }, [isAuthenticated, isSuperAdmin, user?.organizationId, user?.organizationName]);
-
-  useEffect(() => {
-    refreshOrganisations();
-  }, [refreshOrganisations]);
+  }, [isSuperAdmin, user?.organizationId, user?.organizationName, organisations]);
 
   const setSelectedOrganisation = useCallback(
     (orgOrId) => {
+      clearTenantCache();
       if (!orgOrId) {
         setSelectedOrganisationState(null);
         localStorage.removeItem('sms_active_organization_id');
@@ -92,7 +99,7 @@ export const OrganisationProvider = ({ children }) => {
     selectedOrganisation,
     isSuperAdmin,
     loading,
-    error,
+    error: error?.message || null,
     setSelectedOrganisation,
     refreshOrganisations,
   };

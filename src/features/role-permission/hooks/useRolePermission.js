@@ -1,9 +1,12 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { rolePermissionApi } from '../api/rolePermissionApi';
 import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
 import { useAuth } from '../../../hooks/useAuth';
+import { useDebounce } from '../../../hooks/useDebounce';
+import { queryClient, queryKeys } from '../../../config/queryClient';
 
 /**
  * 1. State Management Hook for Role List & Role-Permission Matrix Page
@@ -12,15 +15,54 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
 
-  // Roles state
-  const [roles, setRoles] = useState([]);
+  // Search & Roles state
   const [selectedRoleId, setSelectedRoleId] = useState(null);
-  const [loadingRoles, setLoadingRoles] = useState(true);
   const [roleSearch, setRoleSearch] = useState('');
+  const debouncedRoleSearch = useDebounce(roleSearch, 350);
+
+  const apiFn = isSuperAdminView
+    ? rolePermissionApi.getSuperAdminRoles
+    : rolePermissionApi.getRoles;
+
+  const { data: rolesRes, isLoading: loadingRoles, refetch: fetchRoles } = useQuery({
+    queryKey: queryKeys.roles.list(selectedOrgId, { search: debouncedRoleSearch }),
+    queryFn: () =>
+      apiFn({
+        search: debouncedRoleSearch || undefined,
+        organizationId: selectedOrgId || undefined,
+        limit: 10,
+      }),
+    staleTime: 60 * 1000,
+  });
+
+  const roles = useMemo(() => {
+    return rolesRes?.items || (Array.isArray(rolesRes) ? rolesRes : []);
+  }, [rolesRes]);
+
+  const { data: matrixTemplateRes } = useQuery({
+    queryKey: queryKeys.roles.matrix(),
+    queryFn: () => rolePermissionApi.getMatrixTemplate(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const matrixTemplate = useMemo(() => matrixTemplateRes || [], [matrixTemplateRes]);
+
+  const { data: branchesRes } = useQuery({
+    queryKey: queryKeys.branches.list(selectedOrgId),
+    queryFn: () => rolePermissionApi.getBranches(selectedOrgId || undefined),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const branches = useMemo(() => branchesRes || [], [branchesRes]);
+
+  // Auto-select first role if none currently selected
+  useEffect(() => {
+    if (roles.length > 0 && !selectedRoleId) {
+      setSelectedRoleId(roles[0].id);
+    }
+  }, [roles, selectedRoleId]);
 
   // Permissions & Matrix state for selected role
-  const [matrixTemplate, setMatrixTemplate] = useState([]);
-  const [branches, setBranches] = useState([]);
   const [selectedPermissions, setSelectedPermissions] = useState({});
   const [moduleScopes, setModuleScopes] = useState({});
   const [versionToken, setVersionToken] = useState('');
@@ -55,39 +97,9 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
   const [pendingSwitchRoleId, setPendingSwitchRoleId] = useState(null);
   const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
 
-  // 1. Initial Load: Fetch roles, matrix template, and branches
-  const fetchInitialData = useCallback(async () => {
-    try {
-      setLoadingRoles(true);
-      const apiFn = isSuperAdminView
-        ? rolePermissionApi.getSuperAdminRoles
-        : rolePermissionApi.getRoles;
-
-      const [rolesRes, templateRes, branchesRes] = await Promise.all([
-        apiFn({ limit: 100, organizationId: selectedOrgId || undefined }),
-        rolePermissionApi.getMatrixTemplate(),
-        rolePermissionApi.getBranches(selectedOrgId || undefined),
-      ]);
-
-      const roleList = rolesRes?.items || (Array.isArray(rolesRes) ? rolesRes : []);
-      setRoles(roleList);
-      setMatrixTemplate(templateRes || []);
-      setBranches(branchesRes || []);
-
-      // Auto-select first role if none currently selected
-      if (roleList.length > 0 && !selectedRoleId) {
-        setSelectedRoleId(roleList[0].id);
-      }
-    } catch (err) {
-      toast.error(err.message || 'Failed to initialize role and permission data');
-    } finally {
-      setLoadingRoles(false);
-    }
-  }, [isSuperAdminView, selectedOrgId, selectedRoleId]);
-
-  useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]);
+  const fetchInitialData = useCallback(() => {
+    fetchRoles();
+  }, [fetchRoles]);
 
   // 2. Load Permissions whenever selectedRoleId changes
   const loadRolePermissions = useCallback(async (roleId) => {
@@ -482,9 +494,7 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
       await refreshUser();
 
       // Refresh roles to update permission counters
-      const apiFn = isSuperAdminView ? rolePermissionApi.getSuperAdminRoles : rolePermissionApi.getRoles;
-      const rolesRes = await apiFn({ limit: 100, organizationId: selectedOrgId || undefined });
-      setRoles(rolesRes?.items || (Array.isArray(rolesRes) ? rolesRes : []));
+      queryClient.invalidateQueries({ queryKey: queryKeys.roles.all });
     } catch (err) {
       toast.error(err.message || 'Failed to save permissions');
     } finally {
@@ -500,10 +510,8 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
       toast.success(`Role "${newRole.name}" created successfully`);
       setCreateRoleModalOpen(false);
 
-      // Refresh list & select newly created role
-      const rolesRes = await apiFn({ limit: 100, organizationId: selectedOrgId || undefined });
-      const roleList = rolesRes?.items || (Array.isArray(rolesRes) ? rolesRes : []);
-      setRoles(roleList);
+      // Invalidate queries & select newly created role
+      queryClient.invalidateQueries({ queryKey: queryKeys.roles.all });
       setSelectedRoleId(newRole.id);
     } catch (err) {
       toast.error(err.message || 'Failed to create role');
@@ -515,8 +523,7 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
     const res = await rolePermissionApi.createModulePermissions(data);
     toast.success(`Module "${res.moduleLabel}" registered with ${res.permissions?.length || 0} actions`);
     // Refresh matrix template
-    const templateRes = await rolePermissionApi.getMatrixTemplate();
-    setMatrixTemplate(templateRes || []);
+    queryClient.invalidateQueries({ queryKey: queryKeys.roles.matrix() });
   };
 
   // Update Module Submit
@@ -526,8 +533,7 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
       toast.success(`Module "${res.moduleLabel || data.moduleLabel}" updated successfully`);
       setEditingModule(null);
       // Refresh template & current permissions
-      const templateRes = await rolePermissionApi.getMatrixTemplate();
-      setMatrixTemplate(templateRes || []);
+      queryClient.invalidateQueries({ queryKey: queryKeys.roles.matrix() });
       if (selectedRoleId) {
         await loadRolePermissions(selectedRoleId);
       }
@@ -545,8 +551,7 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
       toast.success(`Module "${deleteConfirmModule.moduleLabel}" deleted successfully`);
       setDeleteConfirmModule(null);
       // Refresh template & current permissions
-      const templateRes = await rolePermissionApi.getMatrixTemplate();
-      setMatrixTemplate(templateRes || []);
+      queryClient.invalidateQueries({ queryKey: queryKeys.roles.matrix() });
       if (selectedRoleId) {
         await loadRolePermissions(selectedRoleId);
       }
@@ -569,12 +574,9 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
       setDeleteConfirmRole(null);
 
       // Refresh roles
-      const apiFn = isSuperAdminView ? rolePermissionApi.getSuperAdminRoles : rolePermissionApi.getRoles;
-      const rolesRes = await apiFn({ limit: 100, organizationId: selectedOrgId || undefined });
-      const roleList = rolesRes?.items || (Array.isArray(rolesRes) ? rolesRes : []);
-      setRoles(roleList);
+      queryClient.invalidateQueries({ queryKey: queryKeys.roles.all });
       if (selectedRoleId === deleteConfirmRole.id) {
-        setSelectedRoleId(roleList[0]?.id || null);
+        setSelectedRoleId(null);
       }
     } catch (err) {
       toast.error(err.message || 'Failed to delete role');

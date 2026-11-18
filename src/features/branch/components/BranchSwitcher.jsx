@@ -50,8 +50,8 @@ export const BranchSwitcher = () => {
     const term = searchTerm.toLowerCase();
     return branches.filter(
       (b) =>
-        b.name.toLowerCase().includes(term) ||
-        b.code.toLowerCase().includes(term) ||
+        b.name?.toLowerCase().includes(term) ||
+        b.code?.toLowerCase().includes(term) ||
         (b.branchAddress?.city && b.branchAddress.city.toLowerCase().includes(term)),
     );
   }, [branches, searchTerm]);
@@ -81,18 +81,18 @@ export const BranchSwitcher = () => {
         aria-label="Branch context switcher"
       >
         <div className="w-6 h-6 rounded-lg bg-primary-500 text-white flex items-center justify-center font-bold text-[10px] shrink-0 font-mono shadow-xs">
-          {currentBranch ? currentBranch.code.slice(0, 3) : <Building2 size={13} />}
+          {currentBranch?.code ? currentBranch.code.slice(0, 3) : <Building2 size={13} />}
         </div>
 
         <div className="text-left hidden sm:block max-w-[140px] md:max-w-[180px]">
           <div className="flex items-center gap-1.5 leading-none">
             <span className="font-bold text-[11px] truncate block text-[var(--text-primary)]">
-              {currentBranch ? currentBranch.name : 'Select Branch'}
+              {currentBranch?.name || 'Select Branch'}
             </span>
           </div>
-          {currentBranch && (
+          {currentBranch?.code && (
             <span className="text-[10px] text-[var(--text-muted)] font-mono block truncate">
-              {currentBranch.code} • {currentBranch.branchType}
+              {currentBranch.code} {currentBranch.branchType ? `• ${currentBranch.branchType}` : ''}
             </span>
           )}
         </div>
@@ -168,7 +168,7 @@ export const BranchSwitcher = () => {
                             : 'bg-black/5 dark:bg-white/5 text-[var(--text-secondary)]'
                         }`}
                       >
-                        {branch.code.slice(0, 3)}
+                        {branch.code ? branch.code.slice(0, 3) : <Building2 size={13} />}
                       </div>
 
                       <div className="min-w-0">

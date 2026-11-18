@@ -1,7 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { login as apiLogin, register as apiRegister, refreshTokens, fetchMe } from '../api/authApi';
+import { clearTenantCache } from '../../../config/queryClient';
 
 export const AuthContext = createContext(null);
+
+let initAuthPromise = null;
+let lastSessionVerificationTime = 0;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -17,27 +21,37 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
+      if (!initAuthPromise) {
+        initAuthPromise = (async () => {
+          try {
+            const data = await refreshTokens(storedRefreshToken);
+            if (data?.accessToken) {
+              setAccessToken(data.accessToken);
+              localStorage.setItem('salon_jwt_token', data.accessToken);
+              if (data.refreshToken) {
+                localStorage.setItem('salon_refresh_token', data.refreshToken);
+              }
+              if (data.user) {
+                setUser(data.user);
+              } else {
+                const profile = await fetchMe(data.accessToken);
+                setUser(profile);
+              }
+            }
+          } catch (err) {
+            console.error('Session restoration failed:', err);
+            localStorage.removeItem('salon_refresh_token');
+            localStorage.removeItem('salon_jwt_token');
+            setUser(null);
+            setAccessToken(null);
+          } finally {
+            initAuthPromise = null;
+          }
+        })();
+      }
+
       try {
-        const data = await refreshTokens(storedRefreshToken);
-        if (data?.accessToken) {
-          setAccessToken(data.accessToken);
-          localStorage.setItem('salon_jwt_token', data.accessToken);
-          if (data.refreshToken) {
-            localStorage.setItem('salon_refresh_token', data.refreshToken);
-          }
-          if (data.user) {
-            setUser(data.user);
-          } else {
-            const profile = await fetchMe(data.accessToken);
-            setUser(profile);
-          }
-        }
-      } catch (err) {
-        console.error('Session restoration failed:', err);
-        localStorage.removeItem('salon_refresh_token');
-        localStorage.removeItem('salon_jwt_token');
-        setUser(null);
-        setAccessToken(null);
+        await initAuthPromise;
       } finally {
         setLoading(false);
       }
@@ -59,6 +73,13 @@ export const AuthProvider = ({ children }) => {
     };
 
     const verifyActiveSession = async () => {
+      const now = Date.now();
+      // Throttle window focus verification to at most once every 15 seconds
+      if (now - lastSessionVerificationTime < 15000) {
+        return;
+      }
+      lastSessionVerificationTime = now;
+
       const token = localStorage.getItem('salon_jwt_token');
       if (token) {
         try {
@@ -89,8 +110,7 @@ export const AuthProvider = ({ children }) => {
     // 1. Same-tab real-time event listener
     window.addEventListener('sms:permissions-updated', handlePermissionsUpdated);
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('focus', verifyActiveSession);
-    const interval = setInterval(verifyActiveSession, 30000);
+    const interval = setInterval(verifyActiveSession, 60000);
 
     // 2. Cross-tab BroadcastChannel listener
     let channel;
@@ -110,7 +130,6 @@ export const AuthProvider = ({ children }) => {
     return () => {
       window.removeEventListener('sms:permissions-updated', handlePermissionsUpdated);
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('focus', verifyActiveSession);
       clearInterval(interval);
       if (channel) {
         channel.close();
@@ -165,6 +184,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('salon_jwt_token');
     setAccessToken(null);
     setUser(null);
+    clearTenantCache();
   };
 
   const role =

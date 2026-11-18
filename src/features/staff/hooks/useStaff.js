@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   fetchStaffList,
   fetchStaffById,
@@ -13,22 +14,24 @@ import {
 import { useAuth } from '../../../hooks/useAuth';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
 import { useBranch } from '../../branch/hooks/useBranch';
+import { useDebounce } from '../../../hooks/useDebounce';
+import { queryClient, queryKeys } from '../../../config/queryClient';
 
-export function useStaff(initialFilters = {}) {
+export function useStaff(initialFilters = {}, options = {}) {
   const { user } = useAuth();
   const { selectedOrganisation, isSuperAdmin } = useOrganisation();
-  const { currentBranch } = useBranch();
+  const { currentBranch, loading: branchLoading } = useBranch();
 
   const effectiveOrgId = isSuperAdmin ? selectedOrganisation?.id : user?.organizationId;
-  const activeBranchId = currentBranch?.id || '';
+  const activeBranchId =
+    initialFilters.branchId ||
+    currentBranch?.id ||
+    (effectiveOrgId ? localStorage.getItem(`sms_active_branch_id_${effectiveOrgId}`) : null) ||
+    localStorage.getItem('sms_active_branch_id') ||
+    '';
 
-  const [staffList, setStaffList] = useState([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const [filters, setFilters] = useState({
     search: '',
@@ -40,79 +43,95 @@ export function useStaff(initialFilters = {}) {
     ...initialFilters,
   });
 
-  const loadStaffList = useCallback(async () => {
-    if (!effectiveOrgId) return;
+  const debouncedSearch = useDebounce(filters.search, 350);
 
-    try {
-      setLoading(true);
-      setError(null);
+  // Construct parameter payload for query key and API request
+  const queryParams = useMemo(
+    () => ({
+      organizationId: effectiveOrgId,
+      branchId: activeBranchId || undefined,
+      page,
+      limit,
+      ...filters,
+      search: debouncedSearch ? debouncedSearch.trim() : undefined,
+    }),
+    [effectiveOrgId, activeBranchId, page, limit, filters, debouncedSearch],
+  );
 
-      const params = {
-        organizationId: effectiveOrgId,
-        page,
-        limit,
-        ...filters,
-      };
+  // Prevent firing without branchId while BranchProvider is still resolving the initial active branch
+  const isBranchResolving = branchLoading && !activeBranchId;
+  const isQueryEnabled = options.enabled !== undefined ? options.enabled : true;
 
-      // Automatically scope by the active branch selected in the Topbar switcher
-      if (activeBranchId) {
-        params.branchId = activeBranchId;
-      }
+  // TanStack Query: Cached, deduplicated, and server-paginated staff list
+  const {
+    data: staffResponse,
+    isLoading: loading,
+    error: queryError,
+    refetch: loadStaffList,
+  } = useQuery({
+    queryKey: queryKeys.staff.list(effectiveOrgId, activeBranchId, queryParams),
+    queryFn: () => fetchStaffList(queryParams),
+    enabled: Boolean(effectiveOrgId && !isBranchResolving && isQueryEnabled),
+    staleTime: 60 * 1000, // 1 minute fresh cache
+  });
 
-      const res = await fetchStaffList(params);
-      setStaffList(res.items || []);
-      setTotal(res.total || 0);
-      setTotalPages(res.totalPages || 1);
-    } catch (err) {
-      console.error('Failed to load staff list:', err);
-      setError(err?.message || 'Failed to load employees');
-    } finally {
-      setLoading(false);
-    }
-  }, [effectiveOrgId, activeBranchId, page, limit, filters]);
+  const staffList = useMemo(() => {
+    if (Array.isArray(staffResponse?.items)) return staffResponse.items;
+    if (Array.isArray(staffResponse?.data)) return staffResponse.data;
+    if (Array.isArray(staffResponse)) return staffResponse;
+    return [];
+  }, [staffResponse]);
 
-  useEffect(() => {
-    loadStaffList();
-  }, [loadStaffList]);
+  const total = staffResponse?.pagination?.totalRecords ?? staffResponse?.total ?? staffList.length;
+  const totalPages =
+    staffResponse?.pagination?.totalPages ??
+    staffResponse?.totalPages ??
+    (limit > 0 ? Math.ceil(total / limit) : 1);
+
+  const error = queryError ? queryError.message || 'Failed to load employees' : null;
 
   const updateFilters = (newFilters) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
     setPage(1); // Reset to first page on filter change
   };
 
+  const invalidateStaff = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.staff.all });
+  };
+
   const createStaff = async (payload) => {
     const res = await apiCreateStaff(payload, effectiveOrgId);
-    await loadStaffList();
+    invalidateStaff();
     return res;
   };
 
   const updateStaff = async (id, payload) => {
     const res = await apiUpdateStaff(id, payload, effectiveOrgId);
-    await loadStaffList();
+    invalidateStaff();
     return res;
   };
 
   const updateStatus = async (id, status, reason) => {
     const res = await apiUpdateStaffStatus(id, status, reason, effectiveOrgId);
-    await loadStaffList();
+    invalidateStaff();
     return res;
   };
 
   const linkUser = async (id, userId) => {
     const res = await apiLinkStaffUser(id, userId, effectiveOrgId);
-    await loadStaffList();
+    invalidateStaff();
     return res;
   };
 
   const unlinkUser = async (id) => {
     const res = await apiUnlinkStaffUser(id, effectiveOrgId);
-    await loadStaffList();
+    invalidateStaff();
     return res;
   };
 
   const removeStaff = async (id) => {
     const res = await apiDeleteStaff(id, effectiveOrgId);
-    await loadStaffList();
+    invalidateStaff();
     return res;
   };
 

@@ -1,4 +1,6 @@
 import React from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './config/queryClient';
 import { AuthProvider } from './store/AuthContext';
 import { ThemeProvider } from './store/ThemeContext';
 import { useAuth } from './hooks/useAuth';
@@ -25,15 +27,17 @@ const MainShell = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <ThemeProvider>
-        <OrganisationProvider>
-          <BranchProvider>
-            <MainShell />
-          </BranchProvider>
-        </OrganisationProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ThemeProvider>
+          <OrganisationProvider>
+            <BranchProvider>
+              <MainShell />
+            </BranchProvider>
+          </OrganisationProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
 import Loader from '../../../components/shared/Loader';
@@ -8,6 +9,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { usePermission } from '../../../hooks/usePermission';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
 import { useBranch } from '../../branch/hooks/useBranch';
+import { queryKeys } from '../../../config/queryClient';
 import { fetchStaffList } from '../../staff/api/staffApi';
 import { useStaffScheduling } from '../hooks/useStaffScheduling';
 import {
@@ -121,11 +123,31 @@ export default function StaffSchedulingWorkspacePage() {
     loadPreferences,
     loadOverrides,
     loadBlockedTimes,
-  } = useStaffScheduling();
+    invalidateSchedulingCache,
+  } = useStaffScheduling(currentTab);
 
-  // Eligible staff list for dropdowns & assignments
-  const [staffList, setStaffList] = useState([]);
-  const [staffLoading, setStaffLoading] = useState(false);
+  // Eligible staff list for dropdowns & assignments via TanStack Query
+  const {
+    data: staffData,
+    isLoading: staffLoading,
+    refetch: refetchStaffMembers,
+  } = useQuery({
+    queryKey: queryKeys.staff.list(effectiveOrgId, selectedBranchId, { employmentStatus: 'active', limit: 10 }),
+    queryFn: () =>
+      fetchStaffList({
+        organizationId: effectiveOrgId,
+        branchId: selectedBranchId || undefined,
+        limit: 10,
+        employmentStatus: 'active',
+      }),
+    enabled: Boolean(effectiveOrgId),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const staffList = useMemo(() => {
+    const items = staffData?.items || staffData?.data || staffData || [];
+    return Array.isArray(items) ? items : [];
+  }, [staffData]);
 
   // Global Workspace Modals triggered from Top-Right Action Button
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
@@ -146,66 +168,6 @@ export default function StaffSchedulingWorkspacePage() {
 
   // Identify active branch object
   const currentBranch = branches?.find((b) => b.id === selectedBranchId) || branches?.[0];
-
-  // Load Staff for the selected branch / org
-  const loadStaffMembers = useCallback(async () => {
-    if (!effectiveOrgId) return;
-    try {
-      setStaffLoading(true);
-      const res = await fetchStaffList({
-        organizationId: effectiveOrgId,
-        branchId: selectedBranchId || undefined,
-        limit: 100,
-        employmentStatus: 'active',
-      });
-      const items = res?.items || res || [];
-      setStaffList(Array.isArray(items) ? items : []);
-    } catch (err) {
-      console.error('Failed to load branch staff list:', err);
-    } finally {
-      setStaffLoading(false);
-    }
-  }, [effectiveOrgId, selectedBranchId]);
-
-  useEffect(() => {
-    loadStaffMembers();
-  }, [loadStaffMembers]);
-
-  // Load active tab data on change
-  useEffect(() => {
-    switch (currentTab) {
-      case 'overview':
-        loadOverview();
-        break;
-      case 'templates':
-        loadTemplates();
-        break;
-      case 'weekly':
-        loadTeamSchedule();
-        loadTemplates();
-        break;
-      case 'preferences':
-        loadPreferences();
-        break;
-      case 'overrides':
-        loadOverrides();
-        break;
-      case 'blocked':
-        loadBlockedTimes();
-        break;
-      default:
-        loadOverview();
-        break;
-    }
-  }, [
-    currentTab,
-    loadOverview,
-    loadTeamSchedule,
-    loadTemplates,
-    loadOverrides,
-    loadBlockedTimes,
-    loadPreferences,
-  ]);
 
   const handleTabChange = (tabId) => {
     setSearchParams({ tab: tabId });
@@ -235,15 +197,16 @@ export default function StaffSchedulingWorkspacePage() {
       default:
         break;
     }
-    loadStaffMembers();
+    refetchStaffMembers();
   };
 
-  // CRUD Handlers
+  // CRUD Handlers with intelligent cache invalidation
   const handleCreateTemplate = async (payload) => {
     try {
       setActionLoading(true);
       await createShiftTemplate(payload, effectiveOrgId);
-      await loadTemplates();
+      invalidateSchedulingCache('templates');
+      invalidateSchedulingCache('overview');
       setTemplateModalOpen(false);
     } finally {
       setActionLoading(false);
@@ -252,34 +215,40 @@ export default function StaffSchedulingWorkspacePage() {
 
   const handleUpdateTemplate = async (templateId, payload) => {
     await updateShiftTemplate(templateId, payload, effectiveOrgId);
-    await loadTemplates();
+    invalidateSchedulingCache('templates');
+    invalidateSchedulingCache('overview');
   };
 
   const handleRetireTemplate = async (templateId) => {
     await retireShiftTemplate(templateId, effectiveOrgId);
-    await loadTemplates();
+    invalidateSchedulingCache('templates');
+    invalidateSchedulingCache('overview');
   };
 
   const handleReactivateTemplate = async (templateId) => {
     await reactivateShiftTemplate(templateId, effectiveOrgId);
-    await loadTemplates();
+    invalidateSchedulingCache('templates');
+    invalidateSchedulingCache('overview');
   };
 
   const handleDeleteTemplate = async (templateId) => {
     await deleteShiftTemplate(templateId, effectiveOrgId);
-    await loadTemplates();
+    invalidateSchedulingCache('templates');
+    invalidateSchedulingCache('overview');
   };
 
   const handleSaveSchedule = async (payload) => {
     await saveWeeklySchedule(payload, effectiveOrgId);
-    await loadTeamSchedule();
+    invalidateSchedulingCache('teamSchedule');
+    invalidateSchedulingCache('overview');
   };
 
   const handleCopySchedule = async (payload) => {
     try {
       setActionLoading(true);
       await copyWeeklySchedule(payload, effectiveOrgId);
-      await loadTeamSchedule();
+      invalidateSchedulingCache('teamSchedule');
+      invalidateSchedulingCache('overview');
       setCopyModalOpen(false);
     } finally {
       setActionLoading(false);
@@ -290,8 +259,8 @@ export default function StaffSchedulingWorkspacePage() {
     try {
       setActionLoading(true);
       await createScheduleOverride(payload, effectiveOrgId);
-      await loadOverrides();
-      if (currentTab === 'weekly') await loadTeamSchedule();
+      invalidateSchedulingCache('overrides');
+      invalidateSchedulingCache('teamSchedule');
       setOverrideModalOpen(false);
     } finally {
       setActionLoading(false);
@@ -300,28 +269,28 @@ export default function StaffSchedulingWorkspacePage() {
 
   const handleCreateSwap = async (payload) => {
     await createShiftSwap(payload, effectiveOrgId);
-    await loadOverrides();
-    if (currentTab === 'weekly') await loadTeamSchedule();
+    invalidateSchedulingCache('overrides');
+    invalidateSchedulingCache('teamSchedule');
   };
 
   const handleReviewOverride = async (overrideId, payload) => {
     await reviewScheduleOverride(overrideId, payload, effectiveOrgId);
-    await loadOverrides();
-    if (currentTab === 'weekly') await loadTeamSchedule();
+    invalidateSchedulingCache('overrides');
+    invalidateSchedulingCache('teamSchedule');
   };
 
   const handleCancelOverride = async (overrideId) => {
     await cancelScheduleOverride(overrideId, effectiveOrgId);
-    await loadOverrides();
-    if (currentTab === 'weekly') await loadTeamSchedule();
+    invalidateSchedulingCache('overrides');
+    invalidateSchedulingCache('teamSchedule');
   };
 
   const handleCreateBlockedTime = async (payload) => {
     try {
       setActionLoading(true);
       await createBlockedTime(payload, effectiveOrgId);
-      await loadBlockedTimes();
-      if (currentTab === 'weekly') await loadTeamSchedule();
+      invalidateSchedulingCache('blockedTimes');
+      invalidateSchedulingCache('teamSchedule');
       setBlockModalOpen(false);
     } finally {
       setActionLoading(false);
@@ -332,8 +301,8 @@ export default function StaffSchedulingWorkspacePage() {
     try {
       setActionLoading(true);
       await bulkCreateBlockedTime(payload, effectiveOrgId);
-      await loadBlockedTimes();
-      if (currentTab === 'weekly') await loadTeamSchedule();
+      invalidateSchedulingCache('blockedTimes');
+      invalidateSchedulingCache('teamSchedule');
       setBlockModalOpen(false);
     } finally {
       setActionLoading(false);
@@ -342,15 +311,15 @@ export default function StaffSchedulingWorkspacePage() {
 
   const handleCancelBlockedTime = async (blockId) => {
     await cancelBlockedTime(blockId, effectiveOrgId);
-    await loadBlockedTimes();
-    if (currentTab === 'weekly') await loadTeamSchedule();
+    invalidateSchedulingCache('blockedTimes');
+    invalidateSchedulingCache('teamSchedule');
   };
 
   const handleCreatePreference = async (payload) => {
     try {
       setActionLoading(true);
       await createAvailabilityPreference(payload, effectiveOrgId);
-      await loadPreferences();
+      invalidateSchedulingCache('preferences');
       setPreferenceModalOpen(false);
     } finally {
       setActionLoading(false);
@@ -359,12 +328,12 @@ export default function StaffSchedulingWorkspacePage() {
 
   const handleUpdatePreference = async (preferenceId, payload) => {
     await updateAvailabilityPreference(preferenceId, payload, effectiveOrgId);
-    await loadPreferences();
+    invalidateSchedulingCache('preferences');
   };
 
   const handleDeletePreference = async (preferenceId) => {
     await deleteAvailabilityPreference(preferenceId, effectiveOrgId);
-    await loadPreferences();
+    invalidateSchedulingCache('preferences');
   };
 
   // Top Action button click handler
