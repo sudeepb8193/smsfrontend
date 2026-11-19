@@ -84,6 +84,15 @@ export const SIDEBAR_MODULE_CONFIG = [
     requiredPermission: 'staff_schedule.view',
     path: '/scheduling',
   },
+  // Staff Attendance Management (Module 08)
+  {
+    id: 'staff-attendance',
+    label: 'Staff Attendance',
+    icon: Clock,
+    allowedRoles: ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER', 'ACCOUNTANT', 'FRONT_DESK'],
+    requiredPermission: 'staff_attendance.view',
+    path: '/attendance',
+  },
   // Service Staff dedicated navigation modules
   {
     id: 'my-profile',
@@ -100,6 +109,14 @@ export const SIDEBAR_MODULE_CONFIG = [
     allowedRoles: ['SERVICE_STAFF', 'STAFF'],
     requiredPermission: 'staff_schedule.view',
     path: '/scheduling/my-schedule',
+  },
+  {
+    id: 'my-attendance',
+    label: 'My Attendance',
+    icon: Clock,
+    allowedRoles: ['SERVICE_STAFF', 'STAFF'],
+    requiredPermission: 'staff_attendance.view',
+    path: '/attendance',
   },
 ];
 
