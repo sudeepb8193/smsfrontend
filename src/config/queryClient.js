@@ -89,6 +89,16 @@ export const queryKeys = {
       params || {},
     ],
   },
+  staffAttendance: {
+    all: ['staffAttendance'],
+    tab: (tabName, orgId, branchId, params) => [
+      ...queryKeys.staffAttendance.all,
+      tabName,
+      orgId || 'no-org',
+      branchId || 'no-branch',
+      params || {},
+    ],
+  },
 };
 
 /**

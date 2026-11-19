@@ -351,7 +351,7 @@ export default function WeeklyScheduleBuilderTab({
       ) : (
         <EmptyState
           title="No Staff Assigned to this Branch"
-          description="Assign staff members to this branch in Module 05, then configure their recurring weekly working schedules."
+          description="Assign staff members to this branch in Staff Management, then configure their recurring weekly working schedules."
         />
       )}
 

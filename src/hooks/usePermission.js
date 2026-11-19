@@ -68,6 +68,8 @@ export const usePermission = () => {
   const canDelete = (moduleCode, branchId = null) => can(`${moduleCode}.delete`, branchId);
   const canManage = (moduleCode, branchId = null) => can(`${moduleCode}.manage`, branchId);
   const canApprove = (moduleCode, branchId = null) => can(`${moduleCode}.approve`, branchId);
+  const canReject = (moduleCode, branchId = null) =>
+    can(`${moduleCode}.reject`, branchId) || can(`${moduleCode}.approve`, branchId);
   const canExport = (moduleCode, branchId = null) => can(`${moduleCode}.export`, branchId);
   const canPrint = (moduleCode, branchId = null) => can(`${moduleCode}.print`, branchId);
 
@@ -82,6 +84,7 @@ export const usePermission = () => {
     canEdit,
     canDelete,
     canApprove,
+    canReject,
     canExport,
     canPrint,
     isSuperAdmin,
