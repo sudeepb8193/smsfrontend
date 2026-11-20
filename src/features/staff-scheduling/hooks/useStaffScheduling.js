@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useAuth } from '../../../hooks/useAuth';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
 import { useBranch } from '../../branch/hooks/useBranch';
@@ -61,6 +61,7 @@ export function useStaffScheduling(currentTab = 'overview') {
       ),
     enabled: Boolean(effectiveOrgId && currentTab === 'overview'),
     staleTime: 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   // Tab 2: Shift Templates
@@ -73,6 +74,7 @@ export function useStaffScheduling(currentTab = 'overview') {
       ),
     enabled: Boolean(effectiveOrgId && (currentTab === 'templates' || currentTab === 'weekly')),
     staleTime: 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   // Tab 3: Weekly Team Schedule
@@ -88,6 +90,7 @@ export function useStaffScheduling(currentTab = 'overview') {
       ),
     enabled: Boolean(effectiveOrgId && selectedBranchId && currentTab === 'weekly'),
     staleTime: 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   // Tab 4: Availability Preferences

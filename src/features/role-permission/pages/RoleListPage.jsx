@@ -3,7 +3,7 @@ import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
 import Toggle from '../../../components/shared/Toggle';
 import Tooltip from '../../../components/shared/Tooltip';
-import Spinner from '../../../components/shared/Spinner';
+import Loader from '../../../components/shared/Loader';
 import ConfirmDialog from '../../../components/shared/ConfirmDialog';
 import CreateRoleModal from '../components/CreateRoleModal';
 import CreateModuleModal from '../components/CreateModuleModal';
@@ -148,10 +148,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
           {/* Roles Scrollable List */}
           <div className="flex-1 p-2 space-y-1.5 overflow-y-auto divide-y divide-[var(--border-color)]">
             {loadingRoles ? (
-              <div className="flex flex-col items-center justify-center p-8 text-[var(--text-muted)] text-xs">
-                <Spinner size="small" />
-                <span className="mt-2 font-medium">Loading roles...</span>
-              </div>
+              <Loader type="list" count={6} text="Loading roles..." className="p-2" />
             ) : filteredRoles.length === 0 ? (
               <div className="p-6 text-center text-[var(--text-muted)] text-xs italic">
                 No matching roles found.
@@ -501,10 +498,7 @@ export const RoleListPage = ({ isSuperAdminView = false, selectedOrgId = null })
 
               {/* Modules Cards List */}
               {loadingPermissions ? (
-                <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-12 text-center text-[var(--text-muted)]">
-                  <Spinner size="large" />
-                  <span className="mt-3 block text-xs font-semibold">Loading module permissions...</span>
-                </div>
+                <Loader type="card" count={3} text="Loading module permissions..." />
               ) : filteredModules.length === 0 ? (
                 <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-8 text-center text-[var(--text-muted)] text-xs">
                   No modules match "{moduleSearch}".

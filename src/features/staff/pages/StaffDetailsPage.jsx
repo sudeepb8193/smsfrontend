@@ -259,11 +259,7 @@ export function StaffDetailsPage() {
   ];
 
   if (loading) {
-    return (
-      <div className="py-24 flex justify-center">
-        <Loader text="Loading employee profile..." />
-      </div>
-    );
+    return <Loader type="detail" text="Loading employee profile..." />;
   }
 
   if (error || !staff) {

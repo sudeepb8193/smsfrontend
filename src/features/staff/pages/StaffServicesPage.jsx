@@ -62,11 +62,7 @@ export default function StaffServicesPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <Loader size="lg" message="Loading your assigned services..." />
-      </div>
-    );
+    return <Loader type="grid" count={6} message="Loading your assigned services..." />;
   }
 
   const primaryDes = designations.find((d) => d.isPrimary);

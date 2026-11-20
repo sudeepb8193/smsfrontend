@@ -1,4 +1,5 @@
 import React from 'react';
+import Loader from '../../../components/shared/Loader';
 import {
   ArrowLeft,
   Building2,
@@ -8,7 +9,6 @@ import {
   Copy,
   Edit,
   Globe2,
-  Loader2,
   Lock,
   Mail,
   MapPin,
@@ -62,12 +62,7 @@ export const BranchDetailsPage = () => {
   }
 
   if (loading) {
-    return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center text-[var(--text-muted)]">
-        <Loader2 className="mb-2 h-8 w-8 animate-spin text-primary-500" />
-        <p className="text-xs font-semibold">Loading branch profile...</p>
-      </div>
-    );
+    return <Loader type="detail" text="Loading branch profile..." />;
   }
 
   if (error || !branch) {

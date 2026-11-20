@@ -422,9 +422,13 @@ export const UserManagementPage = () => {
       {/* 4. MAIN CONTENT AREA (Split View or Table View)                           */}
       {/* ========================================================================= */}
       {loading ? (
-        <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-16 text-center">
-          <Loader text="Loading salon user accounts and permissions..." size="medium" />
-        </div>
+        <Loader
+          type={viewMode === 'table' ? 'table' : 'grid'}
+          text="Loading salon user accounts and permissions..."
+          count={6}
+          rows={10}
+          columns={6}
+        />
       ) : filteredUsers.length === 0 ? (
         /* Empty State */
         <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-12 text-center max-w-lg mx-auto">
@@ -1099,7 +1103,7 @@ export const UserManagementPage = () => {
                     </div>
 
                     {detailsLoading ? (
-                      <Loader text="Updating role configurations..." size="small" />
+                      <Loader type="list" count={2} text="Updating role configurations..." />
                     ) : (
                       <UserRoleChips
                         roles={userDetails?.activeRoles || selectedUser.activeRoles}

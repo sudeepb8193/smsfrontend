@@ -251,11 +251,7 @@ export default function StaffSelfSchedulePage() {
   };
 
   if (loading && !profile) {
-    return (
-      <div className="py-24 flex justify-center">
-        <Loader size="lg" message="Loading your schedule..." />
-      </div>
-    );
+    return <Loader type="detail" message="Loading your schedule..." />;
   }
 
   // Calculate day dates for the 7 days of the selected week

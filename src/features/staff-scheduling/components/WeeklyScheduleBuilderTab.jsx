@@ -3,6 +3,7 @@ import Card from '../../../components/shared/Card';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
 import EmptyState from '../../../components/shared/EmptyState';
+import Loader from '../../../components/shared/Loader';
 import WeeklyScheduleModal from './modals/WeeklyScheduleModal';
 import CopyScheduleModal from './modals/CopyScheduleModal';
 import ScheduleOverrideModal from './modals/ScheduleOverrideModal';
@@ -205,7 +206,9 @@ export default function WeeklyScheduleBuilderTab({
       </div>
 
       {/* 7-Column Team Schedule Grid matching Image Panel 3 */}
-      {teamSchedule?.teamGrid && teamSchedule.teamGrid.length > 0 ? (
+      {loading && (!teamSchedule?.teamGrid || teamSchedule.teamGrid.length === 0) ? (
+        <Loader type="table" rows={6} columns={8} text="Loading weekly team schedule..." />
+      ) : teamSchedule?.teamGrid && teamSchedule.teamGrid.length > 0 ? (
         <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[950px] text-xs">

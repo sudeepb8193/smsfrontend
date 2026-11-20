@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
 import CustomSelector from '../../../components/shared/CustomSelector';
-import Spinner from '../../../components/shared/Spinner';
+import Loader from '../../../components/shared/Loader';
 import {
   BookOpen,
   ChevronDown,
@@ -113,10 +113,7 @@ export const PermissionCatalogPage = () => {
 
       {/* Permission Catalog Accordions */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center p-16 text-[var(--text-muted)]">
-          <Spinner size="large" />
-          <span className="mt-3 text-sm font-semibold">Loading Permission Catalog...</span>
-        </div>
+        <Loader type="list" count={6} text="Loading Permission Catalog..." />
       ) : grouped.length === 0 ? (
         <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-8 text-center text-sm text-[var(--text-muted)]">
           No permissions match your filter criteria.

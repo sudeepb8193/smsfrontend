@@ -3,7 +3,7 @@ import Modal from '../../../../components/shared/Modal';
 import Button from '../../../../components/shared/Button';
 import CustomSelector from '../../../../components/shared/CustomSelector';
 import { userService } from '../../../../services/userService';
-import Spinner from '../../../../components/shared/Spinner';
+import Loader from '../../../../components/shared/Loader';
 import { Users } from 'lucide-react';
 
 export function LinkUserModal({ isOpen, onClose, staff, onLink, loading, existingStaffList = [] }) {
@@ -97,9 +97,7 @@ export function LinkUserModal({ isOpen, onClose, staff, onLink, loading, existin
         </p>
 
         {fetchingUsers ? (
-          <div className="py-6 flex justify-center">
-            <Spinner size="md" />
-          </div>
+          <Loader type="list" count={3} text="Loading available user accounts..." />
         ) : fetchError ? (
           <div className="p-3 text-sm text-rose-600 bg-rose-50 dark:bg-rose-950/30 rounded-lg">
             {fetchError}

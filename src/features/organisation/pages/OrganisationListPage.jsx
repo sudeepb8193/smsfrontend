@@ -8,6 +8,7 @@ import DeleteOrganisationModal from '../components/DeleteOrganisationModal';
 import MarketplaceToggleModal from '../components/MarketplaceToggleModal';
 import Button from '../../../components/shared/Button';
 import Pagination from '../../../components/shared/Pagination';
+import Skeleton from '../../../components/shared/Skeleton';
 import { useOrganisationList } from '../hooks/useOrganisation';
 
 export const OrganisationListPage = () => {
@@ -86,9 +87,7 @@ export const OrganisationListPage = () => {
                   Central Marketplace Availability
                 </h2>
                 {marketplaceLoading ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-500/10 text-[var(--text-muted)]">
-                    <RefreshCw className="w-3 h-3 animate-spin" /> Checking...
-                  </span>
+                  <Skeleton variant="rectangular" className="w-24 h-5 rounded-full" />
                 ) : marketplaceEnabled ? (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />

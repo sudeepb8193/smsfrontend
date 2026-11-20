@@ -157,11 +157,7 @@ export const AttendanceSettingsTab = ({
   };
 
   if (isLoading) {
-    return (
-      <div className="py-16 flex justify-center">
-        <Loader size="lg" text="Loading effective attendance policy..." />
-      </div>
-    );
+    return <Loader type="form" text="Loading effective attendance policy..." />;
   }
 
   // Live parsed values for simulator

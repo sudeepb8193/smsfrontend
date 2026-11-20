@@ -9,6 +9,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import Modal from '../../../components/shared/Modal';
+import Loader from '../../../components/shared/Loader';
 import { fetchBranchBlockers, deleteBranch, updateBranch } from '../api/branchApi';
 import { toast } from 'sonner';
 
@@ -87,10 +88,7 @@ export const BranchDeleteModal = ({
     >
       <div className="space-y-4">
         {loading ? (
-          <div className="flex flex-col items-center justify-center p-8 text-[var(--text-muted)]">
-            <Loader2 className="h-8 w-8 animate-spin text-primary-500 mb-2" />
-            <p className="text-sm">Verifying branch dependencies and active records...</p>
-          </div>
+          <Loader type="list" count={3} text="Verifying branch dependencies and active records..." />
         ) : error ? (
           <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm">
             {error}

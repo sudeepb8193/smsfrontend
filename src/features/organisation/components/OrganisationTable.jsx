@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../../../components/shared/Loader';
 import {
   Building2,
   Eye,
@@ -109,16 +110,7 @@ export const OrganisationTable = ({
   };
 
   if (loading) {
-    return (
-      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-6 space-y-4 shadow-sm">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            className="h-14 bg-[var(--bg-input)] rounded-xl animate-pulse"
-          />
-        ))}
-      </div>
-    );
+    return <Loader type="table" rows={10} columns={6} />;
   }
 
   if (!organisations.length) {

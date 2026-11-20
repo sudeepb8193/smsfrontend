@@ -1,5 +1,6 @@
 import React from 'react';
-import { ArrowLeft, Loader2, Building2 } from 'lucide-react';
+import { ArrowLeft, Building2 } from 'lucide-react';
+import Loader from '../../../components/shared/Loader';
 import BranchForm from '../components/BranchForm';
 import UnauthorizedAccess from '../../../components/shared/UnauthorizedAccess';
 import { useBranchEdit } from '../hooks/useBranch';
@@ -28,12 +29,7 @@ export const BranchEditPage = () => {
   }
 
   if (loading) {
-    return (
-      <div className="flex min-h-[360px] flex-col items-center justify-center text-[var(--text-muted)]">
-        <Loader2 className="mb-2 h-7 w-7 animate-spin text-primary-500" />
-        <p className="text-xs font-semibold">Loading branch details...</p>
-      </div>
-    );
+    return <Loader type="form" text="Loading branch details..." />;
   }
 
   if (error || !branch) {

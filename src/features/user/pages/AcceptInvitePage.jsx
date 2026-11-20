@@ -38,7 +38,9 @@ export const AcceptInvitePage = () => {
   if (verifying) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--bg-app)]">
-        <Loader text="Verifying invitation security token..." size="large" />
+        <div className="w-full max-w-md">
+          <Loader type="card" text="Verifying invitation security token..." />
+        </div>
       </div>
     );
   }

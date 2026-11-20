@@ -106,11 +106,7 @@ export function StaffListPage() {
   }, [activeMenuStaffId]);
 
   if (isServiceStaff) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader size="lg" message="Loading your profile..." />
-      </div>
-    );
+    return <Loader type="detail" message="Loading your profile..." />;
   }
 
   const statusTabs = [
@@ -254,11 +250,13 @@ export function StaffListPage() {
 
       {/* Staff Directory: Grid or Table View */}
       {loading ? (
-        <Card>
-          <div className="py-16 flex justify-center">
-            <Loader text="Loading staff records..." />
-          </div>
-        </Card>
+        <Loader
+          type={viewMode === 'table' ? 'table' : 'grid'}
+          text="Loading staff records..."
+          count={6}
+          rows={10}
+          columns={6}
+        />
       ) : error ? (
         <div className="p-4 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-center text-sm">
           {error}

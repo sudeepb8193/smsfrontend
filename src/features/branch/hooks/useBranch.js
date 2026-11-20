@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   fetchBranches,
   fetchBranchDetails,
@@ -89,6 +89,7 @@ export const useBranchList = () => {
   const {
     data: branchResponse,
     isLoading: loading,
+    isFetching,
     error: queryError,
     refetch: loadData,
   } = useQuery({
@@ -96,6 +97,7 @@ export const useBranchList = () => {
     queryFn: () => fetchBranches(queryParams),
     enabled: Boolean(shouldFetch),
     staleTime: 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   const branchesData = useMemo(() => {
@@ -176,6 +178,7 @@ export const useBranchList = () => {
     branchesData,
     meta,
     loading,
+    isFetching,
     error,
     loadData,
     handleRefresh,

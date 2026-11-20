@@ -158,11 +158,7 @@ export default function StaffDesignationWorkspacePage() {
   };
 
   if (staffLoading || moduleLoading) {
-    return (
-      <div className="py-24 flex justify-center">
-        <Loader text="Loading employee professional profile & services..." />
-      </div>
-    );
+    return <Loader type="detail" text="Loading employee professional profile & services..." />;
   }
 
   if (!staff) {

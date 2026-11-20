@@ -1,5 +1,6 @@
 import React from 'react';
-import { Building2, Loader2 } from 'lucide-react';
+import { Building2 } from 'lucide-react';
+import Loader from '../../../components/shared/Loader';
 import OrganisationForm from '../components/OrganisationForm';
 import { useOrganisationEdit } from '../hooks/useOrganisation';
 
@@ -13,12 +14,7 @@ export const EditOrganisationPage = () => {
   } = useOrganisationEdit();
 
   if (fetchLoading) {
-    return (
-      <div className="min-h-[400px] flex flex-col items-center justify-center text-[var(--text-muted)]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-500 mb-2" />
-        <p className="text-sm font-medium">Loading Organisation Data...</p>
-      </div>
-    );
+    return <Loader type="form" text="Loading Organisation Data..." />;
   }
 
   return (

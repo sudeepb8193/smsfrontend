@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Copy, Loader2, Check, AlertCircle, ArrowRight, Clock3, Settings } from 'lucide-react';
 import Modal from '../../../components/shared/Modal';
+import Loader from '../../../components/shared/Loader';
 import CustomSelector from '../../../components/shared/CustomSelector';
 import { copyBranchSettings } from '../api/branchApi';
 import { useBranch } from '../context/BranchContext';
@@ -129,10 +130,7 @@ export const CopySettingsModal = ({
 
         {/* Preview Loading State */}
         {previewLoading && (
-          <div className="flex items-center justify-center p-6 text-[var(--text-muted)]">
-            <Loader2 className="h-6 w-6 animate-spin text-primary-500 mr-2" />
-            <span className="text-xs">Inspecting source configuration...</span>
-          </div>
+          <Loader type="list" count={2} text="Inspecting source configuration..." />
         )}
 
         {/* Error message */}

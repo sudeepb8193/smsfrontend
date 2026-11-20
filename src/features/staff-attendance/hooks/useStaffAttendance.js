@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { queryKeys, invalidateModuleCache } from '../../../config/queryClient';
 import {
   fetchAttendanceOverview,
@@ -34,6 +34,7 @@ export const useStaffAttendance = (orgId, branchId, activeTab = 'overview', para
     queryKey: queryKeys.staffAttendance.tab('overview', orgId, branchId, params),
     queryFn: () => fetchAttendanceOverview({ branchId, ...params }, orgId),
     enabled: activeTab === 'overview',
+    placeholderData: keepPreviousData,
   });
 
   // 2. Daily Attendance Query
@@ -41,6 +42,7 @@ export const useStaffAttendance = (orgId, branchId, activeTab = 'overview', para
     queryKey: queryKeys.staffAttendance.tab('daily', orgId, branchId, params),
     queryFn: () => fetchDailyAttendance({ branchId, ...params }, orgId),
     enabled: activeTab === 'daily',
+    placeholderData: keepPreviousData,
   });
 
   // 3. Currently Checked In Query
@@ -85,6 +87,7 @@ export const useStaffAttendance = (orgId, branchId, activeTab = 'overview', para
     queryFn: () =>
       fetchPeriodReview(branchId, params.periodStart, params.periodEnd, orgId),
     enabled: activeTab === 'approvals' && Boolean(branchId && params.periodStart && params.periodEnd),
+    placeholderData: keepPreviousData,
   });
 
   // 9. Monthly Summary Query
@@ -93,6 +96,7 @@ export const useStaffAttendance = (orgId, branchId, activeTab = 'overview', para
     queryFn: () =>
       fetchMonthlySummary(branchId, params.year, params.month, orgId),
     enabled: activeTab === 'reports' && Boolean(branchId && params.year && params.month),
+    placeholderData: keepPreviousData,
   });
 
   const invalidateAttendance = () => {
