@@ -1,11 +1,11 @@
 import React from 'react';
+import Loader from '../../../components/shared/Loader';
 import {
   Building2,
   Plus,
   Filter,
   LayoutGrid,
   List,
-  Loader2,
   Sparkles,
   ArrowUpDown,
   RefreshCw,
@@ -253,10 +253,13 @@ export const BranchListPage = () => {
 
       {/* Main Content Area */}
       {loading ? (
-        <div className="py-20 flex flex-col items-center justify-center text-[var(--text-muted)]">
-          <Loader2 className="w-8 h-8 animate-spin text-primary-500 mb-2" />
-          <p className="text-xs font-semibold">Loading branch network...</p>
-        </div>
+        <Loader
+          type={viewMode === 'table' ? 'table' : 'grid'}
+          text="Loading branch network..."
+          count={6}
+          rows={6}
+          columns={5}
+        />
       ) : error ? (
         String(error).toLowerCase().includes('permission') ||
         String(error).toLowerCase().includes('forbidden') ||

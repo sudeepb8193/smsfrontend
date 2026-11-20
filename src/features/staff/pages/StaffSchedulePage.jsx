@@ -29,11 +29,7 @@ export default function StaffSchedulePage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <Loader size="lg" message="Loading your schedule..." />
-      </div>
-    );
+    return <Loader type="table" rows={7} columns={5} message="Loading your schedule..." />;
   }
 
   return (

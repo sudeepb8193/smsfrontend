@@ -1,4 +1,5 @@
 import React from 'react';
+import Loader from '../../../components/shared/Loader';
 import {
   Building2,
   Edit,
@@ -16,7 +17,6 @@ import {
   Globe,
   Store,
   MapPin,
-  Loader2,
   AlertTriangle,
 } from 'lucide-react';
 import StatusChangeModal from '../components/StatusChangeModal';
@@ -62,14 +62,7 @@ export const OrganisationDetailsPage = () => {
   } = useOrganisationDetails();
 
   if (loading) {
-    return (
-      <div className="min-h-[500px] flex flex-col items-center justify-center text-[var(--text-muted)]">
-        <Loader2 className="w-10 h-10 animate-spin text-primary-500 mb-3" />
-        <p className="text-sm font-semibold tracking-wide uppercase text-[var(--text-muted)]">
-          Loading Organisation Profile...
-        </p>
-      </div>
-    );
+    return <Loader type="detail" text="Loading Organisation Profile..." />;
   }
 
   if (!organisation) {

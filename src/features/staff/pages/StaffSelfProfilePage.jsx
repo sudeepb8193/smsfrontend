@@ -184,11 +184,7 @@ export default function StaffSelfProfilePage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[500px]">
-        <Loader size="lg" message="Loading your employee profile..." />
-      </div>
-    );
+    return <Loader type="detail" message="Loading your employee profile..." />;
   }
 
   if (error || !staff) {

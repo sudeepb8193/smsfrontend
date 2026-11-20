@@ -137,11 +137,7 @@ export const MyAttendanceTab = ({
   };
 
   if (isLoading) {
-    return (
-      <div className="py-16 flex justify-center">
-        <Loader size="lg" text="Loading your attendance dashboard..." />
-      </div>
-    );
+    return <Loader type="stats" count={3} text="Loading your attendance dashboard..." />;
   }
 
   return (

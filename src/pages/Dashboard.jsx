@@ -9,6 +9,7 @@ import TimePicker from '../components/shared/TimePicker';
 import CustomSelector from '../components/shared/CustomSelector';  
 import Input from '../components/shared/Input';
 import DataTable from '../components/tables/DataTable/DataTable';
+import Loader from '../components/shared/Loader';
 import { useAuth } from '../hooks/useAuth';
 import {
   Calendar,
@@ -29,7 +30,11 @@ import {
 import { toast } from 'sonner';
 
 export const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <Loader type="dashboard" />;
+  }
 
   const [filterDate, setFilterDate] = useState('');
   const [filterStatus, setFilterStatus] = useState('');

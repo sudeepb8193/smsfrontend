@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   fetchStaffList,
   fetchStaffById,
@@ -66,6 +66,7 @@ export function useStaff(initialFilters = {}, options = {}) {
   const {
     data: staffResponse,
     isLoading: loading,
+    isFetching,
     error: queryError,
     refetch: loadStaffList,
   } = useQuery({
@@ -73,6 +74,7 @@ export function useStaff(initialFilters = {}, options = {}) {
     queryFn: () => fetchStaffList(queryParams),
     enabled: Boolean(effectiveOrgId && !isBranchResolving && isQueryEnabled),
     staleTime: 60 * 1000, // 1 minute fresh cache
+    placeholderData: keepPreviousData,
   });
 
   const staffList = useMemo(() => {
@@ -144,6 +146,7 @@ export function useStaff(initialFilters = {}, options = {}) {
     setLimit,
     totalPages,
     loading,
+    isFetching,
     error,
     filters,
     updateFilters,

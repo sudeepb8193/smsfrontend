@@ -116,7 +116,7 @@ export const RemoveRoleImpactModal = ({
         {errorMsg && <ErrorMessage message={errorMsg} />}
 
         {loading ? (
-          <Loader text="Calculating permission impact summary..." size="medium" />
+          <Loader type="list" count={3} text="Calculating permission impact summary..." />
         ) : isLastRole ? (
           /* BLOCKED CASE: User's last remaining role */
           <div className="space-y-4">

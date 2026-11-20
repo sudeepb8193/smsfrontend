@@ -72,9 +72,7 @@ export const PayPeriodApprovalTab = ({
       {/* Pay Period Approval Grid / Table */}
       <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] overflow-hidden shadow-xs">
         {isLoading ? (
-          <div className="py-16 flex justify-center">
-            <Loader size="lg" text="Evaluating pay-period attendance..." />
-          </div>
+          <Loader type="table" rows={10} columns={7} text="Evaluating pay-period attendance..." />
         ) : staffRows.length === 0 ? (
           <EmptyState
             title="No staff attendance records in this period"

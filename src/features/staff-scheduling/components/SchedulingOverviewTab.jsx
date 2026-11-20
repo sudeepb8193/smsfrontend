@@ -32,11 +32,7 @@ export default function SchedulingOverviewTab({
   onOpenCopyModal,
 }) {
   if (loading && !overview) {
-    return (
-      <div className="py-16 flex justify-center">
-        <Loader size="lg" message="Loading staff scheduling overview..." />
-      </div>
-    );
+    return <Loader type="stats" count={4} message="Loading staff scheduling overview..." />;
   }
 
   // 100% Dynamic KPIs from backend

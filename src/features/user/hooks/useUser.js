@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, keepPreviousData } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { userService } from '../../../services/userService';
 import { fetchBranches } from '../../branch/api/branchApi';
@@ -97,12 +97,14 @@ export const useUserManagement = () => {
   const {
     data: usersResponse,
     isLoading: loading,
+    isFetching,
     refetch: loadData,
   } = useQuery({
     queryKey: queryKeys.users.list(effectiveOrgId, queryParams),
     queryFn: () => userService.getUsers(queryParams),
     enabled: Boolean(!isSuperAdmin || effectiveOrgId),
     staleTime: 45 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   const users = useMemo(() => {
@@ -367,6 +369,7 @@ export const useUserManagement = () => {
     availableRoles,
     availableBranches,
     loading,
+    isFetching,
     loadData,
     viewMode,
     setViewMode,

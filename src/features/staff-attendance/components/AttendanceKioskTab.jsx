@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
-import Loader from '../../../components/shared/Loader';
 import Input from '../../../components/shared/Input';
 import { toast } from 'sonner';
 import { punchKiosk } from '../api/staffAttendanceApi';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { ArrowLeft, Building2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Building2 } from 'lucide-react';
+import Loader from '../../../components/shared/Loader';
 import OrganisationSetupForm from '../components/OrganisationSetupForm';
 import { useOrganisationSetup } from '../hooks/useOrganisation';
 
@@ -19,12 +20,7 @@ export default function OrganisationSetupPage() {
   } = useOrganisationSetup();
 
   if (loading) {
-    return (
-      <div className="flex min-h-[420px] flex-col items-center justify-center text-[var(--text-muted)]">
-        <Loader2 className="mb-3 h-8 w-8 animate-spin text-primary-500" />
-        <p className="text-sm font-semibold">Loading organization setup...</p>
-      </div>
-    );
+    return <Loader type="form" text="Loading organization setup..." />;
   }
 
   if (!organisation) {

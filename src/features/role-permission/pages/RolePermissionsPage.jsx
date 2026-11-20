@@ -1,7 +1,7 @@
 import React from 'react';
 import RolePermissionMatrix from '../components/RolePermissionMatrix';
 import Button from '../../../components/shared/Button';
-import Spinner from '../../../components/shared/Spinner';
+import Loader from '../../../components/shared/Loader';
 import { ArrowLeft } from 'lucide-react';
 import { useRolePermissions } from '../hooks/useRolePermission';
 
@@ -21,12 +21,7 @@ export const RolePermissionsPage = ({ isSuperAdminView = false }) => {
   } = useRolePermissions({ isSuperAdminView });
 
   if (loading && !role) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-[var(--text-muted)]">
-        <Spinner size="large" />
-        <span className="mt-3 text-sm font-semibold">Loading Permission Matrix...</span>
-      </div>
-    );
+    return <Loader type="table" rows={10} columns={6} text="Loading Permission Matrix..." />;
   }
 
   return (

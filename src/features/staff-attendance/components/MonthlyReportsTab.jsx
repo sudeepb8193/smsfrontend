@@ -147,9 +147,7 @@ export const MonthlyReportsTab = ({
       {/* Precomputed Monthly Summary Table */}
       <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] overflow-hidden shadow-xs">
         {isLoading ? (
-          <div className="py-16 flex justify-center">
-            <Loader size="lg" text="Loading monthly attendance rollup..." />
-          </div>
+          <Loader type="table" rows={10} columns={7} text="Loading monthly attendance rollup..." />
         ) : summaries.length === 0 ? (
           <EmptyState
             title="No monthly attendance summary found"

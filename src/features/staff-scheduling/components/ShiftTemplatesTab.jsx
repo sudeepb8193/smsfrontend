@@ -6,6 +6,7 @@ import SearchInput from '../../../components/shared/SearchInput';
 import EmptyState from '../../../components/shared/EmptyState';
 import ConfirmDialog from '../../../components/shared/ConfirmDialog';
 import Pagination from '../../../components/shared/Pagination';
+import Loader from '../../../components/shared/Loader';
 import ShiftTemplateModal from './modals/ShiftTemplateModal';
 import {
   Clock,
@@ -108,6 +109,10 @@ export default function ShiftTemplatesTab({
       setActionLoading(false);
     }
   };
+
+  if (loading && templates.length === 0) {
+    return <Loader type="table" rows={6} columns={9} text="Loading shift templates..." />;
+  }
 
   return (
     <div className="space-y-4">

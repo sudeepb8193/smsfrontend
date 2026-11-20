@@ -4,7 +4,7 @@ import Card from '../../../components/shared/Card';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
 import Tooltip from '../../../components/shared/Tooltip';
-import Spinner from '../../../components/shared/Spinner';
+import Loader from '../../../components/shared/Loader';
 import ConfirmDialog from '../../../components/shared/ConfirmDialog';
 import Toggle from '../../../components/shared/Toggle';
 import StaffPermissionGroups from './StaffPermissionGroups';
@@ -326,12 +326,7 @@ export const RolePermissionMatrix = ({
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 text-[var(--text-muted)]">
-        <Spinner size="large" />
-        <span className="mt-3 text-sm font-semibold">Loading Permission Matrix...</span>
-      </div>
-    );
+    return <Loader type="table" rows={10} columns={6} text="Loading Permission Matrix..." />;
   }
 
   return (

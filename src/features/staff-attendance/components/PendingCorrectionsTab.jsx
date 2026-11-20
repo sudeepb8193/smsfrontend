@@ -61,9 +61,7 @@ export const PendingCorrectionsTab = ({
       {/* Corrections Queue Cards / Table */}
       <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] overflow-hidden shadow-xs">
         {isLoading ? (
-          <div className="py-16 flex justify-center">
-            <Loader size="lg" text="Loading pending corrections..." />
-          </div>
+          <Loader type="list" count={5} text="Loading pending corrections..." />
         ) : items.length === 0 ? (
           <EmptyState
             title="No pending correction requests"

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   fetchStaffDesignations,
   createStaffDesignation,
@@ -58,6 +58,7 @@ export function useStaffDesignation(staffId, organizationId, activeTab = 'design
     queryFn: () => fetchAssignedServices(staffId, organizationId),
     enabled: Boolean(staffId && organizationId && isServicesActive),
     staleTime: 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   const catalogQuery = useQuery({
@@ -65,6 +66,7 @@ export function useStaffDesignation(staffId, organizationId, activeTab = 'design
     queryFn: () => fetchAvailableCatalogServices(staffId, { page: 1, limit: 10 }, organizationId),
     enabled: Boolean(staffId && organizationId && isServicesActive),
     staleTime: 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   // 4. Tab: Branch Availability Exceptions

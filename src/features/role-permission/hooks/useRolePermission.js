@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { rolePermissionApi } from '../api/rolePermissionApi';
 import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
@@ -33,6 +33,7 @@ export const useRoleList = ({ isSuperAdminView = false, selectedOrgId = null } =
         limit: 10,
       }),
     staleTime: 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   const roles = useMemo(() => {

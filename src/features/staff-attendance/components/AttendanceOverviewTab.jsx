@@ -27,11 +27,7 @@ export const AttendanceOverviewTab = ({
   canApprove,
 }) => {
   if (isLoading) {
-    return (
-      <div className="py-12 flex justify-center">
-        <Loader size="lg" text="Loading attendance metrics..." />
-      </div>
-    );
+    return <Loader type="stats" count={4} text="Loading attendance metrics..." />;
   }
 
   const metrics = overviewData || {};
