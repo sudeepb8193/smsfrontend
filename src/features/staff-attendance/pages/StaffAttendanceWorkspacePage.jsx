@@ -136,8 +136,10 @@ export const StaffAttendanceWorkspacePage = () => {
       tabs.push({ id: 'daily', label: 'Daily Attendance', icon: CalendarDays });
     }
 
-    // Staff self-service punch tab
-    tabs.push({ id: 'my-attendance', label: 'My Attendance', icon: UserCheck });
+    // Staff self-service punch tab (Only for staff employees, never for organization Owners or Super Admins)
+    if (!isOwner && !isSuperAdmin) {
+      tabs.push({ id: 'my-attendance', label: 'My Attendance', icon: UserCheck });
+    }
 
     tabs.push({ id: 'kiosk', label: 'Attendance Kiosk', icon: QrCode });
 
@@ -407,6 +409,7 @@ export const StaffAttendanceWorkspacePage = () => {
             data={myAttendanceQuery.data}
             myCorrectionsData={myCorrectionsQuery.data}
             isLoading={myAttendanceQuery.isLoading}
+            error={myAttendanceQuery.error}
             onRefresh={invalidateAttendance}
             onRequestCorrection={(data) => setCorrectionModalData(data)}
             branchId={selectedBranchId}

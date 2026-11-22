@@ -4,6 +4,7 @@ import Button from '../../../../components/shared/Button';
 import Input from '../../../../components/shared/Input';
 import CustomSelector from '../../../../components/shared/CustomSelector';
 import DatePicker from '../../../../components/shared/DatePicker';
+import TimePicker from '../../../../components/shared/TimePicker';
 import Textarea from '../../../../components/shared/Textarea';
 import { toast } from 'sonner';
 import { submitManualAttendance } from '../../api/staffAttendanceApi';
@@ -102,17 +103,19 @@ export const ManualEntryModal = ({
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Input
+          <TimePicker
             label="Check-In Time"
-            type="time"
             value={checkInTime}
-            onChange={(e) => setCheckInTime(e.target.value)}
+            onChange={(val) => setCheckInTime(val)}
+            timeFormat="24h"
+            step={15}
           />
-          <Input
+          <TimePicker
             label="Check-Out Time"
-            type="time"
             value={checkOutTime}
-            onChange={(e) => setCheckOutTime(e.target.value)}
+            onChange={(val) => setCheckOutTime(val)}
+            timeFormat="24h"
+            step={15}
           />
         </div>
 

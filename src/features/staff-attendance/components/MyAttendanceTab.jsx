@@ -24,15 +24,24 @@ export const MyAttendanceTab = ({
   data,
   myCorrectionsData,
   isLoading,
+  error,
   onRefresh,
   onRequestCorrection,
+  branchId,
   organizationId,
 }) => {
   const staff = data?.staff || {};
   const todayData = data?.today || {};
-  const todayRecord = todayData?.attendanceRecord;
-  const isCheckedIn = todayData?.isCurrentlyIn;
-  const historyRows = data?.history || [];
+  const todayRecord = todayData?.attendance || todayData?.attendanceRecord || null;
+  const isCheckedIn = Boolean(
+    todayData?.isCurrentlyIn ?? (todayRecord?.checkInAt && !todayRecord?.checkOutAt),
+  );
+  const historyData = data?.history || {};
+  const historyRows = Array.isArray(data?.history)
+    ? data.history
+    : Array.isArray(data?.history?.data)
+    ? data.history.data
+    : [];
 
   const [isPunching, setIsPunching] = useState(false);
   const [elapsedTimer, setElapsedTimer] = useState('00:00:00');
@@ -66,8 +75,8 @@ export const MyAttendanceTab = ({
     const performPunch = async (coords = null) => {
       try {
         const payload = {
-          branchId: staff.homeBranchId,
-          method: coords ? 'GEOFENCED_APP' : 'MANUAL',
+          branchId: staff.homeBranchId || branchId,
+          method: coords ? 'geofenced_app' : 'manual',
           latitude: coords?.latitude,
           longitude: coords?.longitude,
         };
@@ -138,6 +147,24 @@ export const MyAttendanceTab = ({
 
   if (isLoading) {
     return <Loader type="stats" count={3} text="Loading your attendance dashboard..." />;
+  }
+
+  // Graceful empty state for unlinked staff accounts
+  if (
+    !staff?.id ||
+    error?.code === 'STAFF_NOT_LINKED' ||
+    error?.response?.data?.error?.code === 'STAFF_NOT_LINKED' ||
+    error?.statusCode === 404 ||
+    error?.response?.status === 404
+  ) {
+    return (
+      <div className="rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] p-8 shadow-xs">
+        <EmptyState
+          title="No Linked Employee Profile"
+          description="Your user account is not linked to an employee profile in the salon directory. Self-service check-in, check-out, and personal timesheets are only active for staff accounts."
+        />
+      </div>
+    );
   }
 
   return (

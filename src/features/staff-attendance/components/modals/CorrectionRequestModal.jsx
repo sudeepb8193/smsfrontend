@@ -3,6 +3,7 @@ import Modal from '../../../../components/shared/Modal';
 import Button from '../../../../components/shared/Button';
 import Input from '../../../../components/shared/Input';
 import DatePicker from '../../../../components/shared/DatePicker';
+import TimePicker from '../../../../components/shared/TimePicker';
 import Textarea from '../../../../components/shared/Textarea';
 import { toast } from 'sonner';
 import { submitCorrectionRequest } from '../../api/staffAttendanceApi';
@@ -87,17 +88,19 @@ export const CorrectionRequestModal = ({
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Input
+          <TimePicker
             label="Proposed Check-In Time"
-            type="time"
             value={requestedCheckIn}
-            onChange={(e) => setRequestedCheckIn(e.target.value)}
+            onChange={(val) => setRequestedCheckIn(val)}
+            timeFormat="24h"
+            step={15}
           />
-          <Input
+          <TimePicker
             label="Proposed Check-Out Time"
-            type="time"
             value={requestedCheckOut}
-            onChange={(e) => setRequestedCheckOut(e.target.value)}
+            onChange={(val) => setRequestedCheckOut(val)}
+            timeFormat="24h"
+            step={15}
           />
         </div>
 
