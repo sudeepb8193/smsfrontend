@@ -10,18 +10,19 @@ export const Badge = ({
   const variantClasses = {
     primary: 'bg-primary-500/10 text-primary-700 dark:text-primary-300 border border-primary-500/20',
     secondary: 'bg-secondary-500/10 text-secondary-700 dark:text-secondary-300 border border-secondary-500/20',
-    success: 'bg-success-500/10 text-success-600 dark:text-success-400 border border-success-500/20',
-    danger: 'bg-danger-500/10 text-danger-600 dark:text-danger-400 border border-danger-500/20',
-    warning: 'bg-warning-500/10 text-warning-700 dark:text-warning-400 border border-warning-500/20',
+    success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+    danger: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20',
+    warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
     brand: 'bg-brand-500/10 text-brand-700 dark:text-brand-300 border border-brand-500/20',
     neutral: 'bg-[var(--bg-input)] text-[var(--text-secondary)] border border-[var(--border-color)]',
+    default: 'bg-[var(--bg-input)] text-[var(--text-secondary)] border border-[var(--border-color)]',
     // Compatibility aliases
     purple: 'bg-primary-500/10 text-primary-700 dark:text-primary-300 border border-primary-500/20',
     blue: 'bg-secondary-500/10 text-secondary-700 dark:text-secondary-300 border border-secondary-500/20',
     info: 'bg-secondary-500/10 text-secondary-700 dark:text-secondary-300 border border-secondary-500/20',
-    emerald: 'bg-success-500/10 text-success-600 dark:text-success-400 border border-success-500/20',
-    rose: 'bg-danger-500/10 text-danger-600 dark:text-danger-400 border border-danger-500/20',
-    amber: 'bg-warning-500/10 text-warning-700 dark:text-warning-400 border border-warning-500/20',
+    emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+    rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20',
+    amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
   };
 
   const sizeClasses = {

@@ -8,14 +8,23 @@ export const ConfirmDialog = ({
   title = 'Are you sure?',
   message = 'This action cannot be undone.',
   confirmText = 'Confirm',
+  confirmLabel,
   cancelText = 'Cancel',
+  cancelLabel,
   variant = 'danger',
+  confirmVariant,
   loading = false,
   onConfirm,
   onCancel,
+  onClose,
 }) => {
+  const handleCancel = onCancel || onClose;
+  const actualConfirmText = confirmLabel || confirmText;
+  const actualCancelText = cancelLabel || cancelText;
+  const actualVariant = confirmVariant || variant;
+
   const getIcon = () => {
-    switch (variant) {
+    switch (actualVariant) {
       case 'danger':
         return <AlertTriangle size={32} className="text-danger-500" />;
       case 'warning':
@@ -29,11 +38,11 @@ export const ConfirmDialog = ({
 
   const footer = (
     <div className="flex items-center justify-end gap-3 w-full">
-      <Button variant="secondary" onClick={onCancel} disabled={loading}>
-        {cancelText}
+      <Button variant="secondary" onClick={handleCancel} disabled={loading}>
+        {actualCancelText}
       </Button>
-      <Button variant={variant} onClick={onConfirm} loading={loading}>
-        {confirmText}
+      <Button variant={actualVariant} onClick={onConfirm} loading={loading}>
+        {actualConfirmText}
       </Button>
     </div>
   );
@@ -41,7 +50,7 @@ export const ConfirmDialog = ({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onCancel}
+      onClose={handleCancel}
       title={title}
       size="small"
       closeOnOverlayClick={!loading}

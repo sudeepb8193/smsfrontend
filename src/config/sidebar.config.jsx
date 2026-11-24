@@ -93,6 +93,15 @@ export const SIDEBAR_MODULE_CONFIG = [
     requiredPermission: 'staff_attendance.view',
     path: '/attendance',
   },
+  // Staff Leave Management (Module 09)
+  {
+    id: 'staff-leave',
+    label: 'Staff Leave',
+    icon: CalendarCheck,
+    allowedRoles: ['SUPER_ADMIN', 'OWNER', 'BRANCH_MANAGER', 'ACCOUNTANT', 'FRONT_DESK'],
+    requiredPermission: 'staff_leave.view',
+    path: '/leave',
+  },
   // Service Staff dedicated navigation modules
   {
     id: 'my-profile',
@@ -117,6 +126,14 @@ export const SIDEBAR_MODULE_CONFIG = [
     allowedRoles: ['SERVICE_STAFF', 'STAFF'],
     requiredPermission: 'staff_attendance.view',
     path: '/attendance',
+  },
+  {
+    id: 'my-leave',
+    label: 'My Leave',
+    icon: CalendarCheck,
+    allowedRoles: ['SERVICE_STAFF', 'STAFF'],
+    requiredPermission: 'staff_leave.view',
+    path: '/leave/my-leave',
   },
 ];
 

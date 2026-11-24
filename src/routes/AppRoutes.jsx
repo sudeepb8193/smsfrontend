@@ -12,6 +12,7 @@ import { RolePermissionRoutes } from './RolePermissionRoutes';
 import { OperationsRoutes } from './OperationsRoutes';
 import { SchedulingRoutes } from './SchedulingRoutes';
 import { AttendanceRoutes } from './AttendanceRoutes';
+import { LeaveRoutes } from './LeaveRoutes';
 import { AcceptInvitePage } from '../features/user/pages/AcceptInvitePage';
 import { UserManagementPage } from '../features/user/pages/UserManagementPage';
 import DashboardLayout from '../components/layout/DashboardLayout/DashboardLayout';
@@ -46,6 +47,7 @@ export const AppRoutes = () => {
           {StaffRoutes}
           {SchedulingRoutes}
           {AttendanceRoutes}
+          {LeaveRoutes}
           {AuditRoutes}
           {OperationsRoutes}
 
