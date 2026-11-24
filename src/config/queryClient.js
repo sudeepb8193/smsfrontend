@@ -99,6 +99,82 @@ export const queryKeys = {
       params || {},
     ],
   },
+  staffLeave: {
+    all: ['staffLeave'],
+    types: (orgId, params) => [
+      ...queryKeys.staffLeave.all,
+      'types',
+      orgId || 'no-org',
+      params || {},
+    ],
+    balances: (orgId, branchId, params) => [
+      ...queryKeys.staffLeave.all,
+      'balances',
+      orgId || 'no-org',
+      branchId || 'all-branches',
+      params || {},
+    ],
+    myBalances: (orgId, params) => [
+      ...queryKeys.staffLeave.all,
+      'myBalances',
+      orgId || 'no-org',
+      params || {},
+    ],
+    transactions: (orgId, params) => [
+      ...queryKeys.staffLeave.all,
+      'transactions',
+      orgId || 'no-org',
+      params || {},
+    ],
+    requests: (orgId, branchId, params) => [
+      ...queryKeys.staffLeave.all,
+      'requests',
+      orgId || 'no-org',
+      branchId || 'all-branches',
+      params || {},
+    ],
+    myRequests: (orgId, params) => [
+      ...queryKeys.staffLeave.all,
+      'myRequests',
+      orgId || 'no-org',
+      params || {},
+    ],
+    approvals: (orgId, branchId, params) => [
+      ...queryKeys.staffLeave.all,
+      'approvals',
+      orgId || 'no-org',
+      branchId || 'all-branches',
+      params || {},
+    ],
+    calendar: (orgId, branchId, params) => [
+      ...queryKeys.staffLeave.all,
+      'calendar',
+      orgId || 'no-org',
+      branchId || 'all-branches',
+      params || {},
+    ],
+    blackout: (orgId, branchId, params) => [
+      ...queryKeys.staffLeave.all,
+      'blackout',
+      orgId || 'no-org',
+      branchId || 'all-branches',
+      params || {},
+    ],
+    reports: (orgId, branchId, params) => [
+      ...queryKeys.staffLeave.all,
+      'reports',
+      orgId || 'no-org',
+      branchId || 'all-branches',
+      params || {},
+    ],
+    tab: (tabName, orgId, branchId, params) => [
+      ...queryKeys.staffLeave.all,
+      tabName,
+      orgId || 'no-org',
+      branchId || 'no-branch',
+      params || {},
+    ],
+  },
 };
 
 /**

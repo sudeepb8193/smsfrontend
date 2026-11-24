@@ -28,6 +28,7 @@ export const CustomSelector = ({
   const [searchQuery, setSearchQuery] = useState('');
   const containerRef = useRef(null);
   const listRef = useRef(null);
+  const isSmall = size === 'sm';
 
   const toggleDropdown = () => {
     if (disabled) return;
@@ -141,8 +142,6 @@ export const CustomSelector = ({
     }
     return value === '' ? '' : value;
   }, [options, value, isMulti]);
-
-  const isSmall = size === 'sm';
 
   return (
     <div className={`relative flex flex-col gap-1.5 w-full ${className}`} ref={containerRef}>
