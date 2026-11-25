@@ -1,4 +1,3 @@
-import React from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './config/queryClient';
 import { AuthProvider } from './store/AuthContext';
@@ -6,7 +5,7 @@ import { ThemeProvider } from './store/ThemeContext';
 import { useAuth } from './hooks/useAuth';
 import AppRoutes from './routes/AppRoutes';
 import Loader from './components/shared/Loader';
-import { Toaster } from 'sonner';
+import { ToastProvider } from './components/shared/Toast';
 import { OrganisationProvider } from './features/organisation/context/OrganisationContext';
 import { BranchProvider } from './features/branch/context/BranchContext';
 
@@ -17,12 +16,7 @@ const MainShell = () => {
     return <Loader fullPage text="Initializing SalonFlow Pro..." />;
   }
 
-  return (
-    <>
-      <AppRoutes />
-      <Toaster position="top-right" duration={3000} visibleToasts={1} richColors />
-    </>
-  );
+  return <AppRoutes />;
 };
 
 function App() {
@@ -30,11 +24,13 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <OrganisationProvider>
-            <BranchProvider>
-              <MainShell />
-            </BranchProvider>
-          </OrganisationProvider>
+          <ToastProvider defaultDuration={4000} maxToasts={4}>
+            <OrganisationProvider>
+              <BranchProvider>
+                <MainShell />
+              </BranchProvider>
+            </OrganisationProvider>
+          </ToastProvider>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

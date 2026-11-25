@@ -9,7 +9,7 @@ import {
   UserX,
   UserCheck,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import Modal from '../../../components/shared/Modal';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';

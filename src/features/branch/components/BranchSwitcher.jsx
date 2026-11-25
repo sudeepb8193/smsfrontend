@@ -14,7 +14,7 @@ import { useBranch } from '../context/BranchContext';
 import { useAuth } from '../../../hooks/useAuth';
 import BranchStatusBadge from './BranchStatusBadge';
 import { usePermission } from '../../../hooks/usePermission';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 
 export const BranchSwitcher = () => {
   const navigate = useNavigate();

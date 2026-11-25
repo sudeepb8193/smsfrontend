@@ -6,7 +6,7 @@ import CustomSelector from '../../../../components/shared/CustomSelector';
 import DatePicker from '../../../../components/shared/DatePicker';
 import TimePicker from '../../../../components/shared/TimePicker';
 import Textarea from '../../../../components/shared/Textarea';
-import { toast } from 'sonner';
+import { toast } from '../../../../components/shared/Toast';
 import { submitManualAttendance } from '../../api/staffAttendanceApi';
 
 export const ManualEntryModal = ({

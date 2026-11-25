@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Modal from '../../../components/shared/Modal';
+import { toast } from '../../../components/shared/Toast';
 import {
   ChevronDown,
   Plus,
@@ -95,6 +96,7 @@ export default function SalonSuiteSettingsHub({
       appliesTo: 'All branches',
     });
     setShowAddHolidayModal(false);
+    toast.success(`Holiday "${newHoliday.name.trim()}" added.`);
   };
 
   return (

@@ -8,7 +8,7 @@ import {
   Shuffle,
 } from 'lucide-react';
 import { uploadMedia, getRandomPicsumUrl } from '../../services/mediaService';
-import { toast } from 'sonner';
+import { toast } from './Toast';
 
 /**
  * Shared MediaUpload component.

@@ -5,7 +5,7 @@ import Input from '../../../../components/shared/Input';
 import DatePicker from '../../../../components/shared/DatePicker';
 import TimePicker from '../../../../components/shared/TimePicker';
 import Textarea from '../../../../components/shared/Textarea';
-import { toast } from 'sonner';
+import { toast } from '../../../../components/shared/Toast';
 import { submitCorrectionRequest } from '../../api/staffAttendanceApi';
 
 export const CorrectionRequestModal = ({

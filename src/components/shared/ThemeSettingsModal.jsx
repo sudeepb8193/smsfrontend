@@ -17,7 +17,7 @@ import {
 import { useTheme } from '../../hooks/useTheme';
 import { ACCENT_PALETTES, FONT_FAMILIES } from '../../store/ThemeContext';
 import { Toggle } from './Toggle';
-import { toast } from 'sonner';
+import { toast } from './Toast';
 
 export const ThemeSettingsModal = () => {
   const {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from '../../../components/shared/Button';
 import Badge from '../../../components/shared/Badge';
 import Input from '../../../components/shared/Input';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import { punchKiosk } from '../api/staffAttendanceApi';
 import {
   QrCode,

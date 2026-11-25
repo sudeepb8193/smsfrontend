@@ -14,7 +14,7 @@ import {
   UserCheck,
   TrendingDown,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 
 /**
  * LeaveReportsTab: Leave utilization analytics and CSV export interface.

@@ -34,6 +34,7 @@ import TimePicker from '../../../components/shared/TimePicker';
 import StateCard from '../../../components/shared/StateCard';
 import SalonSuiteOnboardingWizard from './SalonSuiteOnboardingWizard';
 import SalonSuiteSettingsHub from './SalonSuiteSettingsHub';
+import { toast } from '../../../components/shared/Toast';
 
 const STEPS = [
   { id: 'profile', label: 'Business profile', icon: Building2 },
@@ -538,9 +539,12 @@ export default function OrganisationSetupForm({
         ? await sendOwnerContactVerification(contact.id)
         : await sendOrganisationContactVerification(organisation.id, contact.id);
       setVerificationMessages((current) => ({ ...current, [index]: result.message }));
+      toast.success(result.message || 'Verification email sent.');
     } catch (error) {
       console.error('Contact email verification request failed:', error);
-      setUploadError(error.message || 'The verification email could not be sent.');
+      const msg = error.message || 'The verification email could not be sent.';
+      setUploadError(msg);
+      toast.error(msg);
     } finally {
       setVerificationSending((current) => ({ ...current, [index]: false }));
     }
@@ -641,9 +645,11 @@ export default function OrganisationSetupForm({
       : ['application/pdf', 'image/jpeg', 'image/png'];
     const limit = logo ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
     if (!allowed.includes(file.type) || file.size > limit) {
-      setUploadError(logo
+      const msg = logo
         ? 'Choose a JPG, PNG, or SVG file smaller than 5 MB.'
-        : 'Choose a PDF, JPG, or PNG file smaller than 10 MB.');
+        : 'Choose a PDF, JPG, or PNG file smaller than 10 MB.';
+      setUploadError(msg);
+      toast.error(msg);
       return;
     }
     let logoVariants;
@@ -651,7 +657,9 @@ export default function OrganisationSetupForm({
       try {
         const { width, height } = await getImageDimensions(file);
         if (width < 200 || height < 200) {
-          setUploadError('Logo images must be at least 200 × 200 pixels.');
+          const msg = 'Logo images must be at least 200 × 200 pixels.';
+          setUploadError(msg);
+          toast.error(msg);
           return;
         }
         logoVariants = await Promise.all([
@@ -660,6 +668,7 @@ export default function OrganisationSetupForm({
         ]);
       } catch (error) {
         setUploadError(error.message);
+        toast.error(error.message || 'Failed to process logo image.');
         return;
       }
     }
@@ -681,6 +690,7 @@ export default function OrganisationSetupForm({
         setSection('profile', 'logoSquareUrl', getUrl(squareResult));
         setSection('profile', 'logoWideUrl', getUrl(wideResult));
         setLocalPreview('');
+        toast.success('Organization logo uploaded successfully.');
         return;
       }
       const result = await uploadImageFile(file, kind === 'tax' ? 'organization-tax' : 'organizations');
@@ -688,11 +698,18 @@ export default function OrganisationSetupForm({
       const base = rawBase.replace(/\/+$/, '');
       const apiBase = base.endsWith('/sms') ? base : `${base}/sms`;
       const url = `${apiBase}/storage/file?key=${encodeURIComponent(result.key)}`;
-      if (kind === 'tax') setSection('taxProfile', 'documentUrl', url);
-      else setSection('profile', kind === 'logo' ? 'logoUrl' : 'faviconUrl', url);
+      if (kind === 'tax') {
+        setSection('taxProfile', 'documentUrl', url);
+        toast.success('Tax registration document uploaded.');
+      } else {
+        setSection('profile', kind === 'logo' ? 'logoUrl' : 'faviconUrl', url);
+        toast.success('Brand image uploaded successfully.');
+      }
     } catch (error) {
       console.error(`${kind} upload failed:`, error);
-      setUploadError(error.message || 'Upload failed. Your existing file has been kept.');
+      const msg = error.message || 'Upload failed. Your existing file has been kept.';
+      setUploadError(msg);
+      toast.error(msg);
       if (kind === 'logo') setLocalPreview('');
     } finally {
       setUploading('');
@@ -812,6 +829,7 @@ export default function OrganisationSetupForm({
       console.error('Organization setup validation failed:', error);
       // Local validation messages are surfaced in the form's alert.
       setUploadError(error.message);
+      toast.error(error.message || 'Please check the form for errors.');
     }
   };
 

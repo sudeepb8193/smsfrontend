@@ -5,7 +5,7 @@ import Loader from '../../../components/shared/Loader';
 import CustomSelector from '../../../components/shared/CustomSelector';
 import { copyBranchSettings } from '../api/branchApi';
 import { useBranch } from '../context/BranchContext';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 
 export const CopySettingsModal = ({
   isOpen,

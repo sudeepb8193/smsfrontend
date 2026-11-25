@@ -26,7 +26,7 @@ import {
   deleteBlackoutPeriod,
   fetchLeaveSummaryReport,
 } from '../api/staffLeaveApi';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 
 /**
  * Unified custom hook for Staff Leave Management (Module 09).
@@ -137,6 +137,9 @@ export const useStaffLeave = (orgId, branchId, activeTab = 'overview', params = 
       toast.success('Leave type created successfully');
       invalidateEntities(['types']);
     },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to create leave type');
+    },
   });
 
   const updateTypeMutation = useMutation({
@@ -144,6 +147,9 @@ export const useStaffLeave = (orgId, branchId, activeTab = 'overview', params = 
     onSuccess: () => {
       toast.success('Leave type updated successfully');
       invalidateEntities(['types']);
+    },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to update leave type');
     },
   });
 
@@ -188,6 +194,9 @@ export const useStaffLeave = (orgId, branchId, activeTab = 'overview', params = 
       toast.success(data?.message || 'Balance adjusted successfully');
       invalidateEntities(['balances', 'myBalances', 'transactions', 'reports']);
     },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to adjust leave balance');
+    },
   });
 
   const processAccrualMutation = useMutation({
@@ -195,6 +204,9 @@ export const useStaffLeave = (orgId, branchId, activeTab = 'overview', params = 
     onSuccess: (data) => {
       toast.success(data?.message || 'Monthly accrual processed successfully');
       invalidateEntities(['balances', 'myBalances', 'transactions', 'reports']);
+    },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to process monthly accrual');
     },
   });
 
@@ -204,6 +216,9 @@ export const useStaffLeave = (orgId, branchId, activeTab = 'overview', params = 
       toast.success(data?.message || 'Year-end carry forward processed successfully');
       invalidateEntities(['balances', 'myBalances', 'transactions', 'reports']);
     },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to process year-end carry forward');
+    },
   });
 
   // Request & Application Mutations
@@ -212,6 +227,9 @@ export const useStaffLeave = (orgId, branchId, activeTab = 'overview', params = 
     onSuccess: (data) => {
       toast.success(data?.message || 'Leave request submitted successfully');
       invalidateEntities(['requests', 'myRequests', 'approvals', 'balances', 'myBalances', 'calendar', 'reports']);
+    },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to submit leave request');
     },
   });
 
@@ -233,6 +251,9 @@ export const useStaffLeave = (orgId, branchId, activeTab = 'overview', params = 
       toast.success(data?.message || 'Leave request reviewed successfully');
       invalidateEntities(['requests', 'myRequests', 'approvals', 'balances', 'myBalances', 'calendar', 'reports']);
     },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to review leave request');
+    },
   });
 
   // Blackout Period Mutations
@@ -242,6 +263,9 @@ export const useStaffLeave = (orgId, branchId, activeTab = 'overview', params = 
       toast.success('Blackout period created successfully');
       invalidateEntities(['blackout', 'calendar']);
     },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to create blackout period');
+    },
   });
 
   const updateBlackoutMutation = useMutation({
@@ -249,6 +273,9 @@ export const useStaffLeave = (orgId, branchId, activeTab = 'overview', params = 
     onSuccess: () => {
       toast.success('Blackout period updated successfully');
       invalidateEntities(['blackout', 'calendar']);
+    },
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to update blackout period');
     },
   });
 

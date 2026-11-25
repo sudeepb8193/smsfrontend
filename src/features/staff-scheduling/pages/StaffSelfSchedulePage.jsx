@@ -7,6 +7,7 @@ import EmptyState from '../../../components/shared/EmptyState';
 import ConfirmDialog from '../../../components/shared/ConfirmDialog';
 import { useAuth } from '../../../hooks/useAuth';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
+import { toast } from '../../../components/shared/Toast';
 import { fetchMyProfile, fetchStaffList } from '../../staff/api/staffApi';
 import {
   fetchStaffWeeklySchedule,
@@ -178,10 +179,12 @@ export default function StaffSelfSchedulePage() {
         },
         effectiveOrgId,
       );
+      toast.success('Availability preference saved.');
       setPreferenceModalOpen(false);
       await loadScheduleDetails();
     } catch (err) {
       console.error('Failed to submit preference:', err);
+      toast.error(err?.message || 'Failed to save availability preference');
     } finally {
       setActionLoading(false);
     }
@@ -192,10 +195,12 @@ export default function StaffSelfSchedulePage() {
     try {
       setActionLoading(true);
       await deleteAvailabilityPreference(deletePrefCandidate.id, effectiveOrgId);
+      toast.success('Availability preference removed.');
       setDeletePrefCandidate(null);
       await loadScheduleDetails();
     } catch (err) {
       console.error('Failed to delete preference:', err);
+      toast.error(err?.message || 'Failed to delete availability preference');
     } finally {
       setActionLoading(false);
     }
@@ -206,10 +211,12 @@ export default function StaffSelfSchedulePage() {
     try {
       setActionLoading(true);
       await createShiftSwap(payload, effectiveOrgId);
+      toast.success('Shift swap request submitted.');
       setSwapModalOpen(false);
       await loadScheduleDetails();
     } catch (err) {
       console.error('Failed to submit swap request:', err);
+      toast.error(err?.message || 'Failed to submit shift swap request');
     } finally {
       setActionLoading(false);
     }
@@ -227,10 +234,12 @@ export default function StaffSelfSchedulePage() {
         },
         effectiveOrgId,
       );
+      toast.success('Blocked time created.');
       setBlockedModalOpen(false);
       await loadScheduleDetails();
     } catch (err) {
       console.error('Failed to create blocked time:', err);
+      toast.error(err?.message || 'Failed to create blocked time');
     } finally {
       setActionLoading(false);
     }
@@ -241,10 +250,12 @@ export default function StaffSelfSchedulePage() {
     try {
       setActionLoading(true);
       await cancelBlockedTime(cancelBlockCandidate.id, effectiveOrgId);
+      toast.success('Blocked time removed.');
       setCancelBlockCandidate(null);
       await loadScheduleDetails();
     } catch (err) {
       console.error('Failed to remove blocked time:', err);
+      toast.error(err?.message || 'Failed to remove blocked time');
     } finally {
       setActionLoading(false);
     }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Modal from '../../../../components/shared/Modal';
 import Button from '../../../../components/shared/Button';
 import Textarea from '../../../../components/shared/Textarea';
-import { toast } from 'sonner';
+import { toast } from '../../../../components/shared/Toast';
 import { reopenPeriod } from '../../api/staffAttendanceApi';
 import { Unlock, AlertTriangle } from 'lucide-react';
 

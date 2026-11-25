@@ -5,7 +5,7 @@ import Textarea from '../../../components/shared/Textarea';
 import Button from '../../../components/shared/Button';
 import Toggle from '../../../components/shared/Toggle';
 import { Layers, Save, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 
 const AVAILABLE_ACTIONS = [
   { key: 'view', label: 'View', desc: 'Read & view records in this module' },

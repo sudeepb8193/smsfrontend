@@ -12,6 +12,7 @@ import { useBranch } from '../../branch/hooks/useBranch';
 import { queryKeys } from '../../../config/queryClient';
 import { fetchStaffList } from '../../staff/api/staffApi';
 import { useStaffScheduling } from '../hooks/useStaffScheduling';
+import { toast } from '../../../components/shared/Toast';
 import {
   createShiftTemplate,
   updateShiftTemplate,
@@ -205,51 +206,89 @@ export default function StaffSchedulingWorkspacePage() {
     try {
       setActionLoading(true);
       await createShiftTemplate(payload, effectiveOrgId);
+      toast.success('Shift template created successfully.');
       invalidateSchedulingCache('templates');
       invalidateSchedulingCache('overview');
       setTemplateModalOpen(false);
+    } catch (err) {
+      toast.error(err?.message || 'Failed to create shift template');
+      throw err;
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleUpdateTemplate = async (templateId, payload) => {
-    await updateShiftTemplate(templateId, payload, effectiveOrgId);
-    invalidateSchedulingCache('templates');
-    invalidateSchedulingCache('overview');
+    try {
+      await updateShiftTemplate(templateId, payload, effectiveOrgId);
+      toast.success('Shift template updated successfully.');
+      invalidateSchedulingCache('templates');
+      invalidateSchedulingCache('overview');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to update shift template');
+      throw err;
+    }
   };
 
   const handleRetireTemplate = async (templateId) => {
-    await retireShiftTemplate(templateId, effectiveOrgId);
-    invalidateSchedulingCache('templates');
-    invalidateSchedulingCache('overview');
+    try {
+      await retireShiftTemplate(templateId, effectiveOrgId);
+      toast.success('Shift template retired.');
+      invalidateSchedulingCache('templates');
+      invalidateSchedulingCache('overview');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to retire shift template');
+      throw err;
+    }
   };
 
   const handleReactivateTemplate = async (templateId) => {
-    await reactivateShiftTemplate(templateId, effectiveOrgId);
-    invalidateSchedulingCache('templates');
-    invalidateSchedulingCache('overview');
+    try {
+      await reactivateShiftTemplate(templateId, effectiveOrgId);
+      toast.success('Shift template reactivated.');
+      invalidateSchedulingCache('templates');
+      invalidateSchedulingCache('overview');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to reactivate shift template');
+      throw err;
+    }
   };
 
   const handleDeleteTemplate = async (templateId) => {
-    await deleteShiftTemplate(templateId, effectiveOrgId);
-    invalidateSchedulingCache('templates');
-    invalidateSchedulingCache('overview');
+    try {
+      await deleteShiftTemplate(templateId, effectiveOrgId);
+      toast.success('Shift template deleted.');
+      invalidateSchedulingCache('templates');
+      invalidateSchedulingCache('overview');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to delete shift template');
+      throw err;
+    }
   };
 
   const handleSaveSchedule = async (payload) => {
-    await saveWeeklySchedule(payload, effectiveOrgId);
-    invalidateSchedulingCache('teamSchedule');
-    invalidateSchedulingCache('overview');
+    try {
+      await saveWeeklySchedule(payload, effectiveOrgId);
+      toast.success('Weekly schedule saved successfully.');
+      invalidateSchedulingCache('teamSchedule');
+      invalidateSchedulingCache('overview');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to save weekly schedule');
+      throw err;
+    }
   };
 
   const handleCopySchedule = async (payload) => {
     try {
       setActionLoading(true);
       await copyWeeklySchedule(payload, effectiveOrgId);
+      toast.success('Weekly schedule copied successfully.');
       invalidateSchedulingCache('teamSchedule');
       invalidateSchedulingCache('overview');
       setCopyModalOpen(false);
+    } catch (err) {
+      toast.error(err?.message || 'Failed to copy weekly schedule');
+      throw err;
     } finally {
       setActionLoading(false);
     }
@@ -259,39 +298,65 @@ export default function StaffSchedulingWorkspacePage() {
     try {
       setActionLoading(true);
       await createScheduleOverride(payload, effectiveOrgId);
+      toast.success('Schedule override saved.');
       invalidateSchedulingCache('overrides');
       invalidateSchedulingCache('teamSchedule');
       setOverrideModalOpen(false);
+    } catch (err) {
+      toast.error(err?.message || 'Failed to create schedule override');
+      throw err;
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleCreateSwap = async (payload) => {
-    await createShiftSwap(payload, effectiveOrgId);
-    invalidateSchedulingCache('overrides');
-    invalidateSchedulingCache('teamSchedule');
+    try {
+      await createShiftSwap(payload, effectiveOrgId);
+      toast.success('Shift swap request submitted.');
+      invalidateSchedulingCache('overrides');
+      invalidateSchedulingCache('teamSchedule');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to submit shift swap request');
+      throw err;
+    }
   };
 
   const handleReviewOverride = async (overrideId, payload) => {
-    await reviewScheduleOverride(overrideId, payload, effectiveOrgId);
-    invalidateSchedulingCache('overrides');
-    invalidateSchedulingCache('teamSchedule');
+    try {
+      await reviewScheduleOverride(overrideId, payload, effectiveOrgId);
+      toast.success('Schedule override reviewed.');
+      invalidateSchedulingCache('overrides');
+      invalidateSchedulingCache('teamSchedule');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to review schedule override');
+      throw err;
+    }
   };
 
   const handleCancelOverride = async (overrideId) => {
-    await cancelScheduleOverride(overrideId, effectiveOrgId);
-    invalidateSchedulingCache('overrides');
-    invalidateSchedulingCache('teamSchedule');
+    try {
+      await cancelScheduleOverride(overrideId, effectiveOrgId);
+      toast.success('Schedule override cancelled.');
+      invalidateSchedulingCache('overrides');
+      invalidateSchedulingCache('teamSchedule');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to cancel schedule override');
+      throw err;
+    }
   };
 
   const handleCreateBlockedTime = async (payload) => {
     try {
       setActionLoading(true);
       await createBlockedTime(payload, effectiveOrgId);
+      toast.success('Blocked time created.');
       invalidateSchedulingCache('blockedTimes');
       invalidateSchedulingCache('teamSchedule');
       setBlockModalOpen(false);
+    } catch (err) {
+      toast.error(err?.message || 'Failed to create blocked time');
+      throw err;
     } finally {
       setActionLoading(false);
     }
@@ -301,39 +366,65 @@ export default function StaffSchedulingWorkspacePage() {
     try {
       setActionLoading(true);
       await bulkCreateBlockedTime(payload, effectiveOrgId);
+      toast.success('Bulk blocked time created.');
       invalidateSchedulingCache('blockedTimes');
       invalidateSchedulingCache('teamSchedule');
       setBlockModalOpen(false);
+    } catch (err) {
+      toast.error(err?.message || 'Failed to create bulk blocked time');
+      throw err;
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleCancelBlockedTime = async (blockId) => {
-    await cancelBlockedTime(blockId, effectiveOrgId);
-    invalidateSchedulingCache('blockedTimes');
-    invalidateSchedulingCache('teamSchedule');
+    try {
+      await cancelBlockedTime(blockId, effectiveOrgId);
+      toast.success('Blocked time cancelled.');
+      invalidateSchedulingCache('blockedTimes');
+      invalidateSchedulingCache('teamSchedule');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to cancel blocked time');
+      throw err;
+    }
   };
 
   const handleCreatePreference = async (payload) => {
     try {
       setActionLoading(true);
       await createAvailabilityPreference(payload, effectiveOrgId);
+      toast.success('Availability preference saved.');
       invalidateSchedulingCache('preferences');
       setPreferenceModalOpen(false);
+    } catch (err) {
+      toast.error(err?.message || 'Failed to save availability preference');
+      throw err;
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleUpdatePreference = async (preferenceId, payload) => {
-    await updateAvailabilityPreference(preferenceId, payload, effectiveOrgId);
-    invalidateSchedulingCache('preferences');
+    try {
+      await updateAvailabilityPreference(preferenceId, payload, effectiveOrgId);
+      toast.success('Availability preference updated.');
+      invalidateSchedulingCache('preferences');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to update availability preference');
+      throw err;
+    }
   };
 
   const handleDeletePreference = async (preferenceId) => {
-    await deleteAvailabilityPreference(preferenceId, effectiveOrgId);
-    invalidateSchedulingCache('preferences');
+    try {
+      await deleteAvailabilityPreference(preferenceId, effectiveOrgId);
+      toast.success('Availability preference removed.');
+      invalidateSchedulingCache('preferences');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to remove availability preference');
+      throw err;
+    }
   };
 
   // Top Action button click handler

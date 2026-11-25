@@ -27,6 +27,7 @@ import {
   deleteCommissionOverride,
 } from '../api/staffDesignationApi';
 import { queryClient, queryKeys } from '../../../config/queryClient';
+import { toast } from '../../../components/shared/Toast';
 
 /**
  * Tab-level lazy fetching and caching for Staff Professional Designation & Services Workspace.
@@ -138,99 +139,209 @@ export function useStaffDesignation(staffId, organizationId, activeTab = 'design
 
   // Mutations 6.1 (Designations)
   const addDesignation = async (payload) => {
-    await createStaffDesignation(staffId, payload, organizationId);
-    invalidateTab('designations');
+    try {
+      await createStaffDesignation(staffId, payload, organizationId);
+      toast.success('Designation added successfully.');
+      invalidateTab('designations');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to add designation');
+      throw err;
+    }
   };
 
   const updateDesignation = async (designationId, payload) => {
-    await updateStaffDesignation(staffId, designationId, payload, organizationId);
-    invalidateTab('designations');
+    try {
+      await updateStaffDesignation(staffId, designationId, payload, organizationId);
+      toast.success('Designation updated successfully.');
+      invalidateTab('designations');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to update designation');
+      throw err;
+    }
   };
 
   const setPrimary = async (designationId) => {
-    await setPrimaryStaffDesignation(staffId, designationId, organizationId);
-    invalidateTab('designations');
+    try {
+      await setPrimaryStaffDesignation(staffId, designationId, organizationId);
+      toast.success('Primary designation updated.');
+      invalidateTab('designations');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to set primary designation');
+      throw err;
+    }
   };
 
   const deleteDesignation = async (designationId) => {
-    await deleteStaffDesignation(staffId, designationId, organizationId);
-    invalidateTab('designations');
+    try {
+      await deleteStaffDesignation(staffId, designationId, organizationId);
+      toast.success('Designation removed.');
+      invalidateTab('designations');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to remove designation');
+      throw err;
+    }
   };
 
   // Mutations 6.2 (Skills)
   const addSkill = async (payload) => {
-    await createStaffSkill(staffId, payload, organizationId);
-    invalidateTab('skills');
+    try {
+      await createStaffSkill(staffId, payload, organizationId);
+      toast.success('Skill added successfully.');
+      invalidateTab('skills');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to add skill');
+      throw err;
+    }
   };
 
   const updateSkill = async (skillId, payload) => {
-    await updateStaffSkill(staffId, skillId, payload, organizationId);
-    invalidateTab('skills');
+    try {
+      await updateStaffSkill(staffId, skillId, payload, organizationId);
+      toast.success('Skill updated successfully.');
+      invalidateTab('skills');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to update skill');
+      throw err;
+    }
   };
 
   const verifySkill = async (skillId, note) => {
-    await verifyStaffSkill(staffId, skillId, note, organizationId);
-    invalidateTab('skills');
+    try {
+      await verifyStaffSkill(staffId, skillId, note, organizationId);
+      toast.success('Skill verified.');
+      invalidateTab('skills');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to verify skill');
+      throw err;
+    }
   };
 
   const rejectSkill = async (skillId, reason) => {
-    await rejectStaffSkill(staffId, skillId, reason, organizationId);
-    invalidateTab('skills');
+    try {
+      await rejectStaffSkill(staffId, skillId, reason, organizationId);
+      toast.info('Skill verification rejected.');
+      invalidateTab('skills');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to reject skill verification');
+      throw err;
+    }
   };
 
   const deleteSkill = async (skillId) => {
-    await deleteStaffSkill(staffId, skillId, organizationId);
-    invalidateTab('skills');
+    try {
+      await deleteStaffSkill(staffId, skillId, organizationId);
+      toast.success('Skill removed.');
+      invalidateTab('skills');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to remove skill');
+      throw err;
+    }
   };
 
   // Mutations 6.3 (Services)
   const assignBulk = async (payload) => {
-    await bulkAssignServicesToStaff(staffId, payload, organizationId);
-    invalidateTab('services');
-    invalidateTab('catalog');
+    try {
+      await bulkAssignServicesToStaff(staffId, payload, organizationId);
+      toast.success('Services assigned successfully.');
+      invalidateTab('services');
+      invalidateTab('catalog');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to assign services');
+      throw err;
+    }
   };
 
   const updateAssignment = async (assignmentId, payload) => {
-    await updateAssignedService(staffId, assignmentId, payload, organizationId);
-    invalidateTab('services');
+    try {
+      await updateAssignedService(staffId, assignmentId, payload, organizationId);
+      toast.success('Service assignment updated.');
+      invalidateTab('services');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to update service assignment');
+      throw err;
+    }
   };
 
   const unassign = async (assignmentId) => {
-    await unassignServiceFromStaff(staffId, assignmentId, organizationId);
-    invalidateTab('services');
-    invalidateTab('catalog');
+    try {
+      await unassignServiceFromStaff(staffId, assignmentId, organizationId);
+      toast.success('Service unassigned.');
+      invalidateTab('services');
+      invalidateTab('catalog');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to unassign service');
+      throw err;
+    }
   };
 
   // Mutations 6.4 (Branch Overrides)
   const setBranchOverride = async (staffServiceId, payload) => {
-    await createOrUpdateBranchOverride(staffId, staffServiceId, payload, organizationId);
-    invalidateTab('branches');
+    try {
+      await createOrUpdateBranchOverride(staffId, staffServiceId, payload, organizationId);
+      toast.success('Branch availability exception saved.');
+      invalidateTab('branches');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to save branch exception');
+      throw err;
+    }
   };
 
   const removeBranchOverride = async (staffServiceId, branchId) => {
-    await deleteBranchOverride(staffId, staffServiceId, branchId, organizationId);
-    invalidateTab('branches');
+    try {
+      await deleteBranchOverride(staffId, staffServiceId, branchId, organizationId);
+      toast.success('Default branch availability restored.');
+      invalidateTab('branches');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to restore default availability');
+      throw err;
+    }
   };
 
   // Mutations 6.5 (Commission)
   const setCommissionEligible = async (isEligible) => {
-    await setStaffCommissionEligibility(staffId, isEligible, organizationId);
-    invalidateTab('commission');
+    try {
+      await setStaffCommissionEligibility(staffId, isEligible, organizationId);
+      toast.success(
+        isEligible ? 'Commission eligibility enabled.' : 'Commission eligibility disabled.',
+      );
+      invalidateTab('commission');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to update commission eligibility');
+      throw err;
+    }
   };
 
   const createCommOverride = async (payload) => {
-    await createCommissionOverride(staffId, payload, organizationId);
-    invalidateTab('commission');
+    try {
+      await createCommissionOverride(staffId, payload, organizationId);
+      toast.success('Commission override created.');
+      invalidateTab('commission');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to create commission override');
+      throw err;
+    }
   };
 
   const updateCommOverride = async (overrideId, payload) => {
-    await updateCommissionOverride(staffId, overrideId, payload, organizationId);
-    invalidateTab('commission');
+    try {
+      await updateCommissionOverride(staffId, overrideId, payload, organizationId);
+      toast.success('Commission override updated.');
+      invalidateTab('commission');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to update commission override');
+      throw err;
+    }
   };
 
   const deleteCommOverride = async (overrideId) => {
-    await deleteCommissionOverride(staffId, overrideId, organizationId);
-    invalidateTab('commission');
+    try {
+      await deleteCommissionOverride(staffId, overrideId, organizationId);
+      toast.success('Commission override deleted.');
+      invalidateTab('commission');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to delete commission override');
+      throw err;
+    }
   };
 
   return {

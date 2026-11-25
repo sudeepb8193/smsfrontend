@@ -14,6 +14,7 @@ import { userService } from '../../../services/userService';
 import { createStaff as apiCreateStaff, suggestEmployeeCode } from '../api/staffApi';
 import { fetchBranches } from '../../branch/api/branchApi';
 import { queryKeys } from '../../../config/queryClient';
+import { toast } from '../../../components/shared/Toast';
 import {
   User,
   Building2,
@@ -254,10 +255,12 @@ export function StaffCreatePage() {
       const res = await suggestEmployeeCode('EMP', effectiveOrgId);
       if (isMountedRef.current && res?.employeeCode) {
         handleFieldChange('employeeCode', res.employeeCode);
+        toast.info(`Suggested employee code: ${res.employeeCode}`);
       }
     } catch (err) {
       if (isMountedRef.current) {
         console.error('Failed to suggest employee code:', err);
+        toast.error(err?.message || 'Failed to suggest employee code');
       }
     } finally {
       if (isMountedRef.current) {
@@ -395,6 +398,8 @@ export function StaffCreatePage() {
     onSuccess: (res) => {
       // Invalidate only staff listings to reflect the new employee
       queryClient.invalidateQueries({ queryKey: queryKeys.staff.all });
+      const created = res?.data || res;
+      toast.success(`Employee "${created?.fullName || formData.fullName.trim()}" created successfully.`);
       const newStaffId = res?.id || res?.data?.id;
       if (newStaffId) {
         navigate(`/staff/${newStaffId}`);
@@ -411,6 +416,8 @@ export function StaffCreatePage() {
       if (banner) {
         setError(banner);
       }
+      const firstInline = Object.values(inline)[0];
+      toast.error(banner || firstInline || 'Failed to create employee profile');
     },
   });
 
@@ -421,6 +428,7 @@ export function StaffCreatePage() {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      toast.error('Please fix the highlighted validation errors.');
       const firstField = Object.keys(validationErrors)[0];
       const targetEl =
         document.getElementById(firstField) || document.querySelector(`[name="${firstField}"]`);

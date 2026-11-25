@@ -5,7 +5,7 @@ import Input from '../../../components/shared/Input';
 import Toggle from '../../../components/shared/Toggle';
 import Badge from '../../../components/shared/Badge';
 import Loader from '../../../components/shared/Loader';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import {
   saveOrganizationPolicy,
   saveBranchPolicy,

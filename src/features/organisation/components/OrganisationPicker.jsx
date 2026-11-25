@@ -9,7 +9,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { useOrganisation } from '../context/OrganisationContext';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 
 export const OrganisationPicker = () => {
   const navigate = useNavigate();
