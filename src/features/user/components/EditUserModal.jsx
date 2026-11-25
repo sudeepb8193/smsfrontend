@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Phone } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import Modal from '../../../components/shared/Modal';
 import Button from '../../../components/shared/Button';
 import Input from '../../../components/shared/Input';

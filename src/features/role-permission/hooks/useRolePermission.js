@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import { rolePermissionApi } from '../api/rolePermissionApi';
 import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
 import { useAuth } from '../../../hooks/useAuth';

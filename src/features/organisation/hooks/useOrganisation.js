@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import {
   fetchOrganisations,
   fetchOrganisationDetails,
@@ -297,7 +297,9 @@ export const useOrganisationCreate = () => {
       });
     } catch (err) {
       console.error('Failed to create organisation:', err);
-      setServerError(err.message || 'Failed to create organisation');
+      const msg = err.message || 'Failed to create organisation';
+      setServerError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -352,7 +354,9 @@ export const useOrganisationEdit = () => {
       });
     } catch (err) {
       console.error('Failed to update organisation:', err);
-      setServerError(err.message || 'Failed to update organisation');
+      const msg = err.message || 'Failed to update organisation';
+      setServerError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -551,7 +555,9 @@ export const useOrganisationSetup = (customOrgId, customIsOwner) => {
       return result;
     } catch (saveError) {
       console.error('Failed to save organization setup:', saveError);
-      setError(saveError.message || 'Could not save organization setup.');
+      const msg = saveError.message || 'Could not save organization setup.';
+      setError(msg);
+      toast.error(msg);
       throw saveError;
     } finally {
       setSaving(false);
@@ -570,6 +576,7 @@ export const useOrganisationSetup = (customOrgId, customIsOwner) => {
     await save(payload);
     if (isOwner) {
       setSaveMessage('Organization setup saved successfully.');
+      toast.success('Organization setup saved successfully.');
     } else {
       navigate(`/super-admin/organisations/${organisationId}`, {
         state: { message: 'Organization setup saved successfully.' },

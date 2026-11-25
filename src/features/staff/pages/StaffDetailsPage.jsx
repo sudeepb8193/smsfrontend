@@ -7,6 +7,7 @@ import Badge from '../../../components/shared/Badge';
 import UnderlineTabs from '../../../components/shared/UnderlineTabs';
 import Loader from '../../../components/shared/Loader';
 import ConfirmDialog from '../../../components/shared/ConfirmDialog';
+import { toast } from '../../../components/shared/Toast';
 import { useAuth } from '../../../hooks/useAuth';
 import { usePermission } from '../../../hooks/usePermission';
 import { useOrganisation } from '../../organisation/context/OrganisationContext';
@@ -113,10 +114,12 @@ export function StaffDetailsPage() {
     try {
       setActionLoading(true);
       await updateStaffStatus(id, newStatus, reason, effectiveOrgId);
+      toast.success(`Employee status updated to ${String(newStatus).replace(/_/g, ' ')}.`);
       await loadStaff();
       setIsStatusModalOpen(false);
     } catch (err) {
       console.error('Failed to change status:', err);
+      toast.error(err?.message || 'Failed to update employee status');
     } finally {
       setActionLoading(false);
     }
@@ -127,10 +130,12 @@ export function StaffDetailsPage() {
     try {
       setActionLoading(true);
       await linkStaffUser(id, targetUserId, effectiveOrgId);
+      toast.success('User account linked to employee successfully.');
       await loadStaff();
       setIsLinkModalOpen(false);
     } catch (err) {
       console.error('Failed to link user account:', err);
+      toast.error(err?.message || 'Failed to link user account');
     } finally {
       setActionLoading(false);
     }
@@ -141,9 +146,11 @@ export function StaffDetailsPage() {
     try {
       setUnlinkingUser(true);
       await unlinkStaffUser(id, effectiveOrgId);
+      toast.success('User account unlinked from employee.');
       await loadStaff();
     } catch (err) {
       console.error('Failed to unlink user account:', err);
+      toast.error(err?.message || 'Failed to unlink user account');
     } finally {
       setUnlinkingUser(false);
     }
@@ -154,9 +161,11 @@ export function StaffDetailsPage() {
     try {
       setActionLoading(true);
       await deleteStaff(id, effectiveOrgId);
+      toast.success(`Employee "${staff?.fullName || 'Profile'}" terminated successfully.`);
       navigate('/staff');
     } catch (err) {
       console.error('Failed to delete staff:', err);
+      toast.error(err?.message || 'Failed to terminate employee');
     } finally {
       setActionLoading(false);
     }
@@ -167,9 +176,11 @@ export function StaffDetailsPage() {
     try {
       setActionLoading(true);
       await upsertStaffContacts(id, contactData, effectiveOrgId);
+      toast.success('Contact details updated successfully.');
       await loadStaff();
     } catch (err) {
       console.error('Failed to update contacts:', err);
+      toast.error(err?.message || 'Failed to update contact details');
     } finally {
       setActionLoading(false);
     }
@@ -183,6 +194,7 @@ export function StaffDetailsPage() {
       return res;
     } catch (err) {
       console.error('Failed to reveal national ID:', err);
+      toast.error(err?.message || 'Failed to reveal National ID');
       return null;
     } finally {
       setRevealingNationalId(false);
@@ -191,62 +203,130 @@ export function StaffDetailsPage() {
 
   // Emergency Contacts
   const handleCreateEmergencyContact = async (data) => {
-    await createEmergencyContact(id, data, effectiveOrgId);
-    await loadStaff();
+    try {
+      await createEmergencyContact(id, data, effectiveOrgId);
+      toast.success('Emergency contact added.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to add emergency contact');
+      throw err;
+    }
   };
 
   const handleUpdateEmergencyContact = async (contactId, data) => {
-    await updateEmergencyContact(id, contactId, data, effectiveOrgId);
-    await loadStaff();
+    try {
+      await updateEmergencyContact(id, contactId, data, effectiveOrgId);
+      toast.success('Emergency contact updated.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to update emergency contact');
+      throw err;
+    }
   };
 
   const handleDeleteEmergencyContact = async (contactId) => {
-    await deleteEmergencyContact(id, contactId, effectiveOrgId);
-    await loadStaff();
+    try {
+      await deleteEmergencyContact(id, contactId, effectiveOrgId);
+      toast.success('Emergency contact removed.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to remove emergency contact');
+      throw err;
+    }
   };
 
   // Employment History
   const handleRecordEmploymentChange = async (data) => {
-    await createEmploymentHistory(id, data, effectiveOrgId);
-    await loadStaff();
+    try {
+      await createEmploymentHistory(id, data, effectiveOrgId);
+      toast.success('Employment change recorded.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to record employment change');
+      throw err;
+    }
   };
 
   // Skills & Qualifications
   const handleAddQualification = async (data) => {
-    await createQualification(id, data, effectiveOrgId);
-    await loadStaff();
+    try {
+      await createQualification(id, data, effectiveOrgId);
+      toast.success(
+        data?.recordType === 'skill_tag' ? 'Skill tag added.' : 'Qualification added.',
+      );
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to save qualification');
+      throw err;
+    }
   };
 
   const handleRemoveQualification = async (qualId) => {
-    await deleteQualification(id, qualId, effectiveOrgId);
-    await loadStaff();
+    try {
+      await deleteQualification(id, qualId, effectiveOrgId);
+      toast.success('Record removed successfully.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to remove record');
+      throw err;
+    }
   };
 
   // Documents
   const handleUploadDocument = async (data) => {
-    await createStaffDocument(id, data, effectiveOrgId);
-    await loadStaff();
+    try {
+      await createStaffDocument(id, data, effectiveOrgId);
+      toast.success('Document uploaded successfully.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to upload document');
+      throw err;
+    }
   };
 
   const handleDeleteDocument = async (docId) => {
-    await deleteStaffDocument(id, docId, effectiveOrgId);
-    await loadStaff();
+    try {
+      await deleteStaffDocument(id, docId, effectiveOrgId);
+      toast.success('Document deleted.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to delete document');
+      throw err;
+    }
   };
 
   // Branch Assignments
   const handleAddSecondaryBranch = async (data) => {
-    await addSecondaryBranch(id, data, effectiveOrgId);
-    await loadStaff();
+    try {
+      await addSecondaryBranch(id, data, effectiveOrgId);
+      toast.success('Secondary branch assigned.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to assign secondary branch');
+      throw err;
+    }
   };
 
   const handleEndSecondaryBranch = async (assignmentId) => {
-    await endSecondaryBranch(id, assignmentId, effectiveOrgId);
-    await loadStaff();
+    try {
+      await endSecondaryBranch(id, assignmentId, effectiveOrgId);
+      toast.success('Secondary branch assignment ended.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to end branch assignment');
+      throw err;
+    }
   };
 
   const handleTransferHomeBranch = async (data) => {
-    await transferHomeBranch(id, data, effectiveOrgId);
-    await loadStaff();
+    try {
+      await transferHomeBranch(id, data, effectiveOrgId);
+      toast.success('Home branch transfer scheduled/completed.');
+      await loadStaff();
+    } catch (err) {
+      toast.error(err?.message || 'Failed to transfer home branch');
+      throw err;
+    }
   };
 
   const tabs = [

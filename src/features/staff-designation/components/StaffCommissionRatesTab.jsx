@@ -6,6 +6,7 @@ import EmptyState from '../../../components/shared/EmptyState';
 import ConfirmDialog from '../../../components/shared/ConfirmDialog';
 import CommissionOverrideModal from './modals/CommissionOverrideModal';
 import { usePermission } from '../../../hooks/usePermission';
+import { toast } from '../../../components/shared/Toast';
 import {
   Percent,
   DollarSign,
@@ -87,6 +88,7 @@ export default function StaffCommissionRatesTab({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    toast.success('Commission schedule exported to CSV.');
   };
 
   const handlePrint = () => {

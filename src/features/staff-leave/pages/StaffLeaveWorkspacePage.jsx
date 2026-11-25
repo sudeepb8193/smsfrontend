@@ -47,7 +47,7 @@ import {
   Plus,
   RefreshCw,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 
 /**
  * Production-Level Staff Leave Management Workspace Page (Module 09).

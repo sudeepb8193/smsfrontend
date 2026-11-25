@@ -12,7 +12,7 @@ import {
 import { checkBranchCode, uploadBranchCoverImage } from '../../api/branchApi';
 import { useBranch } from '../../context/BranchContext';
 import MediaUpload from '../../../../components/shared/MediaUpload';
-import { toast } from 'sonner';
+import { toast } from '../../../../components/shared/Toast';
 
 const BRANCH_TYPES = [
   { id: 'flagship', label: 'Flagship' },

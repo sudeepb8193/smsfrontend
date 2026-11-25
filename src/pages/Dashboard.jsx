@@ -27,7 +27,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../components/shared/Toast';
 
 export const Dashboard = () => {
   const { user, loading } = useAuth();

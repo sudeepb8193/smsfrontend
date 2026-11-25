@@ -14,6 +14,7 @@ import AddEmergencyContactModal from '../components/modals/AddEmergencyContactMo
 import AddQualificationModal from '../components/modals/AddQualificationModal';
 import UploadDocumentModal from '../components/modals/UploadDocumentModal';
 import { useAuth } from '../../../hooks/useAuth';
+import { toast } from '../../../components/shared/Toast';
 import {
   fetchMyProfile,
   updateMyProfile,
@@ -142,10 +143,13 @@ export default function StaffSelfProfilePage() {
       });
 
       setIsEditProfileOpen(false);
+      toast.success('Profile updated successfully.');
       await loadProfile();
     } catch (err) {
       console.error('Failed to update profile:', err);
-      setEditErrors({ general: err?.message || 'Failed to update profile.' });
+      const errMsg = err?.message || 'Failed to update profile.';
+      setEditErrors({ general: errMsg });
+      toast.error(errMsg);
     } finally {
       setSavingEdit(false);
     }

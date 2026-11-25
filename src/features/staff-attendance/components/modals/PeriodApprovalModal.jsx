@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from '../../../../components/shared/Modal';
 import Button from '../../../../components/shared/Button';
-import { toast } from 'sonner';
+import { toast } from '../../../../components/shared/Toast';
 import { approvePeriod } from '../../api/staffAttendanceApi';
 import { Lock, ShieldCheck, AlertCircle } from 'lucide-react';
 

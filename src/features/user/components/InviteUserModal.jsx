@@ -8,7 +8,7 @@ import {
   Sparkles,
   Building,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import Modal from '../../../components/shared/Modal';
 import Button from '../../../components/shared/Button';
 import Input from '../../../components/shared/Input';
@@ -97,8 +97,11 @@ export const InviteUserModal = ({
 
       const result = await onInviteSuccess(payload);
       setInviteResult(result);
+      toast.success(`Invitation sent to ${displayName.trim()}!`);
     } catch (err) {
-      setErrorMsg(err.message || 'Failed to send invitation');
+      const msg = err.message || 'Failed to send invitation';
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }

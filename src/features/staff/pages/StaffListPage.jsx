@@ -16,6 +16,7 @@ import LinkUserModal from '../components/modals/LinkUserModal';
 import { useStaff } from '../hooks/useStaff';
 import { usePermission } from '../../../hooks/usePermission';
 import { useAuth } from '../../../hooks/useAuth';
+import { toast } from '../../../components/shared/Toast';
 import {
   Users,
   UserPlus,
@@ -122,10 +123,12 @@ export function StaffListPage() {
     try {
       setActionLoading(true);
       await updateStatus(activeModalStaff.id, newStatus, reason);
+      toast.success(`Employee status updated to ${String(newStatus).replace(/_/g, ' ')}.`);
       setActiveModalStaff(null);
       setModalType(null);
     } catch (err) {
       console.error('Failed to change status:', err);
+      toast.error(err?.message || 'Failed to update employee status');
     } finally {
       setActionLoading(false);
     }
@@ -136,10 +139,12 @@ export function StaffListPage() {
     try {
       setActionLoading(true);
       await linkUser(activeModalStaff.id, userId);
+      toast.success('User account linked to employee successfully.');
       setActiveModalStaff(null);
       setModalType(null);
     } catch (err) {
       console.error('Failed to link user:', err);
+      toast.error(err?.message || 'Failed to link user account');
     } finally {
       setActionLoading(false);
     }
@@ -149,11 +154,14 @@ export function StaffListPage() {
     if (!activeModalStaff) return;
     try {
       setActionLoading(true);
+      const staffName = activeModalStaff.fullName || 'Employee';
       await removeStaff(activeModalStaff.id);
+      toast.success(`Employee "${staffName}" removed/terminated successfully.`);
       setActiveModalStaff(null);
       setModalType(null);
     } catch (err) {
       console.error('Failed to delete staff:', err);
+      toast.error(err?.message || 'Failed to terminate employee');
     } finally {
       setActionLoading(false);
     }

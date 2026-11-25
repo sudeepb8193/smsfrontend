@@ -9,6 +9,7 @@ import Toggle from '../../../components/shared/Toggle';
 import Badge from '../../../components/shared/Badge';
 import ErrorMessage from '../../../components/shared/ErrorMessage';
 import { notifyPermissionUpdate } from '../../../utils/permissionUtils';
+import { toast } from '../../../components/shared/Toast';
 
 export const BulkRoleAssignModal = ({
   isOpen,
@@ -74,9 +75,12 @@ export const BulkRoleAssignModal = ({
 
       notifyPermissionUpdate({ userIds: selectedUserIds });
       setResultSummary(res);
+      toast.success(`Role assigned to ${selectedUserIds.length} user(s) successfully.`);
       if (onSuccess) onSuccess();
     } catch (err) {
-      setErrorMsg(err.message || 'Failed to complete bulk role assignment');
+      const msg = err.message || 'Failed to complete bulk role assignment';
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }

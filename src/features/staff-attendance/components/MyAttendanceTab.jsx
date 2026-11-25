@@ -5,7 +5,7 @@ import Badge from '../../../components/shared/Badge';
 import Loader from '../../../components/shared/Loader';
 import EmptyState from '../../../components/shared/EmptyState';
 import Pagination from '../../../components/shared/Pagination';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import { checkInStaff, checkOutStaff } from '../api/staffAttendanceApi';
 import {
   Clock,

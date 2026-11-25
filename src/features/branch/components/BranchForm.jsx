@@ -20,7 +20,7 @@ import TimePicker from '../../../components/shared/TimePicker';
 import Toggle from '../../../components/shared/Toggle';
 import MediaUpload from '../../../components/shared/MediaUpload';
 import CharCount from '../../../components/shared/CharCount';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 
 const BRANCH_TYPES = [
   { id: 'flagship', label: 'Flagship' },

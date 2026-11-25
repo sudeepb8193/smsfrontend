@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import { useAuth as useAuthContext } from '../context/AuthContext';
 import { resolveRoleDestination } from '../utils/authRedirect';
 import { verifyOrganisationContactEmail } from '../../organisation/api/organisationApi';

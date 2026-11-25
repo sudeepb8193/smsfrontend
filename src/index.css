@@ -364,6 +364,84 @@ input, textarea, [contenteditable="true"] {
   animation: shimmerLavender 5s linear infinite;
 }
 
+/* ==========================================================================
+   SMS CUSTOM BOTTOM-CENTER TOAST NOTIFICATION SYSTEM
+   ========================================================================== */
+
+.sms-toast-container {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 10050;
+}
+
+.sms-toast-card {
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid color-mix(in srgb, var(--primary, #F97316) 16%, rgba(15, 23, 42, 0.1));
+  box-shadow:
+    0 14px 34px -6px rgba(15, 23, 42, 0.16),
+    0 6px 16px -4px color-mix(in srgb, var(--primary, #F97316) 18%, transparent),
+    0 0 0 1px rgba(255, 255, 255, 0.75) inset;
+}
+
+:root[data-theme='dark'] .sms-toast-card,
+.dark .sms-toast-card {
+  background: rgba(20, 20, 23, 0.95);
+  border: 1px solid color-mix(in srgb, var(--primary, #F97316) 22%, rgba(255, 255, 255, 0.1));
+  box-shadow:
+    0 18px 42px -6px rgba(0, 0, 0, 0.82),
+    0 8px 20px -6px color-mix(in srgb, var(--primary, #F97316) 22%, transparent),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+@keyframes smsToastEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes smsToastExit {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.96);
+  }
+}
+
+@keyframes smsToastProgress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.sms-toast-enter {
+  animation: smsToastEnter 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.sms-toast-exit {
+  animation: smsToastExit 190ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.sms-toast-progress {
+  animation-name: smsToastProgress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
 /* Reduced Motion Override for Accessibility */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
@@ -377,6 +455,17 @@ input, textarea, [contenteditable="true"] {
   .animate-float-3,
   .animate-float-4,
   .animate-shimmer-lavender {
+    animation: none !important;
+  }
+  .sms-toast-enter,
+  .sms-toast-exit {
+    animation: none !important;
+    transform: none !important;
+  }
+  .sms-toast-exit {
+    opacity: 0 !important;
+  }
+  .sms-toast-progress {
     animation: none !important;
   }
 }

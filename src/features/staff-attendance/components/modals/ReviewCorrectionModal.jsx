@@ -3,7 +3,7 @@ import Modal from '../../../../components/shared/Modal';
 import Button from '../../../../components/shared/Button';
 import Textarea from '../../../../components/shared/Textarea';
 import Badge from '../../../../components/shared/Badge';
-import { toast } from 'sonner';
+import { toast } from '../../../../components/shared/Toast';
 import { approveCorrection, rejectCorrection } from '../../api/staffAttendanceApi';
 import { Clock, CheckCircle2, XCircle, FileText, ArrowRight } from 'lucide-react';
 

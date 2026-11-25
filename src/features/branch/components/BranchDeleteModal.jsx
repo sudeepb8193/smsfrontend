@@ -11,7 +11,7 @@ import {
 import Modal from '../../../components/shared/Modal';
 import Loader from '../../../components/shared/Loader';
 import { fetchBranchBlockers, deleteBranch, updateBranch } from '../api/branchApi';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 
 export const BranchDeleteModal = ({
   isOpen,

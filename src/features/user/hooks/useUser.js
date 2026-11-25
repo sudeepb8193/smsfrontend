@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, keepPreviousData } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '../../../components/shared/Toast';
 import { userService } from '../../../services/userService';
 import { fetchBranches } from '../../branch/api/branchApi';
 import { useAuth } from '../../../hooks/useAuth';

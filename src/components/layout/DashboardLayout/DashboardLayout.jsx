@@ -12,6 +12,13 @@ export const DashboardLayout = () => {
   const lastRefreshRef = React.useRef(Date.now());
 
   useEffect(() => {
+    window.dispatchEvent(new Event('sms:layout-change'));
+    return () => {
+      window.dispatchEvent(new Event('sms:layout-change'));
+    };
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
         setIsMobileOpen(false);
@@ -47,7 +54,7 @@ export const DashboardLayout = () => {
         onCloseMobile={() => setIsMobileOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div data-sms-content-area="true" className="flex-1 flex flex-col min-w-0">
         <Navbar
           onToggleSidebar={handleToggleSidebar}
           isSidebarCollapsed={isSidebarCollapsed}
