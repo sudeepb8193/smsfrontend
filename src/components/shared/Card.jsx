@@ -11,6 +11,7 @@ export const Card = ({
 }) => {
   return (
     <div
+      data-sms-card="true"
       className={`bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-6 shadow-md transition-all duration-200 ${className}`}
       {...props}
     >

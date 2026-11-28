@@ -37,6 +37,8 @@ export const Button = ({
   return (
     <button
       type={type}
+      data-sms-button="true"
+      data-variant={variant}
       className={`${baseClasses} ${sizeClasses[size] || sizeClasses.medium} ${variantClasses[variant] || variantClasses.primary} ${fullWidth ? 'w-full' : ''} ${className}`}
       disabled={isDisabled}
       onClick={(e) => !isDisabled && onClick && onClick(e)}

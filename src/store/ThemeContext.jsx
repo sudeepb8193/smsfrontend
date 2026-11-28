@@ -1,258 +1,23 @@
-import React, { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useRef } from 'react';
+import { checkColorContrast } from '../utils/contrast';
+import {
+  LAYOUT_THEMES,
+  ACCENT_PALETTES,
+  FONT_FAMILIES,
+  generatePaletteFromHex,
+  hexToRgbTuple,
+  pickAccessibleDarkShade,
+} from './themeTokens';
 
+export { LAYOUT_THEMES, ACCENT_PALETTES, FONT_FAMILIES, generatePaletteFromHex };
 export const ThemeContext = createContext(null);
-
-export const ACCENT_PALETTES = {
-  burgundy: {
-    name: 'Burgundy',
-    hex: '#8A4A52',
-    shades: {
-      50: '#FAF0F2',
-      100: '#F5E1E5',
-      200: '#E9C4CB',
-      300: '#D79AA4',
-      400: '#BF6E7C',
-      500: '#8A4A52',
-      600: '#753C44',
-      700: '#602F36',
-      800: '#4E262C',
-      900: '#3D1F24',
-      950: '#21141A',
-    },
-  },
-  blue: {
-    name: 'Blue',
-    hex: '#2563EB',
-    shades: {
-      50: '#EFF6FF',
-      100: '#DBEAFE',
-      200: '#BFDBFE',
-      300: '#93C5FD',
-      400: '#60A5FA',
-      500: '#2563EB',
-      600: '#1D4ED8',
-      700: '#1E40AF',
-      800: '#1E3A8A',
-      900: '#172554',
-      950: '#0B132B',
-    },
-  },
-  emerald: {
-    name: 'Emerald',
-    hex: '#10B981',
-    shades: {
-      50: '#ECFDF5',
-      100: '#D1FAE5',
-      200: '#A7F3D0',
-      300: '#6EE7B7',
-      400: '#34D399',
-      500: '#10B981',
-      600: '#059669',
-      700: '#047857',
-      800: '#065F46',
-      900: '#064E3B',
-      950: '#022C22',
-    },
-  },
-  amber: {
-    name: 'Amber',
-    hex: '#F59E0B',
-    shades: {
-      50: '#FFFBEB',
-      100: '#FEF3C7',
-      200: '#FDE68A',
-      300: '#FCD34D',
-      400: '#FBBF24',
-      500: '#F59E0B',
-      600: '#D97706',
-      700: '#B45309',
-      800: '#92400E',
-      900: '#78350F',
-      950: '#451A03',
-    },
-  },
-  orange: {
-    name: 'Orange',
-    hex: '#F97316',
-    shades: {
-      50: '#FFF7ED',
-      100: '#FFEDD5',
-      200: '#FED7AA',
-      300: '#FDBA74',
-      400: '#FB923C',
-      500: '#F97316',
-      600: '#EA580C',
-      700: '#C2410C',
-      800: '#9A3412',
-      900: '#7C2D12',
-      950: '#431407',
-    },
-  },
-  rose: {
-    name: 'Rose',
-    hex: '#F43F5E',
-    shades: {
-      50: '#FFF1F2',
-      100: '#FFE4E6',
-      200: '#FECDD3',
-      300: '#FDA4AF',
-      400: '#FB7185',
-      500: '#F43F5E',
-      600: '#E11D48',
-      700: '#BE123C',
-      800: '#9F1239',
-      900: '#881337',
-      950: '#4C0519',
-    },
-  },
-  purple: {
-    name: 'Purple',
-    hex: '#A855F7',
-    shades: {
-      50: '#FAF5FF',
-      100: '#F3E8FF',
-      200: '#E9D5FF',
-      300: '#D8B4FE',
-      400: '#C084FC',
-      500: '#A855F7',
-      600: '#9333EA',
-      700: '#7E22CE',
-      800: '#6B21A8',
-      900: '#581C87',
-      950: '#3B0764',
-    },
-  },
-  violet: {
-    name: 'Violet',
-    hex: '#8B5CF6',
-    shades: {
-      50: '#F5F3FF',
-      100: '#EDE9FE',
-      200: '#DDD6FE',
-      300: '#C4B5FD',
-      400: '#A78BFA',
-      500: '#8B5CF6',
-      600: '#7C3AED',
-      700: '#6D28D9',
-      800: '#5B21B6',
-      900: '#4C1D95',
-      950: '#2E1065',
-    },
-  },
-  cyan: {
-    name: 'Cyan',
-    hex: '#06B6D4',
-    shades: {
-      50: '#ECFEFF',
-      100: '#CFFAFE',
-      200: '#A5F3FC',
-      300: '#67E8F9',
-      400: '#22D3EE',
-      500: '#06B6D4',
-      600: '#0891B2',
-      700: '#0E7490',
-      800: '#155E75',
-      900: '#164E63',
-      950: '#083344',
-    },
-  },
-  coral: {
-    name: 'Coral',
-    hex: '#FF6B6B',
-    shades: {
-      50: '#FFF0F0',
-      100: '#FFE0E0',
-      200: '#FFC2C2',
-      300: '#FFA1A1',
-      400: '#FF8080',
-      500: '#FF6B6B',
-      600: '#E64A4A',
-      700: '#C43131',
-      800: '#A02222',
-      900: '#801616',
-      950: '#4D0808',
-    },
-  },
-};
-
-export const FONT_FAMILIES = {
-  Inter: "'Inter', system-ui, -apple-system, sans-serif",
-  Roboto: "'Roboto', system-ui, -apple-system, sans-serif",
-  Outfit: "'Outfit', system-ui, -apple-system, sans-serif",
-  'Plus Jakarta Sans': "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
-  'SF Pro': "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif",
-};
-
-// Function to generate full 50-950 palette from any arbitrary hex color
-export const generatePaletteFromHex = (hex) => {
-  if (!hex || typeof hex !== 'string') hex = '#F97316';
-  let c = hex.replace('#', '');
-  if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
-  if (c.length !== 6) c = 'F97316';
-  const r = parseInt(c.substring(0, 2), 16) / 255;
-  const g = parseInt(c.substring(2, 4), 16) / 255;
-  const b = parseInt(c.substring(4, 6), 16) / 255;
-
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  let h = 0;
-  let s = 0;
-  const l = (max + min) / 2;
-
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
-  }
-
-  const hslToHex = (h, s, l) => {
-    let r, g, b;
-    if (s === 0) {
-      r = g = b = l;
-    } else {
-      const hue2rgb = (p, q, t) => {
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-        if (t < 1 / 6) return p + (q - p) * 6 * t;
-        if (t < 1 / 2) return q;
-        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-        return p;
-      };
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1 / 3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1 / 3);
-    }
-    const toHex = (x) => {
-      const hex = Math.round(Math.min(255, Math.max(0, x * 255))).toString(16);
-      return hex.length === 1 ? '0' + hex : hex;
-    };
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
-  };
-
-  return {
-    50: hslToHex(h, Math.min(1, s * 0.9), 0.96),
-    100: hslToHex(h, Math.min(1, s * 0.9), 0.91),
-    200: hslToHex(h, Math.min(1, s * 0.92), 0.82),
-    300: hslToHex(h, Math.min(1, s * 0.95), 0.71),
-    400: hslToHex(h, s, 0.59),
-    500: `#${c}`.toUpperCase(),
-    600: hslToHex(h, s, Math.max(0.05, l * 0.85)),
-    700: hslToHex(h, s, Math.max(0.05, l * 0.70)),
-    800: hslToHex(h, s, Math.max(0.04, l * 0.55)),
-    900: hslToHex(h, s, Math.max(0.03, l * 0.40)),
-    950: hslToHex(h, s, Math.max(0.02, l * 0.22)),
-  };
-};
 
 export const ThemeProvider = ({ children }) => {
   const [mode, setMode] = useState(() => localStorage.getItem('salon_theme_mode') || 'dark');
+  const [layoutTheme, setLayoutThemeState] = useState(() => {
+    const saved = localStorage.getItem('salon_layout_theme');
+    return saved && LAYOUT_THEMES[saved] ? saved : 'classic';
+  });
   const [accentColor, setAccentColor] = useState(() => localStorage.getItem('salon_accent_color') || 'orange');
   const [customColor, setCustomColor] = useState(() => localStorage.getItem('salon_custom_color') || '#F97316');
   const [density, setDensity] = useState(() => localStorage.getItem('salon_density') || 'tight');
@@ -261,6 +26,46 @@ export const ThemeProvider = ({ children }) => {
   const [smoothAnimations, setSmoothAnimations] = useState(() => localStorage.getItem('salon_smooth_animations') !== 'false');
   const [boldFocusRings, setBoldFocusRings] = useState(() => localStorage.getItem('salon_bold_focus_rings') === 'true');
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const transitionTimerRef = useRef(null);
+  const isInitialThemeMount = useRef(true);
+
+  const triggerSmoothThemeTransition = () => {
+    if (typeof document === 'undefined') return;
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (!smoothAnimations || prefersReduced) return;
+
+    document.documentElement.classList.add('theme-transitioning');
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    transitionTimerRef.current = setTimeout(() => {
+      document.documentElement.classList.remove('theme-transitioning');
+    }, 280);
+  };
+
+  const setLayoutTheme = (nextTheme) => {
+    const resolved = LAYOUT_THEMES[nextTheme] ? nextTheme : 'classic';
+    if (resolved !== layoutTheme) {
+      triggerSmoothThemeTransition();
+    }
+    setLayoutThemeState(resolved);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    };
+  }, []);
+
+  // Sync layout theme attribute to document
+  useEffect(() => {
+    localStorage.setItem('salon_layout_theme', layoutTheme);
+    document.documentElement.setAttribute('data-layout-theme', layoutTheme);
+    if (isInitialThemeMount.current) {
+      isInitialThemeMount.current = false;
+    }
+  }, [layoutTheme]);
 
   // Sync mode changes to document
   useEffect(() => {
@@ -283,7 +88,7 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [mode, accentColor, customColor]);
 
-  // Sync accent color shade scale variables
+  // Sync accent color shade scale variables + RGB tuples + Modern Floating sidebar tokens
   useEffect(() => {
     localStorage.setItem('salon_accent_color', accentColor);
     localStorage.setItem('salon_custom_color', customColor);
@@ -299,12 +104,29 @@ export const ThemeProvider = ({ children }) => {
       root.style.setProperty(`--color-primary-${shade}`, hex);
     });
 
+    root.style.setProperty('--color-primary-500-rgb', hexToRgbTuple(palette.shades[500]));
+    root.style.setProperty('--color-primary-600-rgb', hexToRgbTuple(palette.shades[600]));
+    root.style.setProperty('--color-primary-700-rgb', hexToRgbTuple(palette.shades[700]));
+
     root.style.setProperty('--primary', palette.shades[500]);
     root.style.setProperty('--primary-hover', palette.shades[600]);
     root.style.setProperty('--primary-light', `${palette.shades[500]}30`);
     root.style.setProperty('--primary-gradient', `linear-gradient(135deg, ${palette.shades[500]} 0%, ${palette.shades[700]} 100%)`);
     root.style.setProperty('--shadow-glow', `0 4px 18px ${palette.shades[500]}50`);
     root.style.setProperty('--border-hover', `${palette.shades[500]}80`);
+
+    // WCAG-verified floating sidebar/frame colors derived strictly from active SMS primary palette
+    const mfSidebarStart = pickAccessibleDarkShade(palette.shades, [600, 700, 800, 900, 950]);
+    const mfSidebarEnd = pickAccessibleDarkShade(palette.shades, [700, 800, 900, 950]);
+    const mfAccentContrast = checkColorContrast(palette.shades[600]);
+    const mfSidebarActiveText =
+      mfAccentContrast.valid && mfAccentContrast.whiteContrast >= 4.5
+        ? palette.shades[600]
+        : mfSidebarStart;
+
+    root.style.setProperty('--mf-sidebar-start', mfSidebarStart);
+    root.style.setProperty('--mf-sidebar-end', mfSidebarEnd);
+    root.style.setProperty('--mf-sidebar-active-text', mfSidebarActiveText);
 
     const isCurrentDark = root.getAttribute('data-theme') === 'dark' || root.classList.contains('dark');
     if (isCurrentDark) {
@@ -350,6 +172,7 @@ export const ThemeProvider = ({ children }) => {
   }, [boldFocusRings]);
 
   const toggleTheme = () => {
+    triggerSmoothThemeTransition();
     setMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
@@ -358,6 +181,8 @@ export const ThemeProvider = ({ children }) => {
       value={{
         mode,
         setMode,
+        layoutTheme,
+        setLayoutTheme,
         theme: mode === 'auto' ? 'dark' : mode,
         isDark: mode !== 'light',
         toggleTheme,

@@ -47,6 +47,7 @@ export const Textarea = ({
       <textarea
         id={textareaId}
         name={name}
+        data-sms-input="true"
         value={value ?? ''}
         onChange={handleChange}
         placeholder={placeholder}

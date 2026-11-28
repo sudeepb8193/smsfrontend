@@ -155,6 +155,7 @@ export const CustomSelector = ({
       {/* Control Trigger Input Box */}
       <div
         id={selectorId}
+        data-sms-input="true"
         onClick={toggleDropdown}
         className={`${
           isSmall

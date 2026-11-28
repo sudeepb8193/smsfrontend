@@ -470,3 +470,299 @@ input, textarea, [contenteditable="true"] {
   }
 }
 
+/* ==========================================================================
+   MODERN FLOATING DASHBOARD THEME (Primary-Framed White Sheet Layout)
+   Strictly scoped under :root[data-layout-theme='modern-floating'] so the
+   existing Classic SMS theme remains 100% intact and untouched.
+   ========================================================================== */
+
+/* Smooth, flicker-free theme switch transition */
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition:
+    background-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 180ms ease !important;
+}
+
+/* Lock root viewport under Modern Floating layout to prevent double / page scrolling */
+:root[data-layout-theme='modern-floating'],
+:root[data-layout-theme='modern-floating'] body,
+:root[data-layout-theme='modern-floating'] #root {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+/* Light Mode Tokens for Modern Floating Dashboard (Ultra-Light Primary-Tinted Surface) */
+:root[data-layout-theme='modern-floating'],
+:root[data-layout-theme='modern-floating'][data-theme='light'] {
+  --mf-outer-bg: color-mix(in srgb, var(--primary, #F97316) 13%, #F3F8FC);
+  --mf-canvas: color-mix(in srgb, var(--primary, #F97316) 2%, #FFFFFF);
+  --mf-surface: color-mix(in srgb, var(--primary, #F97316) 2%, #FFFFFF);
+  --mf-surface-subtle: color-mix(in srgb, var(--primary, #F97316) 4%, #F8FAFC);
+  --mf-border: color-mix(in srgb, var(--primary, #F97316) 5%, rgba(15, 23, 42, 0.07));
+  --mf-border-strong: color-mix(in srgb, var(--primary, #F97316) 10%, rgba(15, 23, 42, 0.12));
+  --mf-shell-shadow: 0 28px 70px -18px rgba(15, 23, 42, 0.18), 0 8px 24px -6px rgba(15, 23, 42, 0.08);
+  --mf-sheet-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.06);
+  --mf-card-shadow: 0 4px 20px -6px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.025);
+  --mf-card-shadow-hover: 0 12px 28px -8px rgba(15, 23, 42, 0.09), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --mf-pill-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.08);
+  --mf-sidebar-width: 248px;
+  --mf-sidebar-collapsed-width: 78px;
+  --mf-sidebar-active-text: var(--primary, #1b3804);
+  --mf-header-height: 56px;
+  --mf-anim-duration: 220ms;
+  --mf-anim-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Override shared SMS tokens cleanly inside Modern Floating Light Mode */
+  --bg-app: var(--mf-outer-bg);
+  --bg-surface: var(--mf-surface);
+  --bg-card: #FFFFFF;
+  --bg-card-hover: color-mix(in srgb, var(--primary, #F97316) 1.5%, #FFFFFF);
+  --bg-input: color-mix(in srgb, var(--primary, #F97316) 3%, #F8FAFC);
+  --border-color: color-mix(in srgb, var(--primary, #F97316) 6%, rgba(15, 23, 42, 0.08));
+  --text-primary: #171D34;
+  --text-secondary: #4E566E;
+  --text-muted: #848DA4;
+}
+
+/* Dark Mode Tokens for Modern Floating Dashboard - Identical to Classic SMS Obsidian Luxury Palette */
+:root[data-layout-theme='modern-floating'][data-theme='dark'],
+:root[data-layout-theme='modern-floating'].dark {
+  --mf-outer-bg: #08080A;
+  --mf-canvas: #0E0E12;
+  --mf-surface: #0E0E12;
+  --mf-surface-subtle: #141417;
+  --mf-border: #26262C;
+  --mf-border-strong: #36363E;
+  --mf-shell-shadow: 0 28px 75px -16px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --mf-sheet-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --mf-card-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  --mf-card-shadow-hover: 0 16px 34px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --mf-pill-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.5);
+  --mf-sidebar-start: #0B0B0D;
+  --mf-sidebar-end: #08080A;
+  --mf-sidebar-active-text: #FFFFFF;
+
+  --bg-app: #08080A;
+  --bg-surface: #0E0E12;
+  --bg-sidebar: #0B0B0D;
+  --bg-card: #141417;
+  --bg-card-hover: #18181D;
+  --bg-input: #101013;
+  --border-color: #26262C;
+  --border-hover: rgba(249, 115, 22, 0.45);
+  --text-primary: #FFFFFF;
+  --text-secondary: #9E9EA7;
+  --text-muted: #666670;
+}
+
+/* Dark mode active carved sidebar pill text */
+:root[data-layout-theme='modern-floating'][data-theme='dark'] .mf-nav-active-pill,
+:root[data-layout-theme='modern-floating'].dark .mf-nav-active-pill {
+  color: var(--color-primary-300, #FFFFFF);
+}
+
+/* Signature Active Navigation Pill Text in Modern Floating */
+.mf-nav-active-pill {
+  position: relative;
+  background-color: transparent !important;
+  color: var(--mf-sidebar-active-text, #171D34);
+}
+
+/* Modern Floating Sliding Spring Indicator */
+.mf-nav-spring-indicator {
+  position: absolute;
+  top: 0;
+  pointer-events: none;
+  background-color: var(--mf-surface);
+  z-index: 1;
+  will-change: transform, height, opacity;
+  right: 0;
+  border-radius: 9999px 0 0 9999px;
+}
+
+@media (min-width: 1024px) {
+  .mf-nav-spring-indicator {
+    right: -5px; /* Overlaps 5px directly onto content sheet to eliminate subpixel gap seam */
+  }
+}
+
+.mf-nav-spring-indicator.is-expanded {
+  left: 0.75rem; /* 12px, aligns with pl-3 */
+}
+
+.mf-nav-spring-indicator.is-collapsed {
+  left: 0.5rem; /* 8px, aligns with pl-2 when collapsed */
+}
+
+.mf-nav-spring-indicator::before,
+.mf-nav-spring-indicator::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.mf-nav-spring-indicator::before {
+  top: -20px;
+  background: radial-gradient(circle at 0 0, transparent 20px, var(--mf-surface) 20.5px);
+}
+
+.mf-nav-spring-indicator::after {
+  bottom: -20px;
+  background: radial-gradient(circle at 0 100%, transparent 20px, var(--mf-surface) 20.5px);
+}
+
+/* Subtle Decorative Ambient Dot Grid */
+.mf-dot-grid {
+  background-image: radial-gradient(currentColor 1.25px, transparent 1.25px);
+  background-size: 14px 14px;
+}
+
+@keyframes mfPageEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.mf-page-enter {
+  animation: mfPageEnter 220ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes mfDropdownEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.mf-dropdown-enter {
+  animation: mfDropdownEnter 180ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ==========================================================================
+   SHARED COMPONENT REFINEMENTS UNDER MODERN FLOATING THEME
+   ========================================================================== */
+
+:root[data-layout-theme='modern-floating'] [data-sms-card='true'] {
+  background-color: var(--bg-card);
+  border: 1px solid var(--mf-border);
+  border-radius: 20px;
+  box-shadow: var(--mf-card-shadow);
+  transition:
+    box-shadow var(--mf-anim-duration) var(--mf-anim-ease),
+    border-color var(--mf-anim-duration) var(--mf-anim-ease),
+    transform var(--mf-anim-duration) var(--mf-anim-ease);
+}
+
+:root[data-layout-theme='modern-floating'] [data-sms-card='true'][data-interactive='true']:hover,
+:root[data-layout-theme='modern-floating'] [data-sms-card='true'].cursor-pointer:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mf-card-shadow-hover);
+  border-color: rgba(var(--color-primary-500-rgb, 249 115 22) / 0.25);
+}
+
+/* Clean Pill Buttons */
+:root[data-layout-theme='modern-floating'] [data-sms-button='true'] {
+  border-radius: 9999px;
+  transition:
+    transform 150ms var(--mf-anim-ease),
+    box-shadow var(--mf-anim-duration) var(--mf-anim-ease),
+    background-color var(--mf-anim-duration) ease,
+    border-color var(--mf-anim-duration) ease;
+}
+
+:root[data-layout-theme='modern-floating'] [data-sms-button='true']:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+:root[data-layout-theme='modern-floating'] [data-sms-button='true'][data-variant='primary'] {
+  box-shadow: 0 8px 18px -6px rgba(var(--color-primary-500-rgb, 249 115 22) / 0.45);
+}
+
+:root[data-layout-theme='modern-floating'] [data-sms-button='true'][data-variant='primary']:hover:not(:disabled) {
+  box-shadow: 0 12px 22px -6px rgba(var(--color-primary-500-rgb, 249 115 22) / 0.55);
+}
+
+/* Clean Table Surface */
+:root[data-layout-theme='modern-floating'] [data-sms-table='true'] {
+  border-radius: 18px;
+  border: 1px solid var(--mf-border);
+  background-color: var(--bg-card);
+  box-shadow: none;
+}
+
+:root[data-layout-theme='modern-floating'] [data-sms-table='true'] thead tr {
+  background-color: var(--mf-surface-subtle);
+  border-bottom: 1px solid var(--mf-border);
+}
+
+:root[data-layout-theme='modern-floating'] [data-sms-table='true'] tbody tr {
+  transition: background-color 160ms ease;
+}
+
+:root[data-layout-theme='modern-floating'] [data-sms-table='true'] tbody tr:hover {
+  background-color: rgba(var(--color-primary-500-rgb, 249 115 22) / 0.045);
+}
+
+/* Pagination Polish */
+:root[data-layout-theme='modern-floating'] [data-sms-pagination='true'] {
+  border-radius: 16px;
+  border: 1px solid var(--mf-border);
+  background-color: var(--bg-card);
+  box-shadow: none;
+}
+
+/* Inputs, Selects & Search Bars */
+:root[data-layout-theme='modern-floating'] [data-sms-input='true'],
+:root[data-layout-theme='modern-floating'] [data-sms-select='true'] {
+  border-radius: 14px;
+  background-color: var(--mf-surface-subtle);
+  border-color: var(--mf-border-strong);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+:root[data-layout-theme='modern-floating'] [data-sms-search='true'] {
+  border-radius: 9999px;
+  background-color: var(--mf-surface-subtle);
+  border-color: var(--mf-border-strong);
+}
+
+:root[data-layout-theme='modern-floating'] [data-sms-input='true']:focus,
+:root[data-layout-theme='modern-floating'] [data-sms-select='true']:focus,
+:root[data-layout-theme='modern-floating'] [data-sms-search='true']:focus {
+  background-color: var(--mf-surface);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-500-rgb, 249 115 22) / 0.14);
+}
+
+/* Soft Modern Badges */
+:root[data-layout-theme='modern-floating'] [data-sms-badge='true'] {
+  border-radius: 8px;
+}
+
+/* Modals */
+:root[data-layout-theme='modern-floating'] [data-sms-modal='true'] {
+  border-radius: 24px;
+  border: 1px solid var(--mf-border);
+  box-shadow: 0 28px 70px -12px rgba(15, 23, 42, 0.28);
+}
+
+

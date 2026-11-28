@@ -33,6 +33,7 @@ export const Badge = ({
 
   return (
     <span
+      data-sms-badge="true"
       className={`inline-flex items-center gap-1.5 select-none ${variantClasses[variant] || variantClasses.neutral} ${
         sizeClasses[size] || sizeClasses.medium
       } ${className}`}

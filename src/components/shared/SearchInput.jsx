@@ -68,6 +68,7 @@ export const SearchInput = ({
 
       <input
         type="text"
+        data-sms-search="true"
         value={localValue}
         onChange={handleChange}
         placeholder={placeholder}
