@@ -53,7 +53,10 @@ export const Pagination = ({
   const endEntry = totalItems ? Math.min(currentPage * pageSize, totalItems) : 0;
 
   return (
-    <div className={`flex flex-wrap items-center justify-between gap-4 py-3 px-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-sm ${className}`}>
+    <div
+      data-sms-pagination="true"
+      className={`flex flex-wrap items-center justify-between gap-4 py-3 px-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl text-sm ${className}`}
+    >
       <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--text-muted)] font-medium">
         {onPageSizeChange && (
           <div className="flex items-center gap-2">

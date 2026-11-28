@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 /**
  * Custom Tooltip component to replace default browser `title` attributes.
@@ -7,6 +7,7 @@ import React, { useState, useRef, useEffect } from 'react';
  * @param {React.ReactNode} props.content - Tooltip text or node content.
  * @param {React.ReactNode} props.children - Element that triggers the tooltip on hover/focus.
  * @param {'top' | 'bottom' | 'left' | 'right'} [props.position='top'] - Position relative to children.
+ * @param {'primary' | 'dark'} [props.variant='primary'] - Tooltip color theme variant.
  * @param {number} [props.delay=150] - Delay in ms before showing tooltip.
  * @param {string} [props.className=''] - Additional CSS classes for tooltip popup.
  */
@@ -14,6 +15,7 @@ export const Tooltip = ({
   content,
   children,
   position = 'top',
+  variant = 'primary',
   delay = 150,
   className = '',
 }) => {
@@ -22,6 +24,12 @@ export const Tooltip = ({
   const triggerRef = useRef(null);
   const tooltipRef = useRef(null);
   const timerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   if (!content) return <>{children}</>;
 
@@ -42,8 +50,8 @@ export const Tooltip = ({
     const rect = triggerRef.current.getBoundingClientRect();
     const gap = 8; // distance from trigger element
 
-    let top = 0;
-    let left = 0;
+    let top;
+    let left;
 
     switch (position) {
       case 'bottom':
@@ -67,12 +75,6 @@ export const Tooltip = ({
 
     setCoords({ top, left });
   };
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
 
   // Compute transform translation according to position
   const getTransformStyle = () => {
@@ -111,13 +113,21 @@ export const Tooltip = ({
             zIndex: 9999,
           }}
           role="tooltip"
-          className={`pointer-events-none px-2.5 py-1.5 text-xs font-semibold text-white bg-black rounded-lg shadow-2xl border border-white/15 whitespace-nowrap animate-in fade-in zoom-in-95 duration-150 ${className}`}
+          className={`pointer-events-none px-2.5 py-1.5 text-xs font-semibold text-white ${
+            variant === 'dark'
+              ? 'bg-black border border-white/15 shadow-2xl'
+              : 'bg-[var(--primary,#0D9488)] border border-white/20 shadow-xl'
+          } rounded-lg whitespace-nowrap animate-in fade-in zoom-in-95 duration-150 ${className}`}
         >
           {content}
 
           {/* Arrow */}
           <span
-            className={`absolute w-2 h-2 bg-black border-white/15 rotate-45 ${
+            className={`absolute w-2 h-2 rotate-45 ${
+              variant === 'dark'
+                ? 'bg-black border-white/15'
+                : 'bg-[var(--primary,#0D9488)] border-white/20'
+            } ${
               position === 'bottom'
                 ? '-top-1 left-1/2 -translate-x-1/2 border-t border-l'
                 : position === 'left'

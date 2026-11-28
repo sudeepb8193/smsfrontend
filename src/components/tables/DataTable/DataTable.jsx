@@ -15,7 +15,10 @@ export const DataTable = ({
 }) => {
   return (
     <div className={`w-full flex flex-col gap-3 ${className}`}>
-      <div className="w-full overflow-x-auto rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] shadow-md relative">
+      <div
+        data-sms-table="true"
+        className="w-full overflow-x-auto rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] shadow-md relative"
+      >
         {/* Subtle background refetching / pagination indicator */}
         {isFetching && !loading && (
           <div className="w-full h-1 bg-primary-500/20 overflow-hidden absolute top-0 left-0 right-0 z-10">

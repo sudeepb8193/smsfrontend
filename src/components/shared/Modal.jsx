@@ -69,6 +69,7 @@ export const Modal = ({
         onClick={handleOverlayClick}
       >
         <div
+          data-sms-modal="true"
           className={`relative bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl flex flex-col max-h-[90vh] w-full overflow-hidden text-[var(--text-primary)] transition-all duration-200 animate-fadeIn ${
             sizeClasses[size] || sizeClasses.medium
           } ${className}`}

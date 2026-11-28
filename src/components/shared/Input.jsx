@@ -57,6 +57,7 @@ export const Input = ({
           id={inputId}
           name={name}
           type={type}
+          data-sms-input="true"
           value={value ?? ''}
           onChange={handleChange}
           placeholder={placeholder}

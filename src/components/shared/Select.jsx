@@ -31,6 +31,7 @@ export const Select = ({
         <select
           id={selectId}
           name={name}
+          data-sms-select="true"
           value={value ?? ''}
           onChange={onChange}
           required={required}

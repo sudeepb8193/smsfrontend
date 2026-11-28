@@ -13,9 +13,10 @@ import {
   Sliders,
   CheckCircle2,
   Pipette,
+  LayoutTemplate,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
-import { ACCENT_PALETTES, FONT_FAMILIES } from '../../store/ThemeContext';
+import { ACCENT_PALETTES, FONT_FAMILIES, LAYOUT_THEMES } from '../../store/ThemeContext';
 import { Toggle } from './Toggle';
 import { toast } from './Toast';
 
@@ -23,6 +24,8 @@ export const ThemeSettingsModal = () => {
   const {
     mode,
     setMode,
+    layoutTheme,
+    setLayoutTheme,
     accentColor,
     setAccentColor,
     customColor,
@@ -119,6 +122,147 @@ export const ThemeSettingsModal = () => {
 
         {/* Scrollable Body with Clean Sections */}
         <div className="p-5 sm:p-6 space-y-6 overflow-y-auto flex-1">
+          {/* SECTION 0: Dashboard Layout Theme */}
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-1.5">
+                <LayoutTemplate size={13} className="text-primary-500" />
+                Dashboard Layout Theme
+              </label>
+              <span className="text-[11px] font-semibold text-primary-500">
+                {LAYOUT_THEMES[layoutTheme]?.name || 'Classic SMS'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {Object.values(LAYOUT_THEMES).map((themeOption) => {
+                const isSelected = layoutTheme === themeOption.id;
+                const isFloatingOption = themeOption.id === 'modern-floating';
+
+                return (
+                  <button
+                    key={themeOption.id}
+                    type="button"
+                    onClick={() => {
+                      setLayoutTheme(themeOption.id);
+                      toast.success(`Switched to ${themeOption.name}`);
+                    }}
+                    aria-pressed={isSelected}
+                    className={`group text-left p-3 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2.5 ${
+                      isSelected
+                        ? 'border-primary-500 bg-primary-500/10 ring-2 ring-primary-500/25 shadow-sm'
+                        : 'border-[var(--border-color)] bg-[var(--bg-input)] hover:border-[var(--border-hover)]'
+                    }`}
+                  >
+                    {/* Visual Mini-Preview Thumbnail */}
+                    {isFloatingOption ? (
+                      <div
+                        className="w-full h-24 rounded-xl p-1.5 pl-0 flex overflow-hidden shadow-inner"
+                        style={{
+                          background:
+                            'linear-gradient(175deg, var(--mf-sidebar-start, #C2410C) 0%, var(--mf-sidebar-end, #7C2D12) 100%)',
+                        }}
+                      >
+                        {/* Primary Sidebar Preview inside Framed Outer Shell */}
+                        <div className="w-12 h-full flex flex-col justify-between py-2 pl-1.5 pr-0 shrink-0">
+                          <div className="w-3.5 h-3.5 rounded-md bg-white/25 mx-auto" />
+                          <div className="space-y-1">
+                            <div className="h-1.5 w-7 rounded-full bg-white/35 ml-1" />
+                            <div className="h-3 w-full rounded-l-full bg-white flex items-center pl-1.5">
+                              <span
+                                className="w-1.5 h-1.5 rounded-full"
+                                style={{ backgroundColor: currentPalette.hex }}
+                              />
+                            </div>
+                            <div className="h-1.5 w-6 rounded-full bg-white/35 ml-1" />
+                          </div>
+                          <div className="mx-1 h-4 rounded-md bg-white/15 border border-white/20" />
+                        </div>
+
+                        {/* Rounded White Content Sheet Preview */}
+                        <div className="flex-1 bg-white rounded-xl p-2 flex flex-col gap-1.5 shadow-sm">
+                          <div className="flex items-center justify-between gap-1.5 pb-1 border-b border-slate-100">
+                            <div className="h-1.5 w-9 rounded-full bg-slate-200" />
+                            <div className="flex items-center gap-1">
+                              <div className="h-1.5 w-5 rounded-full bg-slate-200" />
+                              <div
+                                className="w-2.5 h-2.5 rounded-full"
+                                style={{ backgroundColor: currentPalette.hex }}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="h-2.5 w-12 rounded bg-slate-700/80" />
+                            <div
+                              className="h-2.5 w-8 rounded-full"
+                              style={{ backgroundColor: currentPalette.hex }}
+                            />
+                          </div>
+                          <div className="grid grid-cols-3 gap-1.5 flex-1">
+                            <div className="col-span-2 rounded-lg bg-slate-50 border border-slate-100" />
+                            <div
+                              className="rounded-lg opacity-25"
+                              style={{ backgroundColor: currentPalette.hex }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-full h-24 rounded-xl bg-slate-950 flex overflow-hidden border border-slate-800 shadow-inner">
+                        {/* Classic Docked Sidebar Preview */}
+                        <div className="w-11 h-full bg-[#0B0B0D] border-r border-white/10 p-1.5 flex flex-col justify-between shrink-0">
+                          <div
+                            className="w-4 h-4 rounded-md mx-auto"
+                            style={{ backgroundColor: currentPalette.hex }}
+                          />
+                          <div className="space-y-1">
+                            <div className="h-2 w-full rounded bg-white/15" />
+                            <div
+                              className="h-2 w-full rounded"
+                              style={{ backgroundColor: currentPalette.hex }}
+                            />
+                            <div className="h-2 w-full rounded bg-white/10" />
+                          </div>
+                          <div className="h-1 w-6 rounded bg-white/15 mx-auto" />
+                        </div>
+
+                        {/* Classic Content Area Preview */}
+                        <div className="flex-1 bg-[#0E0E12] flex flex-col">
+                          <div className="h-4 border-b border-white/10 px-2 flex items-center justify-between">
+                            <div className="h-1.5 w-8 rounded bg-white/20" />
+                            <div className="h-2 w-6 rounded bg-white/15" />
+                          </div>
+                          <div className="p-2 grid grid-cols-2 gap-1.5 flex-1">
+                            <div className="rounded-md bg-[#141417] border border-white/10" />
+                            <div className="rounded-md bg-[#141417] border border-white/10" />
+                            <div className="col-span-2 rounded-md bg-[#141417] border border-white/10" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Card Label & Active Badge */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                          <span className="truncate">{themeOption.name}</span>
+                        </div>
+                        <p className="text-[10px] text-[var(--text-muted)] leading-snug mt-0.5 line-clamp-2">
+                          {themeOption.description}
+                        </p>
+                      </div>
+                      {isSelected && (
+                        <span className="w-5 h-5 rounded-full bg-primary-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <Check size={12} strokeWidth={3} />
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* SECTION 1: Theme Mode */}
           <div className="space-y-2.5">
             <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-1.5">
